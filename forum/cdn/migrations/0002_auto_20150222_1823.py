@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='MissingImages',
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID', auto_created=True)),
+                ('id', models.AutoField(auto_created=True, primary_key=True, verbose_name='ID', serialize=False)),
                 ('src', models.URLField(verbose_name='Original source', max_length=256)),
             ],
             options={
@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='images',
             name='comment',
-            field=models.ForeignKey(to='base.Comments', default=1, verbose_name='Found in comment', null=None),
+            field=models.ManyToManyField(default=1, verbose_name='Found in comment', to='base.Comments', null=None),
             preserve_default=True,
         ),
     ]

@@ -6,7 +6,7 @@ class Images(models.Model):
 
     """Model for the saved images"""
 
-    comment = models.ForeignKey(
+    comment = models.ManyToManyField(
         'base.Comments', null=None, default=1, verbose_name=_('Found in comment'))
     orig_src = models.URLField(
         verbose_name=_('Original source'), max_length=256)
