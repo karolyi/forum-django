@@ -3,14 +3,14 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 
 
-class Comments(models.Model):
+class Comment(models.Model):
 
     """Essential comment class"""
 
     user = models.ForeignKey(User, verbose_name=_('The commenter user'))
-    topic = models.ForeignKey('Topics', verbose_name=_('Commented in topic'))
+    topic = models.ForeignKey('Topic', verbose_name=_('Commented in topic'))
     moved_from = models.ForeignKey(
-        'Topics', blank=True, default=None, related_name='moved_from',
+        'Topic', blank=True, default=None, related_name='moved_from',
         verbose_name=_('Comment moved from topic'), on_delete=models.SET_DEFAULT)
     time = models.DateTimeField(auto_now=True, verbose_name=_('Commented at'))
     number = models.IntegerField(verbose_name=_('Comment number in topic'))
@@ -22,7 +22,7 @@ class Comments(models.Model):
     host = models.CharField(
         max_length=256, verbose_name=_('Host of the commenter (old)'))
     ip = models.IPAddressField(verbose_name=_('IP of the commenter'))
-    edits = models.ForeignKey('Edits', verbose_name=_('Edits'))
+    edits = models.ForeignKey('Edit', verbose_name=_('Edits'))
     unique_id = models.CharField(
         verbose_name=_('Obsolete unique ID'),
         null=False,
@@ -30,7 +30,7 @@ class Comments(models.Model):
         max_length=20, unique=True)
 
 
-class Edits(models.Model):
+class Edit(models.Model):
 
     """Comment edits"""
 
@@ -39,7 +39,7 @@ class Edits(models.Model):
     diff = models.TextField(verbose_name=_('Diff of the previous version'))
 
 
-class Topics(models.Model):
+class Topic(models.Model):
 
     """Essential topic class"""
 
@@ -64,5 +64,5 @@ class Topics(models.Model):
     slug = models.SlugField(verbose_name=_('Topic slug'))
     comment_count = models.IntegerField(verbose_name=_('Comment count'))
     last_comment = models.ForeignKey(
-        Comments, verbose_name=_('Last comment reference'))
+        Comment, verbose_name=_('Last comment reference'), related_name='last_comment')
     description = models.TextField(verbose_name=_('HTML description'))

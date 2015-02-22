@@ -7,17 +7,29 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('base', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Images',
+            name='Image',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, verbose_name='ID', serialize=False)),
-                ('orig_src', models.URLField(max_length=256, verbose_name='Original source')),
-                ('mime_type', models.CharField(max_length=100, verbose_name='Mime type')),
-                ('cdn_path', models.CharField(max_length=256, verbose_name='Path in CDN')),
-                ('file_hash', models.CharField(max_length=200, verbose_name='File hash')),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
+                ('orig_src', models.URLField(verbose_name='Original source', max_length=256)),
+                ('mime_type', models.CharField(verbose_name='Mime type', max_length=100)),
+                ('cdn_path', models.CharField(verbose_name='Path in CDN', max_length=256)),
+                ('file_hash', models.CharField(verbose_name='File hash', max_length=200)),
+                ('comment', models.ManyToManyField(verbose_name='Found in comment', to='base.Comment', default=1, null=None)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='MissingImage',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, primary_key=True, serialize=False)),
+                ('src', models.URLField(verbose_name='Original source', max_length=256)),
             ],
             options={
             },
