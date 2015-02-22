@@ -14,6 +14,9 @@ class Image(models.Model):
     cdn_path = models.CharField(verbose_name=_('Path in CDN'), max_length=256)
     file_hash = models.CharField(verbose_name=_('File hash'), max_length=200)
 
+    def __str__(self):
+        return self.cdn_path
+
 
 class MissingImage(models.Model):
 
