@@ -20,7 +20,7 @@ class Comments(models.Model):
         on_delete=models.SET_DEFAULT)
     content = models.TextField(verbose_name=_('Content'))
     host = models.CharField(
-        max_length=256, verbose_name=_('Host of the commenter'))
+        max_length=256, verbose_name=_('Host of the commenter (old)'))
     ip = models.IPAddressField(verbose_name=_('IP of the commenter'))
     edits = models.ForeignKey('Edits', verbose_name=_('Edits'))
     unique_id = models.CharField(
