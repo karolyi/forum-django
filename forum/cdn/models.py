@@ -24,4 +24,5 @@ class MissingImage(models.Model):
 
     """Model for the missing images, so they don't need to be downloaded again"""
 
-    src = models.URLField(verbose_name=_('Original source'), max_length=256)
+    src = models.URLField(
+        verbose_name=_('Original source'), max_length=10, db_index=True)

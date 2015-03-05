@@ -55,3 +55,6 @@ target/
 
 *sublime*
 virtualenv/
+
+# Django development source directory
+django/
