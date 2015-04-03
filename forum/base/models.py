@@ -11,7 +11,8 @@ class Comment(models.Model):
     topic = models.ForeignKey('Topic', verbose_name=_('Commented in topic'))
     moved_from = models.ForeignKey(
         'Topic', null=True, default=None, related_name='moved_from',
-        verbose_name=_('Comment moved from topic'), on_delete=models.SET_DEFAULT)
+        verbose_name=_('Comment moved from topic'),
+        on_delete=models.SET_DEFAULT)
     time = models.DateTimeField(auto_now=True, verbose_name=_('Commented at'))
     number = models.PositiveIntegerField(
         verbose_name=_('Comment number in topic'))
@@ -60,12 +61,14 @@ class Topic(models.Model):
         null=True,
         verbose_name=_('Max comment number to keep'))
     reply_to = models.ForeignKey(
-        'self', null=True, default=None, verbose_name=_('Reply to topic goes to'))
+        'self', null=True, default=None,
+        verbose_name=_('Reply to topic goes to'))
     last_updated = models.DateTimeField(
         auto_now=True, verbose_name=_('Last updated'))
     slug = models.SlugField(verbose_name=_('Topic slug'))
     comment_count = models.PositiveIntegerField(
         verbose_name=_('Comment count'))
     last_comment = models.ForeignKey(
-        Comment, verbose_name=_('Last comment reference'), related_name='last_comment')
+        Comment, verbose_name=_('Last comment reference'),
+        related_name='last_comment')
     description = models.TextField(verbose_name=_('HTML description'))
