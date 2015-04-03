@@ -28,4 +28,5 @@ class MissingImage(models.Model):
     """
 
     src = models.URLField(
-        verbose_name=_('Original source'), max_length=10, db_index=True)
+        verbose_name=_('Original source'), max_length=255, db_index=True,
+        unique=True)
