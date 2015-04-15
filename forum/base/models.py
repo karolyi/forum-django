@@ -26,7 +26,6 @@ class Comment(models.Model):
         max_length=256, verbose_name=_('Host of the commenter (old)'))
     ip = models.GenericIPAddressField(
         verbose_name=_('IP of the commenter'), null=False, blank=False)
-    edits = models.ForeignKey('Edit', verbose_name=_('Edits'))
     unique_id = models.CharField(
         verbose_name=_('Obsolete unique ID'),
         default=0,
@@ -37,6 +36,7 @@ class Edit(models.Model):
 
     """Comment edits"""
 
+    comment = models.ForeignKey('Comment', verbose_name=_('Edited comment'))
     timestamp = models.DateTimeField(
         auto_now=True, verbose_name=_('Edit timestamp'))
     diff = models.TextField(verbose_name=_('Diff of the previous version'))
