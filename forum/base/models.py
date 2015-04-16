@@ -72,3 +72,72 @@ class Topic(models.Model):
         Comment, verbose_name=_('Last comment reference'),
         related_name='last_comment')
     description = models.TextField(verbose_name=_('HTML description'))
+
+
+class User(User):
+    last_global_read = models.PositiveIntegerField(
+        verbose_name=_('Last global message ID read'))
+    received_comment_vote_sum = models.IntegerField(
+        verbose_name=_('Summary received votes value on comments'))
+    received_comment_vote_count = models.PositiveIntegerField(
+        verbose_name=_('Summary received votes count on comments'))
+    comment_vote_hide_limit = models.IntegerField(
+        default=-5, verbose_name=_('Hide comments under this vote value'))
+    quote = models.CharField(
+        max_length=256, verbose_name=_('Chosen quote (appears at username)'))
+    max_comments_per_day = models.PositiveIntegerField(
+        verbose_name=_('Maximum allowed comments per day'))
+    comment_count = models.PositiveIntegerField(
+        verbose_name=_('Comment count'))
+    todays_comment_count = models.PositiveIntegerField(
+        verbose_name=_('Today\'s comment count'))
+    invitations_today = models.PositiveIntegerField(
+        verbose_name=_('Sent invitations today'))
+    invitations_success = models.PositiveIntegerField(
+        verbose_name=_('Successful invitations'))
+    pw_reminders_today = models.PositiveIntegerField(
+        verbose_name=_('Password reminders sent today'))
+    used_skin = models.CharField(
+        max_length=256, verbose_name=_('Used skin name'))
+    introduction_all = models.TextField(
+        verbose_name=_('Introduction visible for everybody'))
+    introduction_reg = models.TextField(
+        verbose_name=_('Introduction visible for registered users'))
+    introduction_friends = models.TextField(
+        verbose_name=_('Introduction visible for friended users'))
+    picture_emails = models.CharField(
+        max_length=256, verbose_name=_(
+            'Email addresses used for image upload'
+            ' separated with semicolon (;)'))
+    uses_auto_bookmarks = models.BooleanField(
+        null=False, default=False,
+        verbose_name=_('Use automatic bookmark placement'))
+    mails_own_topic_comments = models.BooleanField(
+        null=False, default=False,
+        verbose_name=_('Receive mails from comments in own topic'))
+    mails_replies_topic = models.BooleanField(
+        null=False, default=True,
+        verbose_name=_('Receive mails from comment replies'))
+    mails_moderation_topic = models.BooleanField(
+        null=False, default=True,
+        verbose_name=_('Receive mails from moderation'))
+    mails_messages = models.BooleanField(
+        null=False, default=True,
+        verbose_name=_('Receive mails from messages'))
+    show_replies_comment = models.BooleanField(
+        null=False, default=True, verbose_name=_('Show replies on comments'))
+    show_relations = models.BooleanField(
+        null=False, default=True, verbose_name=_('Show user relations'))
+    is_banned = models.BooleanField(
+        null=False, default=False, verbose_name=_('User is banned'))
+    separate_bookmarked_topics = models.BooleanField(
+        null=False, default=True,
+        verbose_name=_('Show bookmarked topics separated'))
+    show_outsiders = models.BooleanField(
+        null=False, default=True, verbose_name=_('Show not-logged-in users'))
+    has_chat_enabled = models.BooleanField(
+        null=False, default=True, verbose_name=_('Enable chat'))
+    is_approved = models.BooleanField(
+        null=False, default=False, verbose_name=_('Is approved by admins'))
+    expand_archived = models.BooleanField(
+        null=False, default=False, verbose_name=_('Expand archived topics'))
