@@ -6,30 +6,31 @@ from django.db.backends.mysql.base import DatabaseWrapper
 
 
 def remove_fk(apps, schema_editor):
-    if isinstance(schema_editor.connection, DatabaseWrapper):
-        cursor = schema_editor.connection.cursor()
-        Edit = apps.get_model('base', 'Edit')
-        table_edit_name = Edit._meta.db_table
-        cursor.execute('SELECT DATABASE()')
-        db_name = cursor.fetchall()[0][0]
-        cursor.execute(
-            'SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE'
-            ' `TABLE_SCHEMA`=\'%s\' AND `REFERENCED_TABLE_NAME`=\'%s\'' % (
-                db_name,
-                table_edit_name
-            ))
-        result = cursor.fetchall()
-        if not result:
-            return
+    if not isinstance(schema_editor.connection, DatabaseWrapper):
+        return
+    cursor = schema_editor.connection.cursor()
+    Edit = apps.get_model('base', 'Edit')
+    table_edit_name = Edit._meta.db_table
+    cursor.execute('SELECT DATABASE()')
+    db_name = cursor.fetchall()[0][0]
+    cursor.execute(
+        'SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE'
+        ' `TABLE_SCHEMA`=\'%s\' AND `REFERENCED_TABLE_NAME`=\'%s\'' % (
+            db_name,
+            table_edit_name
+        ))
+    result = cursor.fetchall()
+    if not result:
+        return
 
-        Comment = apps.get_model('base', 'Comment')
-        table_comment_name = Comment._meta.db_table
-        fk_name = result[0][0]
-        query = 'ALTER TABLE `%s` DROP FOREIGN KEY `%s`' % (
-            table_comment_name,
-            fk_name
-        )
-        cursor.execute(query)
+    Comment = apps.get_model('base', 'Comment')
+    table_comment_name = Comment._meta.db_table
+    fk_name = result[0][0]
+    query = 'ALTER TABLE `%s` DROP FOREIGN KEY `%s`' % (
+        table_comment_name,
+        fk_name
+    )
+    cursor.execute(query)
 
 
 class Migration(migrations.Migration):
