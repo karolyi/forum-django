@@ -40,7 +40,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(remove_fk),
+        migrations.RunPython(
+            remove_fk, reverse_code=migrations.RunPython.noop),
         migrations.RemoveField(
             model_name='comment',
             name='edits',
