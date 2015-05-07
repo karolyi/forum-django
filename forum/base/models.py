@@ -68,7 +68,7 @@ class Topic(models.Model):
         auto_now=True, verbose_name=_('Last updated'))
     slug = AutoSlugField(
         verbose_name=_('Topic slug'), null=False, max_length=100,
-        populate_from=('text',))
+        populate_from=('text',), unique=True)
     comment_count = models.PositiveIntegerField(
         verbose_name=_('Comment count'), null=False, default=0)
     last_comment = models.ForeignKey(
