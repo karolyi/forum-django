@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
 
+from base.choices import TOPIC_STATUS_CHOICES
+
 
 class Comment(models.Model):
 
@@ -48,8 +50,8 @@ class Topic(models.Model):
     """Essential topic class"""
 
     creator = models.ForeignKey(User, verbose_name=_('Topic creator'))
-    html = models.CharField(max_length=256, verbose_name=_('HTML name'))
-    text = models.CharField(max_length=256, verbose_name=_('Text name'))
+    html_name = models.CharField(max_length=256, verbose_name=_('HTML name'))
+    text_name = models.CharField(max_length=256, verbose_name=_('Text name'))
     is_disabled = models.BooleanField(
         null=False, default=True, verbose_name=_('Is topic disabled'))
     is_staff_only = models.BooleanField(
@@ -58,14 +60,15 @@ class Topic(models.Model):
         null=False,
         default=True,
         verbose_name=_('Is voting enabled'))
+    type = models.CharField(
+        verbose_name=_('Topic type'), null=False, max_length=20,
+        choices=TOPIC_STATUS_CHOICES, default=TOPIC_STATUS_CHOICES[0][0])
     truncate_at = models.SmallIntegerField(
         null=True,
         verbose_name=_('Max comment number to keep'))
     reply_to = models.ForeignKey(
         'self', null=True, default=None, on_delete=models.SET_NULL,
         verbose_name=_('Reply to topic goes to'))
-    last_updated = models.DateTimeField(
-        auto_now=True, verbose_name=_('Last updated'))
     slug = AutoSlugField(
         verbose_name=_('Topic slug'), null=False, max_length=100,
         populate_from=('text',), unique=True)
