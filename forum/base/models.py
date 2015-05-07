@@ -94,7 +94,8 @@ class User(User):
     invitations_today = models.PositiveIntegerField(
         verbose_name=_('Sent invitations today'))
     inviter = models.ForeignKey(
-        'self', null=True, default=None, verbose_name=_('Invited by'))
+        'self', null=True, default=None, verbose_name=_('Invited by'),
+        on_delete=models.SET_NULL)
     invitations_success = models.PositiveIntegerField(
         verbose_name=_('Successful invitations'))
     pw_reminders_today = models.PositiveIntegerField(
