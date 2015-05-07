@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+from django_extensions.db.fields import AutoSlugField
 
 
 class Comment(models.Model):
@@ -61,20 +62,25 @@ class Topic(models.Model):
         null=True,
         verbose_name=_('Max comment number to keep'))
     reply_to = models.ForeignKey(
-        'self', null=True, default=None,
+        'self', null=True, default=None, on_delete=models.SET_NULL,
         verbose_name=_('Reply to topic goes to'))
     last_updated = models.DateTimeField(
         auto_now=True, verbose_name=_('Last updated'))
-    slug = models.SlugField(verbose_name=_('Topic slug'))
+    slug = AutoSlugField(
+        verbose_name=_('Topic slug'), null=False, max_length=100,
+        populate_from=('text',))
     comment_count = models.PositiveIntegerField(
-        verbose_name=_('Comment count'))
+        verbose_name=_('Comment count'), null=False, default=0)
     last_comment = models.ForeignKey(
-        Comment, verbose_name=_('Last comment reference'),
-        related_name='last_comment')
-    description = models.TextField(verbose_name=_('HTML description'))
+        Comment, verbose_name=_('Last comment reference'), null=True,
+        related_name='last_comment', on_delete=models.SET_NULL)
+    description = models.TextField(verbose_name=_('Description'))
 
 
 class User(User):
+    slug = AutoSlugField(
+        verbose_name=_('Slug of the user'), max_length=50, unique=True,
+        populate_from=('username',), null=False)
     last_global_read = models.PositiveIntegerField(
         verbose_name=_('Last global message ID read'))
     received_comment_vote_sum = models.IntegerField(
