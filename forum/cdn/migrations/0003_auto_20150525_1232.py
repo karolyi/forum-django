@@ -31,11 +31,13 @@ def migrate_backward(apps, schema_editor):
     Migrates the orig_src field from ImageUrl to Image table
     """
     ImageUrl = apps.get_model('cdn', 'ImageUrl')
+    Image = apps.get_model('cdn', 'Image')
     with transaction.atomic():
-        for image_url in ImageUrl.objects.all().select_related('image')\
-                .order_by('id'):
-            image_url.image.orig_src = image_url.orig_src
-            image_url.image.save()
+        for image_url in ImageUrl.objects.all().order_by('id'):
+            images = Image.objects.filter(id=image_url.image_id)
+            images.update(orig_src=image_url.orig_src)
+            # image_url.image.orig_src = image_url.orig_src
+            # image_url.image.save()
 
 
 class Migration(migrations.Migration):
