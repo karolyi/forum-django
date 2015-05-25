@@ -16,7 +16,8 @@ class Comment(models.Model):
         'Topic', null=True, default=None, related_name='moved_from',
         verbose_name=_('Comment moved from topic'),
         on_delete=models.SET_DEFAULT)
-    time = models.DateTimeField(auto_now=True, verbose_name=_('Commented at'))
+    time = models.DateTimeField(
+        auto_now_add=True, verbose_name=_('Commented at'))
     number = models.PositiveIntegerField(
         verbose_name=_('Comment number in topic'))
     voting_value = models.SmallIntegerField(
@@ -41,7 +42,7 @@ class Edit(models.Model):
 
     comment = models.ForeignKey('Comment', verbose_name=_('Edited comment'))
     timestamp = models.DateTimeField(
-        auto_now=True, verbose_name=_('Edit timestamp'))
+        auto_now_add=True, verbose_name=_('Edit timestamp'))
     diff = models.TextField(verbose_name=_('Diff of the previous version'))
 
 
