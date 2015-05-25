@@ -61,13 +61,12 @@ WSGI_APPLICATION = 'forum.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'forum-django',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
+        'PORT': 3306,
         'OPTIONS': {
-            'read_default_file': os.path.join(
-                BASE_DIR,
-                'config',
-                'db',
-                '%s.conf' % (os.environ.get('FORUM_ENV', 'default'))
-            )
         }
     }
 }
@@ -90,3 +89,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+PATH_CDN_ROOT = os.path.join(
+    os.path.expanduser('~'), 'Work', 'forum-django-cdn', 'original')

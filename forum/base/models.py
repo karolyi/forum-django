@@ -98,8 +98,6 @@ class User(User):
         verbose_name=_('Maximum allowed comments per day'))
     comment_count = models.PositiveIntegerField(
         verbose_name=_('Comment count'))
-    # todays_comment_count = models.PositiveIntegerField(
-    #     verbose_name=_('Today\'s comment count'))
     invitations_today = models.PositiveIntegerField(
         verbose_name=_('Sent invitations today'))
     inviter = models.ForeignKey(

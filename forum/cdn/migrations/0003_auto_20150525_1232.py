@@ -1,0 +1,90 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.db import models, migrations, transaction
+from django.conf import settings
+
+
+def migrate_forward(apps, schema_editor):
+    """
+    Migrates the orig_src field from Image to ImageUrl table
+    """
+    Image = apps.get_model('cdn', 'Image')
+    ImageUrl = apps.get_model('cdn', 'ImageUrl')
+    bulk_list = []
+    counter = 0
+    for image in Image.objects.all():
+        bulk_list.append(
+            ImageUrl(
+                image=image,
+                orig_src=image.orig_src
+            ))
+        if image.id > counter + 1000:
+            counter = image.id
+            ImageUrl.objects.bulk_create(bulk_list)
+            bulk_list.clear()
+    ImageUrl.objects.bulk_create(bulk_list)
+
+
+def migrate_backward(apps, schema_editor):
+    """
+    Migrates the orig_src field from ImageUrl to Image table
+    """
+    ImageUrl = apps.get_model('cdn', 'ImageUrl')
+    with transaction.atomic():
+        for image_url in ImageUrl.objects.all().select_related('image')\
+                .order_by('id'):
+            image_url.image.orig_src = image_url.orig_src
+            image_url.image.save()
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('cdn', '0002_auto_20150403_2024'),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='ImageUrl',
+            fields=[
+                ('id', models.AutoField(
+                    serialize=False, primary_key=True,
+                    verbose_name='ID', auto_created=True)),
+                ('orig_src', models.URLField(
+                    db_index=True, verbose_name='Original source',
+                    max_length=512)),
+            ],
+            options={
+                'verbose_name': 'ImageUrl',
+                'verbose_name_plural': 'ImageUrls',
+            },
+        ),
+        migrations.AlterModelOptions(
+            name='image',
+            options={'verbose_name': 'Image', 'verbose_name_plural': 'Images'},
+        ),
+        migrations.AlterModelOptions(
+            name='missingimage',
+            options={'verbose_name': 'Missing Image',
+                     'verbose_name_plural': 'Missing Images'},
+        ),
+        # migrations.RunPython(
+        #     migrations.RunPython.noop, reverse_code=migrate_backward),
+        migrations.AlterField(
+            model_name='image',
+            name='cdn_path',
+            field=models.FilePathField(
+                path=settings.PATH_CDN_ROOT,
+                unique=True, max_length=255, verbose_name='Path in CDN'),
+        ),
+        migrations.AddField(
+            model_name='imageurl',
+            name='image',
+            field=models.ForeignKey(
+                verbose_name='The CDN file', to='cdn.Image')),
+        migrations.RunPython(
+            migrate_forward, reverse_code=migrate_backward),
+        migrations.RemoveField(
+            model_name='image', name='orig_src'),
+    ]

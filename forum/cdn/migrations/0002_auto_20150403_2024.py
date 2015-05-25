@@ -14,6 +14,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='missingimage',
             name='src',
-            field=models.URLField(unique=True, db_index=True, max_length=255, verbose_name='Original source'),
+            field=models.URLField(
+                unique=True, db_index=True, max_length=255,
+                verbose_name='Original source'),
         ),
     ]
