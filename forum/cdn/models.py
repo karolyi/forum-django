@@ -21,7 +21,7 @@ class Image(models.Model):
         path=settings.PATH_CDN_ROOT, verbose_name=_('Path in CDN'),
         max_length=255, unique=True)
     file_hash = models.CharField(
-        verbose_name=_('File hash'), max_length=200, unique=True)
+        verbose_name=_('File SHA512 hash'), max_length=128, unique=True)
 
     def __str__(self):
         return self.cdn_path
@@ -44,6 +44,9 @@ class ImageUrl(models.Model):
         'cdn.Image', verbose_name=_('The CDN file'))
     orig_src = models.URLField(
         verbose_name=_('Original source'), max_length=512, db_index=True,
+        null=False)
+    src_hash = models.CharField(
+        verbose_name=_('SHA512 hash of orig_src'), max_length=128, unique=True,
         null=False)
 
 

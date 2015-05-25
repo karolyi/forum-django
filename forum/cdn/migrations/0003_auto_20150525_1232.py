@@ -36,8 +36,7 @@ def migrate_backward(apps, schema_editor):
         for image_url in ImageUrl.objects.all().order_by('id'):
             images = Image.objects.filter(id=image_url.image_id)
             images.update(orig_src=image_url.orig_src)
-            # image_url.image.orig_src = image_url.orig_src
-            # image_url.image.save()
+        Image.objects.filter(orig_src='').delete()
 
 
 class Migration(migrations.Migration):
@@ -71,8 +70,6 @@ class Migration(migrations.Migration):
             options={'verbose_name': 'Missing Image',
                      'verbose_name_plural': 'Missing Images'},
         ),
-        # migrations.RunPython(
-        #     migrations.RunPython.noop, reverse_code=migrate_backward),
         migrations.AlterField(
             model_name='image',
             name='cdn_path',
