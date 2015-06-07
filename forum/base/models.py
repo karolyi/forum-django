@@ -82,6 +82,9 @@ class Topic(models.Model):
         related_name='last_comment', on_delete=models.SET_NULL)
     description = models.TextField(verbose_name=_('Description'))
 
+    def __str__(self):
+        return self.text_name
+
 
 class User(User):
     slug = AutoSlugField(
