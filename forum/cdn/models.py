@@ -1,6 +1,15 @@
+import os
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from django.db.models.signals import pre_delete
+
+
+def cdn_delete_file(sender, instance, *args, **kwargs):
+    abs_path = os.path.join(settings.PATH_CDN_ROOT, instance.cdn_path)
+    if os.path.exists(abs_path):
+        os.remove(abs_path)
 
 
 class Image(models.Model):
@@ -26,6 +35,8 @@ class Image(models.Model):
 
     def __str__(self):
         return self.cdn_path
+
+pre_delete.connect(cdn_delete_file, sender=Image)
 
 
 class ImageUrl(models.Model):
