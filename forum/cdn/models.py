@@ -14,8 +14,8 @@ class Image(models.Model):
         verbose_name_plural = _('Images')
 
     comment = models.ManyToManyField(
-        'base.Comment', null=False, default=1,
-        verbose_name=_('Found in comment'))
+        'base.Comment', null=False, verbose_name=_('Found in comment'))
+    topic = models.ManyToManyField('base.Topic', null=False)
     mime_type = models.CharField(verbose_name=_('Mime type'), max_length=100)
     cdn_path = models.FilePathField(
         path=settings.PATH_CDN_ROOT, verbose_name=_('Path in CDN'),
