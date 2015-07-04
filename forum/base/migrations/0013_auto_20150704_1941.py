@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 import django_extensions.db.fields
-import base.models
 
 
 class Migration(migrations.Migration):
@@ -16,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='settings',
             name='slug',
-            field=django_extensions.db.fields.AutoSlugField(blank=True, populate_from=base.models.Settings._get_user_username, editable=False, unique=True, verbose_name='Slug of the user'),
+            field=django_extensions.db.fields.AutoSlugField(editable=False, blank=True, verbose_name='Slug of the user', unique=True, populate_from='user'),
         ),
     ]

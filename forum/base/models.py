@@ -89,16 +89,17 @@ class Topic(models.Model):
 
 class Settings(models.Model):
 
-    def _get_user_username(self, instance):
+    def my_slugify(self, user_instance):
         """
         Returns the username from the OneToOneField relation to User.
         """
-        return instance.user.username
+        return slugify(user_instance.username)
 
-    user = models.OneToOneField(User, verbose_name=_('Respective user'))
+    user = models.OneToOneField(
+        User, verbose_name=_('Respective user'), null=False)
     slug = AutoSlugField(
         verbose_name=_('Slug of the user'), max_length=50, unique=True,
-        populate_from='_get_user_username', slugify_function=slugify, null=False)
+        populate_from='user', slugify_function=my_slugify, null=False)
     last_global_read = models.PositiveIntegerField(
         verbose_name=_('Last global message ID read'))
     received_comment_vote_sum = models.IntegerField(
