@@ -46,6 +46,8 @@ coverage.xml
 
 # Django stuff:
 *.log
+logs/
+tmp/
 
 # Sphinx documentation
 docs/_build/
@@ -59,3 +61,4 @@ venv/
 
 # Django development source directory
 django/
+
