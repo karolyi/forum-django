@@ -4,6 +4,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.db.models.signals import pre_delete
+from django.contrib.auth.models import User
 
 
 def cdn_delete_file(sender, instance, *args, **kwargs):
@@ -25,7 +26,7 @@ class Image(models.Model):
     comments = models.ManyToManyField(
         'base.Comment', null=False, verbose_name=_('Found in comment'))
     topics = models.ManyToManyField('base.Topic', null=False)
-    users = models.ManyToManyField('base.User', null=False)
+    users = models.ManyToManyField(User, null=False)
     mime_type = models.CharField(verbose_name=_('Mime type'), max_length=100)
     cdn_path = models.FilePathField(
         path=settings.PATH_CDN_ROOT, verbose_name=_('Path in CDN'),
