@@ -117,8 +117,8 @@ class Settings(models.Model):
     invitations_today = models.PositiveIntegerField(
         verbose_name=_('Sent invitations today'))
     invited_by = models.ForeignKey(
-        User, related_name='invited_by', null=True, default=None,
-        verbose_name=_('Invited by'))
+        User, related_name='invited_user_setting_set', null=True,
+        default=None, verbose_name=_('Invited by'))
     invitations_success = models.PositiveIntegerField(
         verbose_name=_('Successful invitations'))
     pw_reminders_today = models.PositiveIntegerField(
