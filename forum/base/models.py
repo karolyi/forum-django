@@ -116,8 +116,9 @@ class Settings(models.Model):
         verbose_name=_('Comment count'))
     invitations_today = models.PositiveIntegerField(
         verbose_name=_('Sent invitations today'))
-    inviter = models.ForeignKey(
-        'self', null=True, default=None, verbose_name=_('Invited by'))
+    invited_by = models.ForeignKey(
+        User, related_name='invited_by', null=True, default=None,
+        verbose_name=_('Invited by'))
     invitations_success = models.PositiveIntegerField(
         verbose_name=_('Successful invitations'))
     pw_reminders_today = models.PositiveIntegerField(
@@ -135,7 +136,8 @@ class Settings(models.Model):
             'Email addresses used for image upload'
             ' separated with semicolon (;)'))
     ignored_users = models.ManyToManyField(
-        'self', null=None, verbose_name=_('List of ignored users'))
+        User, related_name='ignored_users', null=False,
+        verbose_name=_('List of ignored users'))
     uses_auto_bookmarks = models.BooleanField(
         null=False, default=False,
         verbose_name=_('Use automatic bookmark placement'))
