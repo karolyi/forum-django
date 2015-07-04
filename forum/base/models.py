@@ -98,7 +98,7 @@ class Settings(models.Model):
     user = models.OneToOneField(User, verbose_name=_('Respective user'))
     slug = AutoSlugField(
         verbose_name=_('Slug of the user'), max_length=50, unique=True,
-        populate_from=_get_user_username, slugify_function=slugify, null=False)
+        populate_from='_get_user_username', slugify_function=slugify, null=False)
     last_global_read = models.PositiveIntegerField(
         verbose_name=_('Last global message ID read'))
     received_comment_vote_sum = models.IntegerField(
