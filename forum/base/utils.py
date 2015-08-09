@@ -1,4 +1,3 @@
-import re
 from django.utils.text import slugify as django_slugify
 from django.utils.safestring import mark_safe
 from django.utils.encoding import force_text

@@ -27,7 +27,8 @@ class Comment(models.Model):
     prev_comment = models.ForeignKey(
         'self', verbose_name=_('Answered comment'), null=True, default=None,
         on_delete=models.SET_DEFAULT)
-    content = models.TextField(verbose_name=_('Content'))
+    content_md = models.TextField(verbose_name=_('Markdown content'))
+    content_html = models.TextField(verbose_name=_('HTML content'))
     host = models.CharField(
         max_length=256, verbose_name=_('Host of the commenter (old)'))
     ip = models.GenericIPAddressField(
@@ -42,11 +43,18 @@ class Edit(models.Model):
 
     """Comment edits"""
 
-    comment = models.ForeignKey('Comment', verbose_name=_('Edited comment'))
+    comment = models.ForeignKey(
+        'Comment', verbose_name=_('Edited comment'), null=False)
+    edited_by = models.ForeignKey(
+        User, verbose_name=_('Edited by'), null=False)
     timestamp = models.DateTimeField(
         # auto_now_add=True,
-        verbose_name=_('Edit timestamp'))
-    diff = models.TextField(verbose_name=_('Diff of the previous version'))
+        verbose_name=_('Edit timestamp'), null=False)
+    reason = models.CharField(
+        verbose_name=_('Reason for editing'), max_length=50, null=False,
+        default='')
+    diff = models.TextField(
+        verbose_name=_('Diff of the previous version'), null=False)
 
 
 class Topic(models.Model):
