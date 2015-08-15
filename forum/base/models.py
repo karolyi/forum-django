@@ -9,7 +9,7 @@ from base.utils import slugify
 
 class Comment(models.Model):
 
-    """Essential comment class"""
+    """Essential comment class."""
 
     user = models.ForeignKey(User, verbose_name=_('The commenter user'))
     topic = models.ForeignKey('Topic', verbose_name=_('Commented in topic'))
@@ -27,6 +27,8 @@ class Comment(models.Model):
     prev_comment = models.ForeignKey(
         'self', verbose_name=_('Answered comment'), null=True, default=None,
         on_delete=models.SET_DEFAULT)
+    # FOR HTML ESCAPING IN MARKDOWN
+    # https://pythonhosted.org/Markdown/release-2.6.html#safe_mode-deprecated
     content_md = models.TextField(verbose_name=_('Markdown content'))
     content_html = models.TextField(verbose_name=_('HTML content'))
     host = models.CharField(
