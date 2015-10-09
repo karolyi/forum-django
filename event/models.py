@@ -62,6 +62,6 @@ class Response(models.Model):
         related_name='event_sharings')
     invitee = models.ForeignKey(
         User, verbose_name=_('Invitee'), related_name='event_responses')
-    response = models.PositiveSmallIntegerField(
+    status = models.PositiveSmallIntegerField(
         verbose_name=_('Response'), choices=EVENT_RESPONSES,
         default=EVENT_RESPONSES[0][0])
