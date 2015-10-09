@@ -3,13 +3,25 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
 
-from base.choices import TOPIC_STATUS_CHOICES
+from base.choices import TOPIC_TYPE_CHOICES
 from base.utils import slugify
 
 
 class Comment(models.Model):
 
-    """Essential comment class."""
+    """
+    Essential comment class.
+
+    The hostname is obsoleted, but since there's no stable way to get
+    IPs from hostnames, we store it. It was stored in the previous
+    version like that.
+    """
+
+    def __str__(self):
+        return _('Comment of user %(user)s in \'%(topic)s\'' % {
+            'user': self.user,
+            'topic': self.topic
+        })
 
     user = models.ForeignKey(User, verbose_name=_('The commenter user'))
     topic = models.ForeignKey('Topic', verbose_name=_('Commented in topic'))
@@ -43,7 +55,9 @@ class Comment(models.Model):
 
 class Edit(models.Model):
 
-    """Comment edits"""
+    """
+    Comment edits.
+    """
 
     comment = models.ForeignKey(
         'Comment', verbose_name=_('Edited comment'), null=False)
@@ -61,11 +75,16 @@ class Edit(models.Model):
 
 class Topic(models.Model):
 
-    """Essential topic class"""
+    """
+    Essential topic class.
+    """
+
+    def __str__(self):
+        return self.text_name
 
     creator = models.ForeignKey(User, verbose_name=_('Topic creator'))
-    html_name = models.CharField(max_length=256, verbose_name=_('HTML name'))
-    text_name = models.CharField(max_length=256, verbose_name=_('Text name'))
+    name_html = models.CharField(max_length=256, verbose_name=_('HTML name'))
+    name_text = models.CharField(max_length=256, verbose_name=_('Text name'))
     is_disabled = models.BooleanField(
         null=False, default=True, verbose_name=_('Is topic disabled'))
     is_staff_only = models.BooleanField(
@@ -76,7 +95,7 @@ class Topic(models.Model):
         verbose_name=_('Is voting enabled'))
     type = models.CharField(
         verbose_name=_('Topic type'), null=False, max_length=20,
-        choices=TOPIC_STATUS_CHOICES, default=TOPIC_STATUS_CHOICES[0][0])
+        choices=TOPIC_TYPE_CHOICES, default=TOPIC_TYPE_CHOICES[0][0])
     truncate_at = models.SmallIntegerField(
         null=True,
         verbose_name=_('Max comment number to keep'))
@@ -84,7 +103,7 @@ class Topic(models.Model):
         'self', null=True, default=None, on_delete=models.SET_NULL,
         verbose_name=_('Reply to topic goes to'))
     slug = AutoSlugField(
-        verbose_name=_('Topic slug'), null=False, max_length=100,
+        verbose_name=_('Slug'), null=False, max_length=100,
         populate_from=('text_name',), unique=True)
     comment_count = models.PositiveIntegerField(
         verbose_name=_('Comment count'), null=False, default=0)
@@ -93,17 +112,21 @@ class Topic(models.Model):
         related_name='last_comment', on_delete=models.SET_NULL)
     description = models.TextField(verbose_name=_('Description'))
 
-    def __str__(self):
-        return self.text_name
-
 
 class Settings(models.Model):
+
+    """
+    An object represeting the user's settings.
+    """
 
     def _my_slugify(user_instance):
         """
         Returns the username from the OneToOneField relation to User.
         """
         return slugify(user_instance.username)
+
+    def __str__(self):
+        return _('Settings for user %s' % self.user)
 
     user = models.OneToOneField(
         User, verbose_name=_('Respective user'), null=False)
@@ -135,17 +158,17 @@ class Settings(models.Model):
         verbose_name=_('Password reminders sent today'))
     used_skin = models.CharField(
         max_length=256, verbose_name=_('Used skin name'))
-    introduction_all_md = models.TextField(
+    introduction_md_all = models.TextField(
         verbose_name=_('Introduction visible for everybody (Markdown)'))
-    introduction_reg_md = models.TextField(
+    introduction_md_reg = models.TextField(
         verbose_name=_('Introduction visible for registered users (Markdown)'))
-    introduction_friends_md = models.TextField(
+    introduction_md_friends = models.TextField(
         verbose_name=_('Introduction visible for friended users (Markdown)'))
-    introduction_all_html = models.TextField(
+    introduction_html_all = models.TextField(
         verbose_name=_('Introduction visible for everybody (HTML)'))
-    introduction_reg_html = models.TextField(
+    introduction_html_reg = models.TextField(
         verbose_name=_('Introduction visible for registered users (HTML)'))
-    introduction_friends_html = models.TextField(
+    introduction_html_friends = models.TextField(
         verbose_name=_('Introduction visible for friended users (HTML)'))
     picture_emails = models.CharField(
         max_length=256, verbose_name=_(
