@@ -135,12 +135,18 @@ class Settings(models.Model):
         verbose_name=_('Password reminders sent today'))
     used_skin = models.CharField(
         max_length=256, verbose_name=_('Used skin name'))
-    introduction_all = models.TextField(
-        verbose_name=_('Introduction visible for everybody'))
-    introduction_reg = models.TextField(
-        verbose_name=_('Introduction visible for registered users'))
-    introduction_friends = models.TextField(
-        verbose_name=_('Introduction visible for friended users'))
+    introduction_all_md = models.TextField(
+        verbose_name=_('Introduction visible for everybody (Markdown)'))
+    introduction_reg_md = models.TextField(
+        verbose_name=_('Introduction visible for registered users (Markdown)'))
+    introduction_friends_md = models.TextField(
+        verbose_name=_('Introduction visible for friended users (Markdown)'))
+    introduction_all_html = models.TextField(
+        verbose_name=_('Introduction visible for everybody (HTML)'))
+    introduction_reg_html = models.TextField(
+        verbose_name=_('Introduction visible for registered users (HTML)'))
+    introduction_friends_html = models.TextField(
+        verbose_name=_('Introduction visible for friended users (HTML)'))
     picture_emails = models.CharField(
         max_length=256, verbose_name=_(
             'Email addresses used for image upload'
