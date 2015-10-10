@@ -176,7 +176,8 @@ class Settings(models.Model):
     uses_auto_bookmarks = models.BooleanField(
         default=False, verbose_name=_('Use automatic bookmark placement'))
     mails_own_topic_comments = models.BooleanField(
-        default=False, verbose_name=_('Receive mails from comments in own topic'))
+        default=False, verbose_name=_(
+            'Receive mails from comments in own topic'))
     mails_replies_topic = models.BooleanField(
         default=True, verbose_name=_('Receive mails from comment replies'))
     mails_moderation_topic = models.BooleanField(
@@ -199,3 +200,5 @@ class Settings(models.Model):
         default=False, verbose_name=_('Is approved by admins'))
     expand_archived = models.BooleanField(
         default=False, verbose_name=_('Expand archived topics'))
+    friended_users = models.ManyToManyField(
+        'self', verbose_name=_('Friended users'))
