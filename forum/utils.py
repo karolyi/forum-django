@@ -10,5 +10,5 @@ def slugify(input_data):
     Powerup version of the original django slugify.
     """
     pass_one = unidecode(force_text(input_data))
-    pass_two = django_slugify(pass_one.replace('_', '-'))
+    pass_two = django_slugify(pass_one.replace('_', '-').strip('-'))
     return mark_safe(pass_two)
