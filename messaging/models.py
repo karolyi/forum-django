@@ -17,6 +17,7 @@ class Mail(models.Model):
             'recipient': self.recipient,
         })
 
+    # The collation for thread_id is binary, see the initial migration.
     thread_id = models.CharField(
         verbose_name=_('Thread ID'), max_length=10, null=True)
     sender = models.ForeignKey(
