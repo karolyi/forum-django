@@ -48,8 +48,9 @@ INSTALLED_APPS = (
     'django_extensions',
     'forum',
     'base',
-    'event',
     'cdn',
+    'event',
+    'messaging',
 )
 
 MIDDLEWARE_CLASSES = (
