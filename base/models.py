@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
 
 from base.choices import TOPIC_TYPE_CHOICES
-from base.utils import slugify
+from forum.utils import slugify
 
 
 class Comment(models.Model):

@@ -6,6 +6,7 @@ from django_extensions.db.fields import AutoSlugField
 
 from base.models import Topic
 from event.choices import EVENT_RESPONSES
+from forum.utils import slugify
 
 
 class Event(models.Model):
@@ -25,7 +26,7 @@ class Event(models.Model):
     place = models.CharField(verbose_name=_('Place'), max_length=100)
     slug = AutoSlugField(
         verbose_name=_('Slug'), null=False, max_length=100,
-        populate_from=('name',), unique=True)
+        populate_from=('name',), unique=True, slugify_function=slugify)
     owner = models.ForeignKey(User, verbose_name=_('Owner'))
     topic = models.ForeignKey(
         Topic, verbose_name=_('Related topic'), null=True)
