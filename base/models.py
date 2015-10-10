@@ -85,20 +85,17 @@ class Topic(models.Model):
     creator = models.ForeignKey(User, verbose_name=_('Topic creator'))
     name_html = models.CharField(max_length=256, verbose_name=_('HTML name'))
     name_text = models.CharField(max_length=256, verbose_name=_('Text name'))
-    is_disabled = models.BooleanField(
-        null=False, default=True, verbose_name=_('Is topic disabled'))
+    is_enabled = models.BooleanField(
+        default=False, verbose_name=_('Is topic enabled'))
     is_staff_only = models.BooleanField(
-        null=False, default=False, verbose_name=_('Is staff only'))
+        default=False, verbose_name=_('Is staff only'))
     is_voting_enabled = models.BooleanField(
-        null=False,
-        default=True,
-        verbose_name=_('Is voting enabled'))
+        default=True, verbose_name=_('Is voting enabled'))
     type = models.CharField(
-        verbose_name=_('Topic type'), null=False, max_length=20,
+        verbose_name=_('Topic type'), max_length=20,
         choices=TOPIC_TYPE_CHOICES, default=TOPIC_TYPE_CHOICES[0][0])
     truncate_at = models.SmallIntegerField(
-        null=True,
-        verbose_name=_('Max comment number to keep'))
+        null=True, verbose_name=_('Max comment number to keep'))
     reply_to = models.ForeignKey(
         'self', null=True, default=None, on_delete=models.SET_NULL,
         verbose_name=_('Reply to topic goes to'))
@@ -106,7 +103,7 @@ class Topic(models.Model):
         verbose_name=_('Slug'), null=False, max_length=100,
         populate_from=('name_text',), unique=True)
     comment_count = models.PositiveIntegerField(
-        verbose_name=_('Comment count'), null=False, default=0)
+        verbose_name=_('Comment count'), default=0)
     last_comment = models.ForeignKey(
         Comment, verbose_name=_('Last comment reference'), null=True,
         related_name='last_comment', on_delete=models.SET_NULL)
@@ -116,7 +113,7 @@ class Topic(models.Model):
 class Settings(models.Model):
 
     """
-    An object represeting the user's settings.
+    An object representing the user's settings.
     """
 
     def _my_slugify(user_instance):
@@ -128,8 +125,7 @@ class Settings(models.Model):
     def __str__(self):
         return _('Settings for user %s' % self.user)
 
-    user = models.OneToOneField(
-        User, verbose_name=_('Respective user'), null=False)
+    user = models.OneToOneField(User, verbose_name=_('Respective user'))
     slug = AutoSlugField(
         verbose_name=_('Slug of the user'), max_length=50, unique=True,
         populate_from='user', slugify_function=_my_slugify, null=False)
@@ -173,39 +169,33 @@ class Settings(models.Model):
     picture_emails = models.CharField(
         max_length=256, verbose_name=_(
             'Email addresses used for image upload'
-            ' separated with semicolon (;)'))
+            ' separated with semicolons (;)'))
     ignored_users = models.ManyToManyField(
-        User, related_name='ignored_users', null=False,
+        User, related_name='ignored_users',
         verbose_name=_('List of ignored users'))
     uses_auto_bookmarks = models.BooleanField(
-        null=False, default=False,
-        verbose_name=_('Use automatic bookmark placement'))
+        default=False, verbose_name=_('Use automatic bookmark placement'))
     mails_own_topic_comments = models.BooleanField(
-        null=False, default=False,
-        verbose_name=_('Receive mails from comments in own topic'))
+        default=False, verbose_name=_('Receive mails from comments in own topic'))
     mails_replies_topic = models.BooleanField(
-        null=False, default=True,
-        verbose_name=_('Receive mails from comment replies'))
+        default=True, verbose_name=_('Receive mails from comment replies'))
     mails_moderation_topic = models.BooleanField(
-        null=False, default=True,
-        verbose_name=_('Receive mails from moderation'))
+        default=True, verbose_name=_('Receive mails from moderation'))
     mails_messages = models.BooleanField(
-        null=False, default=True,
-        verbose_name=_('Receive mails from messages'))
+        default=True, verbose_name=_('Receive mails from messages'))
     show_replies_comment = models.BooleanField(
-        null=False, default=True, verbose_name=_('Show replies on comments'))
+        default=True, verbose_name=_('Show replies on comments'))
     show_relations = models.BooleanField(
-        null=False, default=True, verbose_name=_('Show user relations'))
+        default=True, verbose_name=_('Show user relations'))
     is_banned = models.BooleanField(
-        null=False, default=False, verbose_name=_('User is banned'))
+        default=False, verbose_name=_('User is banned'))
     separate_bookmarked_topics = models.BooleanField(
-        null=False, default=True,
-        verbose_name=_('Show bookmarked topics separated'))
+        default=True, verbose_name=_('Show bookmarked topics separated'))
     show_outsiders = models.BooleanField(
-        null=False, default=True, verbose_name=_('Show not-logged-in users'))
+        default=True, verbose_name=_('Show not-logged-in users'))
     has_chat_enabled = models.BooleanField(
-        null=False, default=True, verbose_name=_('Enable chat'))
+        default=True, verbose_name=_('Enable chat'))
     is_approved = models.BooleanField(
-        null=False, default=False, verbose_name=_('Is approved by admins'))
+        default=False, verbose_name=_('Is approved by admins'))
     expand_archived = models.BooleanField(
-        null=False, default=False, verbose_name=_('Expand archived topics'))
+        default=False, verbose_name=_('Expand archived topics'))

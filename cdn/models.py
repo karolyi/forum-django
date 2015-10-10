@@ -24,9 +24,11 @@ class Image(models.Model):
         verbose_name_plural = _('Images')
 
     comments = models.ManyToManyField(
-        'base.Comment', null=False, verbose_name=_('Found in comment'))
-    topics = models.ManyToManyField('base.Topic', null=False)
-    users = models.ManyToManyField(User, null=False)
+        'base.Comment', verbose_name=_('Found in comment'))
+    topics = models.ManyToManyField('base.Topic', verbose_name=_('In topic'))
+    users = models.ManyToManyField(
+        User, verbose_name=_('In user introduction'))
+    events = models.ManyToManyField('event.Event', verbose_name=_('In event'))
     mime_type = models.CharField(verbose_name=_('Mime type'), max_length=100)
     cdn_path = models.FilePathField(
         path=settings.PATH_CDN_ROOT, verbose_name=_('Path in CDN'),
@@ -56,11 +58,9 @@ class ImageUrl(models.Model):
     image = models.ForeignKey(
         'cdn.Image', verbose_name=_('The CDN file'))
     orig_src = models.URLField(
-        verbose_name=_('Original source'), max_length=512, db_index=True,
-        null=False)
+        verbose_name=_('Original source'), max_length=512, db_index=True)
     src_hash = models.CharField(
-        verbose_name=_('SHA512 hash of orig_src'), max_length=128, unique=True,
-        null=False)
+        verbose_name=_('SHA512 hash of orig_src'), max_length=128, unique=True)
 
 
 class MissingImage(models.Model):

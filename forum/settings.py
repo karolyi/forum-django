@@ -164,6 +164,8 @@ STATIC_URL = '/static/'
 PATH_CDN_ROOT = os.path.join(
     os.path.expanduser('~'), 'Work', 'forum-django-cdn', 'original')
 
+SUPPORTED_LANGUAGES = ('en', 'de', 'hu')
+
 # Keep this at the end
 try:
     from forum.settings_production import *
