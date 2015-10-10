@@ -29,6 +29,7 @@ class Image(models.Model):
     users = models.ManyToManyField(
         User, verbose_name=_('In user introduction'))
     events = models.ManyToManyField('event.Event', verbose_name=_('In event'))
+    mails = models.ManyToManyField('messaging.Mail', verbose_name=_('In mail'))
     mime_type = models.CharField(verbose_name=_('Mime type'), max_length=100)
     cdn_path = models.FilePathField(
         path=settings.PATH_CDN_ROOT, verbose_name=_('Path in CDN'),
