@@ -36,5 +36,7 @@ class Mail(models.Model):
         verbose_name=_('Retained in sender\'s outbox'), default=False)
     is_retained_recipient = models.BooleanField(
         verbose_name=_('Retained in recipient\'s inbox'), default=False)
+    sender_deleted = models.BooleanField(
+        verbose_name=_('Sender deleted it in outbox'), default=False)
     content_html = models.TextField(verbose_name=_('HTML content'))
     content_md = models.TextField(verbose_name=_('Markdown content'))
