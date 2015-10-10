@@ -57,6 +57,8 @@ class Response(models.Model):
             })
 
     event = models.ForeignKey(Event, verbose_name=_('Event'))
+    last_modified = models.DateTimeField(
+        auto_now=True, verbose_name=_('Last modified at'))
     inviter = models.ForeignKey(
         User, verbose_name=_('Inviter'), null=True,
         related_name='event_sharings')
