@@ -101,7 +101,7 @@ class Topic(models.Model):
         verbose_name=_('Reply to topic goes to'))
     slug = AutoSlugField(
         verbose_name=_('Slug'), null=False, max_length=100,
-        populate_from=('name_text',), unique=True)
+        populate_from=('name_text',), unique=True, slugify_function=slugify)
     comment_count = models.PositiveIntegerField(
         verbose_name=_('Comment count'), default=0)
     last_comment = models.ForeignKey(
