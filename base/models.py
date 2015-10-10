@@ -201,4 +201,4 @@ class Settings(models.Model):
     expand_archived = models.BooleanField(
         default=False, verbose_name=_('Expand archived topics'))
     friended_users = models.ManyToManyField(
-        'self', verbose_name=_('Friended users'))
+        User, verbose_name=_('Friended users'))
