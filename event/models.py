@@ -37,20 +37,20 @@ class Event(models.Model):
     content_md = models.TextField(verbose_name=_('Markdown content'))
 
 
-class Response(models.Model):
+class EventResponse(models.Model):
 
     """
     An response for a given event.
     """
 
     class Meta:
-        verbose_name = _('Event invitation')
-        verbose_name_plural = _('Event Invitations')
+        verbose_name = _('Event response')
+        verbose_name_plural = _('Event responses')
         unique_together = (('event', 'invitee'),)
 
     def __str__(self):
         return _(
-            'Event invitation for \'%(event)s\', response from %(invitee)s: '
+            'Event response for \'%(event)s\', from %(invitee)s: '
             '%(response)s' % {
                 'event': self.event,
                 'invitee': self.invitee,
