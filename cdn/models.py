@@ -16,7 +16,7 @@ def cdn_delete_file(sender, instance, *args, **kwargs):
 class Image(models.Model):
 
     """
-    The saved image files
+    The saved image files.
     """
 
     class Meta:
@@ -30,6 +30,8 @@ class Image(models.Model):
         User, verbose_name=_('In user introduction'))
     events = models.ManyToManyField('event.Event', verbose_name=_('In event'))
     mails = models.ManyToManyField('messaging.Mail', verbose_name=_('In mail'))
+    global_messages = models.ManyToManyField(
+        'messaging.GlobalMessage', verbose_name=_('In global message'))
     mime_type = models.CharField(verbose_name=_('Mime type'), max_length=100)
     cdn_path = models.FilePathField(
         path=settings.PATH_CDN_ROOT, verbose_name=_('Path in CDN'),
@@ -46,7 +48,7 @@ pre_delete.connect(cdn_delete_file, sender=Image)
 class ImageUrl(models.Model):
 
     """
-    The already downloaded image URLs
+    The already downloaded image URLs.
     """
 
     class Meta:
@@ -67,7 +69,7 @@ class ImageUrl(models.Model):
 class MissingImage(models.Model):
 
     """
-    The missing images, so they don't need to be downloaded again
+    The missing images, so they don't need to be downloaded again.
     """
 
     class Meta:

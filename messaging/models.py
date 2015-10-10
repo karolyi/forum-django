@@ -7,6 +7,10 @@ from messaging.choices import MESSAGE_STATUSES
 
 class Mail(models.Model):
 
+    """
+    Private messaging, mail-like functionality.
+    """
+
     class Meta:
         verbose_name = _('Mail message')
         verbose_name_plural = _('Mail messages')
@@ -38,5 +42,31 @@ class Mail(models.Model):
         verbose_name=_('Retained in recipient\'s inbox'), default=False)
     sender_deleted = models.BooleanField(
         verbose_name=_('Sender deleted it in outbox'), default=False)
+    content_html = models.TextField(verbose_name=_('HTML content'))
+    content_md = models.TextField(verbose_name=_('Markdown content'))
+
+
+class GlobalMessage(models.Model):
+
+    """
+    A global message shown instantaneously for logged-in users.
+    """
+
+    class Meta:
+        verbose_name = _('Global message')
+        verbose_name_plural = _('Global messages')
+
+    def __str__(self):
+        return _(
+            'Global message created by user %(user)s at %(created_at)s' % {
+                'user': self.user,
+                'created_at': self.created_at
+            })
+
+    user = models.ForeignKey(User, verbose_name=_('Created by'))
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name=_('Created at'))
+    is_enabled = models.BooleanField(verbose_name=_('Is enabled'))
+    subject = models.CharField(verbose_name=_('Subject'), max_length=100)
     content_html = models.TextField(verbose_name=_('HTML content'))
     content_md = models.TextField(verbose_name=_('Markdown content'))
