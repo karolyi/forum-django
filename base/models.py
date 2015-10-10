@@ -171,7 +171,7 @@ class Settings(models.Model):
             'Email addresses used for image upload'
             ' separated with semicolons (;)'))
     ignored_users = models.ManyToManyField(
-        User, related_name='ignored_users',
+        User, related_name='ignored_him',
         verbose_name=_('List of ignored users'))
     uses_auto_bookmarks = models.BooleanField(
         default=False, verbose_name=_('Use automatic bookmark placement'))
@@ -201,4 +201,4 @@ class Settings(models.Model):
     expand_archived = models.BooleanField(
         default=False, verbose_name=_('Expand archived topics'))
     friended_users = models.ManyToManyField(
-        User, verbose_name=_('Friended users'))
+        User, verbose_name=_('Friended users'), related_name='friended_him')
