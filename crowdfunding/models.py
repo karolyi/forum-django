@@ -2,8 +2,11 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from django_extensions.db.fields import AutoSlugField
+
 from base.models import Topic
 from crowdfunding.choices import STATUS_CHOICES
+from forum.utils import slugify
 
 
 class Project(models.Model):
@@ -20,6 +23,9 @@ class Project(models.Model):
         return self.name
 
     name = models.CharField(verbose_name=_('Name'), max_length=50)
+    slug = AutoSlugField(
+        verbose_name=_('Slug'), null=False, max_length=50,
+        populate_from=('name',), unique=True, slugify_function=slugify)
     owner = models.ForeignKey(User, verbose_name=_('Owner'))
     last_updated_at = models.DateTimeField(
         auto_now=True, verbose_name=_('Last updated at'))
