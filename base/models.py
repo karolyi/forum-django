@@ -18,8 +18,8 @@ class Comment(models.Model):
     """
 
     def __str__(self):
-        return _('Comment of user %(user)s in \'%(topic)s\'' % {
-            'user': self.user,
+        return _('#%(number)s in \'%(topic)s\'' % {
+            'number': self.number,
             'topic': self.topic
         })
 
@@ -227,3 +227,21 @@ class CommentBookmark(models.Model):
     comment = models.ForeignKey(Comment, verbose_name=_('Comment'))
     last_updated_at = models.DateTimeField(
         auto_now=True, verbose_name=_('Last updated at'))
+
+
+class CommentVote(models.Model):
+
+    class Meta:
+        verbose_name = _('Comment vote')
+        verbose_name_plural = _('Comment votes')
+        unique_together = (('comment', 'user'),)
+
+    def __str__(self):
+        return _('%(value)s on comment %(comment)s' % {
+            'value': self.value,
+            'comment': self.comment,
+        })
+
+    comment = models.ForeignKey(Comment, verbose_name=_('Comment'))
+    user = models.ForeignKey(User, verbose_name=_('User'))
+    value = models.SmallIntegerField(verbose_name=_('Value'))
