@@ -64,8 +64,7 @@ class Edit(models.Model):
     edited_by = models.ForeignKey(
         User, verbose_name=_('Edited by'), null=False)
     timestamp = models.DateTimeField(
-        # auto_now_add=True,
-        verbose_name=_('Edit timestamp'), null=False)
+        auto_now_add=True, verbose_name=_('Edit timestamp'), null=False)
     reason = models.CharField(
         verbose_name=_('Reason for editing'), max_length=50, null=False,
         default='')

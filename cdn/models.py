@@ -23,6 +23,7 @@ class Image(models.Model):
         verbose_name = _('Image')
         verbose_name_plural = _('Images')
 
+    # Relations to models that can contain images in their content
     comments = models.ManyToManyField(
         'base.Comment', verbose_name=_('Found in comment'))
     topics = models.ManyToManyField('base.Topic', verbose_name=_('In topic'))
@@ -32,6 +33,12 @@ class Image(models.Model):
     mails = models.ManyToManyField('messaging.Mail', verbose_name=_('In mail'))
     global_messages = models.ManyToManyField(
         'messaging.GlobalMessage', verbose_name=_('In global message'))
+    projects = models.ManyToManyField(
+        'crowdfunding.Project', verbose_name=_('In project'))
+    project_backers = models.ManyToManyField(
+        'crowdfunding.ProjectBacker',
+        verbose_name=_('In project backer message'))
+
     mime_type = models.CharField(verbose_name=_('Mime type'), max_length=100)
     cdn_path = models.FilePathField(
         path=settings.PATH_CDN_ROOT, verbose_name=_('Path in CDN'),

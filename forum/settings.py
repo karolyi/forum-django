@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'cdn',
     'event',
     'messaging',
+    'crowdfunding',
 )
 
 MIDDLEWARE_CLASSES = (
