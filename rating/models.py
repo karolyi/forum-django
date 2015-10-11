@@ -21,10 +21,10 @@ class CommentVote(models.Model):
     value = models.SmallIntegerField(verbose_name=_('Value'))
 
 
-class UserReview(models.Model):
+class UserRating(models.Model):
 
     """
-    A review of a user from another user.
+    A rating of a user from another user.
     """
 
     class Meta:
@@ -44,7 +44,7 @@ class UserReview(models.Model):
         User, verbose_name=_('Ratee'), related_name='ratee')
     rater = models.ForeignKey(
         User, verbose_name=_('Rater'), related_name='rater')
-    value = models.PositiveSmallIntegerField(verbose_name=_('Value'))
+    value = models.SmallIntegerField(verbose_name=_('Value'))
     created_at = models.DateTimeField(
         auto_now_add=True, verbose_name=_('Created at'))
     content_html = models.TextField(verbose_name=_('HTML content'))
