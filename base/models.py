@@ -201,3 +201,29 @@ class Settings(models.Model):
         default=False, verbose_name=_('Expand archived topics'))
     friended_users = models.ManyToManyField(
         User, verbose_name=_('Friended users'), related_name='friended_him')
+
+
+class CommentBookmark(models.Model):
+
+    """
+    A set bookmark for a comment object. A bookmark notes where the user
+    left off reading comments the last time.
+    """
+
+    class Meta:
+        verbose_name = _('Comment bookmark')
+        verbose_name_plural = _('Comment bookmarks')
+        unique_together = (('user', 'topic'),)
+
+    def __str__(self):
+        return _('s(number)s in %(topic)s for %(user)s') % {
+            'number': self.comment.number,
+            'topic': self.topic,
+            'user': self.user
+        }
+
+    user = models.ForeignKey(User, verbose_name=_('User'))
+    topic = models.ForeignKey(Topic, verbose_name=_('Topic'))
+    comment = models.ForeignKey(Comment, verbose_name=_('Comment'))
+    last_updated_at = models.DateTimeField(
+        auto_now=True, verbose_name=_('Last updated at'))
