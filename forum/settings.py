@@ -53,6 +53,7 @@ INSTALLED_APPS = (
     'messaging',
     'crowdfunding',
     'poll',
+    'rating',
 )
 
 MIDDLEWARE_CLASSES = (
