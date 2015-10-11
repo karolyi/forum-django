@@ -42,7 +42,7 @@ class Choice(models.Model):
         verbose_name_plural = _('Choices')
 
     def __str__(self):
-        return _('Choice for question \'%(question)s\', choice: %(text)s') % {
+        return _('%(text)s of question \'%(question)s\'') % {
             'question': self.question,
             'text': self.text}
 
@@ -60,7 +60,7 @@ class Vote(models.Model):
         unique_together = (('user', 'question'),)
 
     def __str__(self):
-        return _('Vote of user \'%(user)s\' to %(choice)s') % {
+        return _('\'%(user)s\' to Choice \'%(choice)s\'') % {
             'user': self.user,
             'choice': self.choice
         }
