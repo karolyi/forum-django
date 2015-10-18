@@ -35,6 +35,8 @@ class Project(models.Model):
         default=STATUS_CHOICES[0][0])
     content_html = models.TextField(verbose_name=_('HTML content'))
     content_md = models.TextField(verbose_name=_('Markdown content'))
+    images = models.ManyToManyField(
+        'cdn.Image', verbose_name=_('Images in this project description'))
 
 
 class ProjectBacker(models.Model):
@@ -57,3 +59,5 @@ class ProjectBacker(models.Model):
         auto_now=True, verbose_name=_('Last updated at'))
     content_html = models.TextField(verbose_name=_('HTML content'))
     content_md = models.TextField(verbose_name=_('Markdown content'))
+    images = models.ManyToManyField(
+        'cdn.Image', verbose_name=_('Images in this backer\'s message'))

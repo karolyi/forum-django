@@ -43,6 +43,8 @@ class Mail(models.Model):
         verbose_name=_('Sender deleted it in outbox'), default=False)
     content_html = models.TextField(verbose_name=_('HTML content'))
     content_md = models.TextField(verbose_name=_('Markdown content'))
+    images = models.ManyToManyField(
+        'cdn.Image', verbose_name=_('Images in this mail message'))
 
 
 class GlobalMessage(models.Model):
@@ -69,3 +71,5 @@ class GlobalMessage(models.Model):
     subject = models.CharField(verbose_name=_('Subject'), max_length=100)
     content_html = models.TextField(verbose_name=_('HTML content'))
     content_md = models.TextField(verbose_name=_('Markdown content'))
+    images = models.ManyToManyField(
+        'cdn.Image', verbose_name=_('Images in this global message'))
