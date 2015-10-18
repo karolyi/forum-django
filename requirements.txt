@@ -4,8 +4,12 @@ blessings==1.6
 decorator==4.0.4
 Django==1.8.5
 django-extensions==1.5.7
+django-nose==1.4.2
+django-pipeline==1.5.4
+django-require==1.0.8
 filemagic==1.6
 flake8==2.4.1
+futures==3.0.3
 html2text==2015.6.21
 ipython==4.0.0
 ipython-genutils==0.1.0
@@ -13,6 +17,7 @@ lxml==3.4.4
 Markdown==2.6.2
 mccabe==0.3.1
 mysqlclient==1.3.6
+nose==1.3.7
 path.py==8.1.2
 pep8==1.6.2
 pexpect==4.0.1

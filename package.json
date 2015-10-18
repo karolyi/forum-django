@@ -1,0 +1,32 @@
+{
+  "name": "forum-django",
+  "version": "1.0.0",
+  "description": "A forum engine based on Django",
+  "main": "index.js",
+  "dependencies": {
+    "autoprefixer": "^6.0.3",
+    "bower": "^1.6.3",
+    "node-sass": "^3.3.3",
+    "npm-check-updates": "^2.3.2",
+    "postcss-cli": "^2.2.0",
+    "requirejs": "^2.1.20"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/karolyi/forum-django.git"
+  },
+  "keywords": [
+    "forum",
+    "django"
+  ],
+  "author": "László Károlyi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/karolyi/forum-django/issues"
+  },
+  "homepage": "https://github.com/karolyi/forum-django#readme"
+}

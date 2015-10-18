@@ -1,0 +1,28 @@
+{% load pipeline staticfiles require i18n %}
+{% get_current_language as LANGUAGE_CODE  %}
+{% get_language_info for LANGUAGE_CODE as current_language %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Zalando Webmaster Stats{% endblock title %}</title>
+    {% stylesheet 'bootstrap_defaultskin' %}
+    {% require_module 'default/js/common' %}
+    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+    <script type="text/javascript">
+    require(['common'], function (common) {
+      common.init({
+        languageInfo: {
+            code: '{{ current_language.code|escapejs }}',
+            localName: '{{ current_language.name_local|escapejs }}',
+            name: '{{ current_language.name|escapejs }}'
+        }
+      });
+    });
+    </script>
+    <link rel="icon" href="{% static "favicon.ico" %}" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+</head>
+<body>
+{% block body_content %}Cucc{% endblock body_content %}
+</body>
+</html>

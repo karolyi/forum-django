@@ -46,6 +46,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'require',
+    'pipeline',
     'forum',
     'base',
     'cdn',
@@ -64,6 +66,18 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+)
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'pipeline.finders.PipelineFinder',
+)
+
+STATICFILES_STORAGE = 'forum.storage.ForumStorage'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
 )
 
 ROOT_URLCONF = 'forum.urls'
@@ -164,11 +178,45 @@ LOGGING = {
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'static'))
 
 PATH_CDN_ROOT = os.path.join(
     os.path.expanduser('~'), 'Work', 'forum-django-cdn', 'original')
 
 SUPPORTED_LANGUAGES = ('en', 'de', 'hu')
+
+# No extra compressing needed since node-sass does it all
+PIPELINE_CSS_COMPRESSOR = None
+PIPELINE_COMPILERS = (
+    'tools.node_sass_compiler.NodeSassCompiler',
+)
+PIPELINE_NODE_SASS_BINARY = os.path.join(
+    BASE_DIR, 'node_modules', '.bin', 'node-sass')
+PIPELINE_CSS = {
+    'bootstrap_defaultskin': {
+        'source_filenames': (
+            'skins/default/scss/base.scss',
+            # 'css/colors/*.css',
+            # 'css/layers.css'
+        ),
+        'output_filename': 'css/base-compiled.css',
+        # 'extra_context': {
+        #     'media': 'screen,projection',
+        # },
+    },
+}
+
+# Django-require config
+REQUIRE_BASE_URL = 'skins'
+REQUIRE_JS = '../bower_components/requirejs/require.js'
+REQUIRE_BUILD_PROFILE = 'app.build.js'
+REQUIRE_DEBUG = DEBUG
+REQUIRE_STANDALONE_MODULES = {
+    'default/js/common': {
+        'out': 'default/js/common-built.js',
+        'build_profile': 'default/js/common.build.js'
+    }
+}
 
 # Keep this at the end
 try:
