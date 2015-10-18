@@ -193,13 +193,13 @@ PIPELINE_COMPILERS = (
 PIPELINE_NODE_SASS_BINARY = os.path.join(
     BASE_DIR, 'node_modules', '.bin', 'node-sass')
 PIPELINE_CSS = {
-    'bootstrap_defaultskin': {
+    'skins/default/scss/base': {
         'source_filenames': (
             'skins/default/scss/base.scss',
             # 'css/colors/*.css',
             # 'css/layers.css'
         ),
-        'output_filename': 'css/base-compiled.css',
+        'output_filename': 'skins/default/css/base-compiled.css',
         # 'extra_context': {
         #     'media': 'screen,projection',
         # },
