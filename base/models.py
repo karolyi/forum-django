@@ -82,6 +82,9 @@ class Topic(models.Model):
     Essential topic class.
     """
 
+    class Meta(object):
+        ordering = ['-last_comment__time', 'name_text']
+
     def __str__(self):
         return self.name_text
 

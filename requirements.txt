@@ -3,6 +3,7 @@ beautifulsoup4==4.4.1
 blessings==1.6
 decorator==4.0.4
 Django==1.8.5
+django-debug-toolbar==1.4
 django-extensions==1.5.7
 django-nose==1.4.2
 django-pipeline==1.5.4

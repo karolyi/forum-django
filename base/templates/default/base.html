@@ -1,10 +1,10 @@
-{% load pipeline staticfiles require i18n %}
+{% load pipeline staticfiles require i18n settings_getter %}
 {% get_current_language as LANGUAGE_CODE  %}
 {% get_language_info for LANGUAGE_CODE as current_language %}
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{% block title %}Zalando Webmaster Stats{% endblock title %}</title>
+    <title>{% block title %}{% get_setting SITE_NAME %}{% endblock title %}</title>
     {% stylesheet 'skins/default/scss/base' %}
     {% require_module 'default/js/common' %}
     <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
@@ -23,6 +23,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 </head>
 <body>
-{% block body_content %}Cucc{% endblock body_content %}
+<div class="main-sidebar-wrapper"></div>
+<div class="container-fluid main-content-wrapper">
+    {% block main_content %}{% endblock main_content %}
+</div>
 </body>
 </html>

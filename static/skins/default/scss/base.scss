@@ -1,0 +1,37 @@
+// Variables override
+@import "variables.scss";
+
+// Bootswatch variables
+@import "../../../bower_components/bootswatch/paper/_variables.scss";
+
+// Import bootstrap itself
+@import "../../../bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
+
+// Bootswatch customizations
+@import "../../../bower_components/bootswatch/paper/_bootswatch.scss";
+
+.main-content-wrapper {
+  .topic-group-wrapper {
+    .panel-body {
+      .topic-header-row {
+        border-bottom: 2px solid $panel-default-border;
+        font-weight: bold;
+      }
+
+      .topic-list-item-row {
+        border-bottom: 1px solid $panel-default-border;
+        padding: $padding-base-vertical 0;
+
+        @include transition(background-color 0.2s linear);
+
+        &:hover {
+          background-color: $nav-link-hover-bg;
+        }
+
+        &:last-child {
+          border-bottom: 0;
+        }
+      }
+    }
+  }
+}
