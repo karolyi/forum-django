@@ -9,7 +9,7 @@ register = template.Library()
 def get_paginated_list(
         page=None, adjacent_pages=settings.PAGINATOR_ADJACENT_PAGES):
     """
-    Generate a paginator dict with ellipsis.
+    Generate a paginator list with ellipsis.
     """
     # Sanity check
     if type(page) is not Page or page.paginator.count == 0:
@@ -25,11 +25,11 @@ def get_paginated_list(
     page_number_list.extend((
         x for x in range(start_page, end_page + 1)))
 
-    if 2 not in page_number_list and num_pages > 1:
+    if 2 not in page_number_list:
         page_number_list.insert(0, 2)
         page_number_list.insert(0, 1)
 
-    if num_pages - 1 not in page_number_list and num_pages > 1:
+    if num_pages - 1 not in page_number_list:
         page_number_list.extend((num_pages - 1, num_pages))
 
     return page_number_list

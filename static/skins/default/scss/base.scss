@@ -7,10 +7,23 @@
 // Import bootstrap itself
 @import "../../../bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
 
+// Bootstrap ms grid
+@import "grid-ms.scss";
+
 // Bootswatch customizations
 @import "../../../bower_components/bootswatch/paper/_bootswatch.scss";
 
-.main-content-wrapper {
+// Import navbar & sidebar adjustments
+@import "navbar.scss";
+@import "sidebar.scss";
+
+.page-content-wrapper {
+  @media (min-width: $grid-float-breakpoint) {
+    padding-left: $sidebar-width-desktop + $grid-gutter-width / 2;
+  }
+
+  padding-top: $navbar-height + $navbar-margin-bottom;
+
   .topic-group-wrapper {
     .panel-body {
       .topic-header-row {

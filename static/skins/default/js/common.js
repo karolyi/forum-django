@@ -30,7 +30,7 @@ define([
         options[key] = initOptions[key];
       }
     }
-    if (Intl) {
+    if (window.Intl) {
       var intlNumberformat = new Intl.NumberFormat(options.languageInfo.code);
       numberFormat = function (input) {
         return intlNumberformat.format(input);

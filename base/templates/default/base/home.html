@@ -1,0 +1,8 @@
+{% extends 'default/base.html' %}
+{% load i18n humanize %}
+
+{% block main_content %}
+{% include 'default/base/include/topic-group.html' with topic_list=topics_highlighted topic_type='highlighted' %}
+{% include 'default/base/include/topic-group.html' with topic_list=topics_normal topic_type='normal' %}
+{% include 'default/base/include/topic-group.html' with topic_list=topics_archived topic_type='archived' %}
+{% endblock main_content %}

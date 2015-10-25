@@ -1,0 +1,76 @@
+.sidebar-wrapper {
+  position: fixed;
+  top: $navbar-height;
+  left: 0;
+  bottom: 0;
+  width: $sidebar-width-desktop;
+  overflow: auto;
+  background-color: $body-bg;
+  border: 0;
+
+  @include box-shadow(0px 0px 4px rgba(0, 0, 0, 0.3));
+
+  @media (max-width: $grid-float-breakpoint-max) {
+    @include transition(left $sidebar-transition-duration $sidebar-transition-timing-function);
+
+    @include box-shadow(1px 0px 4px rgba(0, 0, 0, 0.3));
+
+    z-index: $zindex-navbar-fixed;
+    width: $sidebar-width-offcanvas;
+    top: 0;
+    padding-left: $sidebar-extra-left;
+    left: -$sidebar-width-offcanvas - $sidebar-extra-left;
+
+    &.in {
+      left: -$sidebar-extra-left;
+    }
+  }
+
+  .list-group {
+    margin-bottom: 0;
+
+    .list-group-item {
+      border-right: 0;
+      border-left: 0;
+
+      &:first-child, &:last-child {
+        border-radius: 0;
+      }
+
+      &:first-child {
+        border-top: 0;
+      }
+
+      &:last-child {
+        border-bottom: 0;
+      }
+    }
+  }
+}
+
+.sidebar-offcanvas-overlay {
+  display: none;
+
+  @media (max-width: $grid-float-breakpoint-max) {
+    position: fixed;
+    z-index: $zindex-navbar-fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: block;
+    visibility: hidden;
+    opacity: 0;
+    background-color: black;
+
+    // '0' as a transition duration is invalid! It must be as '0s'
+    @include transition(opacity $sidebar-transition-duration $sidebar-overlay-transition-timing-function, visibility 0s linear $sidebar-transition-duration);
+
+    &.in {
+      @include transition(opacity $sidebar-overlay-transition-timing-function $sidebar-transition-duration);
+
+      opacity: $sidebar-overlay-opacity;
+      visibility: visible;
+    }
+  }
+}
