@@ -11,7 +11,6 @@ django-require2==2.0.0
 filemagic==1.6
 flake8==2.5.1
 futures==3.0.3
-gnureadline==6.3.3
 html2text==2015.11.4
 ipython==4.0.1
 ipython-genutils==0.1.0
