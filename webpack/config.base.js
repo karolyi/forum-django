@@ -1,5 +1,4 @@
 var path = require('path')
-var webpack = require('webpack')
 var BundleTracker = require('webpack-bundle-tracker')
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
@@ -11,13 +10,13 @@ module.exports = {
       // entry point of our app. assets/js/index.js should require other
       // js modules and dependencies it needs
       './assets/js/skin-default/index',
-      './assets/scss/skin-default/base.scss',
+      './assets/scss/skin-default/base.scss'
     ]
   },
 
   output: {
     path: path.resolve(path.join(__dirname, 'assets', 'bundles/')),
-    filename: '[name]-[hash].js',
+    filename: '[name]-[hash].js'
   },
 
   plugins: [
@@ -41,7 +40,7 @@ module.exports = {
         test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         loader: 'file-loader'
       }
-    ],
+    ]
   },
 
   sassLoader: {
@@ -56,5 +55,5 @@ module.exports = {
       'bower_components'
     ],
     extensions: ['', '.js', '.jsx']
-  },
+  }
 }

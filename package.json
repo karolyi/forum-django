@@ -46,7 +46,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "devserver": "node webpack/devserver.js",
     "build": "rm -rf webpack/assets/bundles/*;webpack --config webpack/config.dev.js --progress --colors",
-    "build-production": "rm -rf webpack/assets/bundles/*;webpack --config webpack/config.prod.js --progress --colors"
+    "build-production": "rm -rf webpack/assets/bundles/*;webpack --config webpack/config.prod.js --progress --colors",
+    "lint": "eslint webpack/"
   },
   "repository": {
     "type": "git",

@@ -1,3 +1,5 @@
+/* eslint-env node, browser */
+/* eslint no-console: 0 */
 var webpack = require('webpack')
 var WebpackDevServer = require('webpack-dev-server')
 var config = require('./config.dev')
@@ -12,9 +14,10 @@ var server = new WebpackDevServer(webpack(config), {
     colors: true
   }
 })
-server.listen(3000, '0.0.0.0', function (err, result) {
+// server.listen(3000, '0.0.0.0', function (err, result) {
+server.listen(3000, '0.0.0.0', function (err) {
   if (err) {
-    console.log(err)
+   console.log(err)
   }
 
   console.log('Listening at 0.0.0.0:3000')

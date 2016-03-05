@@ -7,6 +7,7 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 configBase.plugins = [
   new BundleTracker({
     filename: path.join('./', 'webpack', 'stats.json')}),
+  // To split all the CSS files
   new ExtractTextPlugin('[name].css'),
 
   // removes a lot of debugging code in React
@@ -27,7 +28,8 @@ configBase.plugins = [
 
 configBase.module.loaders.push({
   test: /\.scss$/,
-  loaders: ['style', 'css', 'sass']
+  loader: ExtractTextPlugin.extract(
+    'style-loader', 'css-loader!sass-loader')
 })
 
 module.exports = configBase;
