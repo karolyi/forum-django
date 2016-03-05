@@ -19,8 +19,7 @@ configBase.output.publicPath = 'http://localhost:3000/assets/bundles/'
 configBase.plugins = [
   new webpack.HotModuleReplacementPlugin(),
   new webpack.NoErrorsPlugin(), // don't reload if there is an error
-  new BundleTracker({filename: path.join(
-    'webpack', 'stats.json')})
+  new BundleTracker({filename: path.join('webpack', 'stats.json')})
 ]
 
 // This turns on the creation of map files, in addition to turning on
