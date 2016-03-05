@@ -2,16 +2,17 @@ var path = require('path')
 var webpack = require('webpack')
 var BundleTracker = require('webpack-bundle-tracker')
 var configBase = require('./config.base')
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 configBase.plugins = [
-  new BundleTracker({filename: path.join(
-    './', 'webpack', 'stats.json')}),
+  new BundleTracker({
+    filename: path.join('./', 'webpack', 'stats.json')}),
+  new ExtractTextPlugin('[name].css'),
 
   // removes a lot of debugging code in React
   new webpack.DefinePlugin({
     'process.env': {
-      'NODE_ENV': JSON.stringify('production')
-  }}),
+      'NODE_ENV': JSON.stringify('production')}}),
 
   // keeps hashes consistent between compilations
   new webpack.optimize.OccurenceOrderPlugin(),
@@ -28,7 +29,5 @@ configBase.module.loaders.push({
   test: /\.scss$/,
   loaders: ['style', 'css', 'sass']
 })
-
-
 
 module.exports = configBase;

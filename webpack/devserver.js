@@ -2,14 +2,17 @@ var webpack = require('webpack')
 var WebpackDevServer = require('webpack-dev-server')
 var config = require('./config.dev')
 
-new WebpackDevServer(webpack(config), {
+var server = new WebpackDevServer(webpack(config), {
   publicPath: config.output.publicPath,
   hot: true,
   inline: true,
   historyApiFallback: true,
   progress: true,
-  colors: true
-}).listen(3000, '0.0.0.0', function (err, result) {
+  stats: {
+    colors: true
+  }
+})
+server.listen(3000, '0.0.0.0', function (err, result) {
   if (err) {
     console.log(err)
   }

@@ -2,6 +2,7 @@ var path = require('path')
 var webpack = require('webpack')
 var BundleTracker = require('webpack-bundle-tracker')
 var configBase = require('./config.base')
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 configBase.entry = {
   default: [
@@ -21,13 +22,15 @@ configBase.plugins = [
   new webpack.NoErrorsPlugin(), // don't reload if there is an error
   new BundleTracker({filename: path.join(
     'webpack', 'stats.json')}),
+  new ExtractTextPlugin('[name].css')
 ]
 
 configBase.devtool = 'source-map';
 
 configBase.module.loaders.push({
   test: /\.scss$/,
-  loaders: ['style', 'css?sourceMap', 'sass?sourceMap']
+  loader: ExtractTextPlugin.extract(
+    'style-loader', 'css-loader?sourceMap!sass-loader?sourceMap')
 })
 
 module.exports = configBase;
