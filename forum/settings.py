@@ -2,10 +2,10 @@
 Django settings for forum project.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/1.7/topics/settings/
+https://docs.djangoproject.com/en/1.9/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.7/ref/settings/
+https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -72,8 +72,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'django_extensions',
-    'require',
-    'pipeline',
+    'webpack_loader',
     'debug_toolbar',
     'forum',
     'base',
@@ -100,14 +99,22 @@ MIDDLEWARE_CLASSES = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'pipeline.finders.PipelineFinder',
 )
-
-STATICFILES_STORAGE = 'forum.storage.ForumStorage'
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
+    # We do this so that django's collectstatic copies or our bundles to
+    # the STATIC_ROOT or syncs them to whatever storage we use.
+    os.path.join(BASE_DIR, 'webpack', 'assets'),
 )
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack', 'stats.json'),
+        'CACHE': not DEBUG
+    }
+}
 
 ROOT_URLCONF = 'forum.urls'
 
@@ -115,7 +122,7 @@ WSGI_APPLICATION = 'forum.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/1.7/ref/settings/#databases
+# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -131,7 +138,7 @@ DATABASES = {
 }
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.7/topics/i18n/
+# https://docs.djangoproject.com/en/1.9/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -160,7 +167,7 @@ if not os.path.exists(LOG_DIR):
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
+# https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'static'))
@@ -169,42 +176,6 @@ PATH_CDN_ROOT = os.path.join(
     os.path.expanduser('~'), 'Work', 'forum-django-cdn', 'original')
 
 SUPPORTED_LANGUAGES = ('en', 'de', 'hu')
-
-# No extra compressing needed since node-sass does it all
-PIPELINE_CSS_COMPRESSOR = None
-PIPELINE_COMPILERS = (
-    'tools.node_sass_compiler.NodeSassCompiler',
-)
-PIPELINE_NODE_SASS_BINARY = os.path.join(
-    BASE_DIR, 'node_modules', '.bin', 'node-sass')
-PIPELINE_CSS = {
-    'skins/default/scss/base': {
-        'source_filenames': (
-            'skins/default/scss/base.scss',
-            # 'css/colors/*.css',
-            # 'css/layers.css'
-        ),
-        'output_filename': 'skins/default/css/base-compiled.css',
-        # 'extra_context': {
-        #     'media': 'screen,projection',
-        # },
-    },
-}
-
-# Django-require config
-REQUIRE_BASE_URL = 'skins'
-REQUIRE_JS = '../bower_components/requirejs/require.js'
-REQUIRE_BUILD_PROFILE = 'app.build.js'
-REQUIRE_DEBUG = DEBUG
-REQUIRE_STANDALONE_MODULES = {
-    'default-skin': {
-        'devel_tag': 'separate_tag',
-        'relative_baseurl': 'default/js',
-        'entry_file_name': 'common.js',
-        'out': 'common-built.js',
-        'build_profile': 'common.build.js',
-    }
-}
 
 # ### Forum settings ###
 # Default amount of topics to show per category

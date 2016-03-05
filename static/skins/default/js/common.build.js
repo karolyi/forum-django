@@ -44,12 +44,13 @@
         'bootstrap',
         'moment',
         'strip-json-comments',
+        'sidebar'
     ],
     paths: {
-        jquery: '../bower_components/jquery/dist/jquery',
-        bootstrap: '../bower_components/bootstrap-sass/assets/javascripts/bootstrap',
-        'strip-json-comments': '../bower_components/strip-json-comments/strip-json-comments',
-        moment: '../bower_components/moment/moment',
+        jquery: '../../../node_modules/jquery/dist/jquery',
+        bootstrap: '../../../node_modules/bootstrap-sass/assets/javascripts/bootstrap',
+        'strip-json-comments': '../../../node_modules/strip-json-comments/strip-json-comments',
+        'moment': '../../../node_modules/moment/moment'
     },
     shim: {
         bootstrap: {

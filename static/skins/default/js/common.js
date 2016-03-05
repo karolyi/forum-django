@@ -2,21 +2,22 @@
 'use strict';
 require.config({
   paths: {
-    jquery: '../../../bower_components/jquery/dist/jquery',
-    bootstrap: '../../../bower_components/bootstrap-sass/assets/javascripts/bootstrap',
-    'strip-json-comments': '../../../bower_components/strip-json-comments/strip-json-comments',
-    'moment': '../../../bower_components/moment/moment',
+    jquery: '../../../node_modules/jquery/dist/jquery',
+    bootstrap: '../../../node_modules/bootstrap-sass/assets/javascripts/bootstrap',
+    'strip-json-comments': '../../../node_modules/strip-json-comments/strip-json-comments',
+    'moment': '../../../node_modules/moment/moment'
   },
   shim: {
     bootstrap: {
-      deps: ['jquery'],
+      deps: ['jquery']
     },
     'strip-json-comments': {
       exports: 'stripJsonComments'
-    },
-  }
+    }
+  },
+  baseUrl: '/static/skins/default/js'
 });
-define([
+define('common', [
   'jquery', 'strip-json-comments', 'moment', 'bootstrap'], function (
   $, stripJsonComments, moment) {
   var options = {};

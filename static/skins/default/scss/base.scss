@@ -2,16 +2,16 @@
 @import "variables.scss";
 
 // Bootswatch variables
-@import "../../../bower_components/bootswatch/paper/_variables.scss";
+// @import "../../../node_modules/bootswatch/paper/_variables.scss";
 
 // Import bootstrap itself
-@import "../../../bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
+@import "../../../node_modules/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
 
 // Bootstrap ms grid
 @import "grid-ms.scss";
 
 // Bootswatch customizations
-@import "../../../bower_components/bootswatch/paper/_bootswatch.scss";
+// @import "../../../node_modules/bootswatch/paper/_bootswatch.scss";
 
 // Import navbar & sidebar adjustments
 @import "navbar.scss";
