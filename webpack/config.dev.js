@@ -10,6 +10,7 @@ configBase.entry = {
     // entry point of our app. assets/js/index.js should require other
     // js modules and dependencies it needs
     './assets/js/skin-default/index',
+    './assets/scss/skin-default/base.scss',
   ]
 }
 

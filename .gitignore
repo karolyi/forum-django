@@ -24,4 +24,4 @@ docs/_build/
 target/
 
 node_modules/
-static/bower_components/
+webpack/stats.json
