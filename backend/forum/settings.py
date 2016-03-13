@@ -133,6 +133,7 @@ DATABASES = {
         'HOST': '127.0.0.1',
         'PORT': 3306,
         'OPTIONS': {
+            'charset': 'utf8mb4'
         }
     }
 }
@@ -175,7 +176,10 @@ STATIC_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'static'))
 PATH_CDN_ROOT = os.path.join(
     os.path.expanduser('~'), 'Work', 'forum-django-cdn', 'original')
 
-SUPPORTED_LANGUAGES = ('en', 'de', 'hu')
+LANGUAGES = (
+    ('en', _('English')),
+    ('de', _('German')),
+    ('hu', _('Hungarian')))
 
 # ### Forum settings ###
 # Default amount of topics to show per category

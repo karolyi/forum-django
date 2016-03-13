@@ -18,12 +18,10 @@ module.exports = {
     path: path.resolve(path.join(__dirname, 'assets', 'bundles/')),
     filename: '[name]-[hash].js'
   },
-
   plugins: [
     new BundleTracker({filename: './stats.json'}),
     new ExtractTextPlugin('[name].css')
   ],
-
   module: {
     loaders: [
       // to transform JSX into JS

@@ -26,7 +26,7 @@ class Image(models.Model):
     mime_type = models.CharField(verbose_name=_('Mime type'), max_length=100)
     cdn_path = models.FilePathField(
         path=settings.PATH_CDN_ROOT, verbose_name=_('Path in CDN'),
-        max_length=255, unique=True)
+        max_length=191, unique=True)
     file_hash = models.CharField(
         verbose_name=_('File SHA512 hash'), max_length=128, unique=True)
 
@@ -68,5 +68,5 @@ class MissingImage(models.Model):
         verbose_name_plural = _('Missing Images')
 
     src = models.URLField(
-        verbose_name=_('Original source'), max_length=255, db_index=True,
+        verbose_name=_('Original source'), max_length=191, db_index=True,
         unique=True)

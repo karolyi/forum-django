@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('mime_type', models.CharField(
                     max_length=100, verbose_name='Mime type')),
                 ('cdn_path', models.CharField(
-                    max_length=255, unique=True, verbose_name='Path in CDN')),
+                    max_length=191, unique=True, verbose_name='Path in CDN')),
                 ('file_hash', models.CharField(
                     max_length=200, unique=True, verbose_name='File hash')),
                 ('comment', models.ManyToManyField(
