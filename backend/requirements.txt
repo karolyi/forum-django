@@ -10,7 +10,6 @@ django-webpack-loader==0.3.0
 filemagic==1.6
 flake8==2.5.4
 futures==3.0.5
-gnureadline==6.3.3
 html2text==2016.1.8
 ipython==4.1.2
 ipython-genutils==0.1.0
