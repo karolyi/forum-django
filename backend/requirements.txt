@@ -2,7 +2,7 @@ appnope==0.1.0
 beautifulsoup4==4.4.1
 blessings==1.6
 decorator==4.0.9
-Django==1.9.3
+Django==1.9.4
 django-debug-toolbar==1.4
 django-extensions==1.6.1
 django-nose==1.4.3
