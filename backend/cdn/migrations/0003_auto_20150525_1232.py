@@ -75,7 +75,7 @@ class Migration(migrations.Migration):
             name='cdn_path',
             field=models.FilePathField(
                 path=settings.PATH_CDN_ROOT,
-                unique=True, max_length=255, verbose_name='Path in CDN'),
+                unique=True, max_length=191, verbose_name='Path in CDN'),
         ),
         migrations.AddField(
             model_name='imageurl',
