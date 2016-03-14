@@ -6,10 +6,19 @@ const webpack = require('webpack')
 const WebpackDevServer = require('webpack-dev-server')
 const path = require('path')
 const del = require('del')
-const htmlreplace = require('gulp-html-replace');
-
-// Include Our Plugins
+const htmlreplace = require('gulp-html-replace')
+const bundleHelper = require('./frontend/src/js/loader/bundlehelper')
 const eslint = require('gulp-eslint')
+
+const htmlReplaceSkeleton = () =>
+  gulp.src('frontend/src/index.html')
+    .pipe(htmlreplace({
+      loader: {
+        src: null,
+        tpl: bundleHelper.createHeader(),
+      },
+    }))
+    .pipe(gulp.dest('frontend/dist/'))
 
 // Cleanup task
 gulp.task('clean', () => del(['./frontend/dist/**/*']))
@@ -35,26 +44,13 @@ gulp.task('webpack-dev', ['lint'], () => gulp.src('')
   .pipe(webpackStream(require('./frontend/webpack/config.dev')))
   .pipe(gulp.dest('frontend/dist/assets/')))
 
+gulp.task('prepare-index-dev', ['webpack-dev'], htmlReplaceSkeleton)
+gulp.task('prepare-index-prod', ['webpack-prod'], htmlReplaceSkeleton)
 
-gulp.task('prepare-index', () => gulp.src('frontend/src/index.html')
-  .pipe(htmlreplace({
-    loader: {
-      src: null,
-      tpl: '<script type="text/javascript">x</script>' +
-        '<script type="text/javascript" src="y"></script>',
-    },
-  }))
-  .pipe(gulp.dest('frontend/dist/')))
+gulp.task('build', ['clean', 'webpack-prod', 'prepare-index-prod'])
+gulp.task('build-dev', ['clean', 'webpack-dev', 'prepare-index-dev'])
 
-gulp.task('build', ['clean', 'webpack-prod', 'prepare-index'], () => {
-  // This will only run if the lint task is successful...
-})
-
-gulp.task('build-dev', ['clean', 'webpack-dev', 'prepare-index'], () => {
-  // This will only run if the lint task is successful...
-})
-
-gulp.task('webpack-dev-server', () => {
+gulp.task('webpack-dev-server', ['clean'], () => {
   const config = require('./frontend/webpack/config.dev-server')
   const compiler = webpack(config)
   const server = new WebpackDevServer(compiler, {
@@ -63,6 +59,7 @@ gulp.task('webpack-dev-server', () => {
     historyApiFallback: true,
     progress: true,
     contentBase: path.join(__dirname, 'frontend', 'src'),
+    publicPath: '/assets/',
     stats: {
       colors: true,
     },

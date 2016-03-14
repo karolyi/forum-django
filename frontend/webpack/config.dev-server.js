@@ -23,7 +23,7 @@ configBase.entry = tempEntry
 configBase.output.path = path.resolve(
   path.join(__dirname, '..', 'src', 'assets'))
 configBase.output.filename = '[name].js'
-configBase.output.publicPath = '/'
+configBase.output.publicPath = '/assets/'
 
 // This turns on the creation of map files, in addition to turning on
 // sourcemaps in plugins, this MUST be specified
