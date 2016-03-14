@@ -24,5 +24,10 @@ docs/_build/
 target/
 
 node_modules/
-webpack/stats.json
-webpack/assets/bundles/*
+frontend/dist
+static/
+*.sublime*
+logs/
+venv/
+tools/
+
