@@ -1,6 +1,9 @@
 module.exports = (config) => {
   config.set({
     frameworks: ['assert', 'mocha', 'riot'],
+    // client: {
+    //   useIframe: false,
+    // },
     plugins: [
       'karma-babel-preprocessor',
       'karma-assert',
@@ -12,11 +15,17 @@ module.exports = (config) => {
       'karma-riot',
     ],
     files: [
-      'frontend/src/**/*.tag',
+      'node_modules/babel-standalone/babel.js',
+      'node_modules/riot/riot+compiler.js',
       'frontend/test/**/*.js',
+      {
+        pattern: 'frontend/src/**/*.tag',
+        served: true,
+        included: false,
+      },
     ],
     preprocessors: {
-      'frontend/src/**/*.tag': ['riot', 'coverage'],
+      // 'frontend/src/**/*.tag': ['riot', 'coverage'],
       'frontend/test/**/*.js': ['babelSourceMap', 'coverage'],
     },
     customPreprocessors: {
