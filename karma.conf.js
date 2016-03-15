@@ -4,6 +4,7 @@ module.exports = (config) => {
     plugins: [
       'karma-babel-preprocessor',
       'karma-assert',
+      'karma-coverage',
       'karma-mocha',
       'karma-mocha-reporter',
       'karma-chrome-launcher',
@@ -15,8 +16,8 @@ module.exports = (config) => {
       'frontend/test/**/*.js',
     ],
     preprocessors: {
-      'frontend/src/**/*.tag': ['riot'],
-      'frontend/test/**/*.js': ['babelSourceMap'],
+      'frontend/src/**/*.tag': ['riot', 'coverage'],
+      'frontend/test/**/*.js': ['babelSourceMap', 'coverage'],
     },
     customPreprocessors: {
       babelSourceMap: {
@@ -30,6 +31,17 @@ module.exports = (config) => {
       },
       // Other custom preprocessors...
     },
+    coverageReporter: {
+      dir: 'coverage/',
+      reporters: [
+        // works correctly
+        { type: 'html', subdir: 'report-html' },
+        // does not work correctly -- gets its input from unprocessed
+        // riot tag file
+        { type: 'lcovonly', subdir: '.', file: 'lcov.info' },
+      ],
+    },
+
     browsers: [
       // 'PhantomJS',
       'Chrome',
@@ -37,7 +49,7 @@ module.exports = (config) => {
       // local testing and debugging
       // 'PhantomJS_custom'
     ],
-    reporters: ['mocha'],
+    reporters: ['mocha', 'coverage'],
     riotPreprocessor: {
       options: {
         type: 'babel',
