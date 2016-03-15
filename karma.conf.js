@@ -6,6 +6,7 @@ module.exports = (config) => {
       'karma-assert',
       'karma-mocha',
       'karma-mocha-reporter',
+      'karma-chrome-launcher',
       'karma-phantomjs-launcher',
       'karma-riot',
     ],
@@ -30,8 +31,11 @@ module.exports = (config) => {
       // Other custom preprocessors...
     },
     browsers: [
-      'PhantomJS',
-      'PhantomJS_custom'
+      // 'PhantomJS',
+      'Chrome',
+      // Customized phantomjs is commented out, since it's only used for
+      // local testing and debugging
+      // 'PhantomJS_custom'
     ],
     reporters: ['mocha'],
     riotPreprocessor: {
