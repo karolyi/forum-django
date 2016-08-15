@@ -19,6 +19,9 @@ module.exports = {
     path: path.resolve(path.join(__dirname, '..', 'dist', 'assets')),
     publicPath: '/static/assets/',
     filename: '[name]-[hash].js',
+    // http://stackoverflow.com/questions/34357489/calling-webpacked-code-from-outside-html-script-tag
+    libraryTarget: 'var',
+    library: ['Forum', '[name]']
   },
 
   // configure your plugins at the separate mode level files

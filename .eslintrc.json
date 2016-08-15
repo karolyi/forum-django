@@ -18,5 +18,5 @@
   },
   "plugins": [
   ],
-  "extends": ["eslint:recommended"]
+  "extends": ["eslint:recommended", "airbnb-base"]
 }
