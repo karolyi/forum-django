@@ -6,7 +6,7 @@ const path = require('path')
 
 const getJsAndCssList = (items) => {
   const resultList = []
-  for (let item of items) {
+  for (var item of items) {
     if (item.name.endsWith('.js') || item.name.endsWith('.css')) {
       resultList.push(item.publicPath)
     }

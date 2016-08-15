@@ -21,7 +21,8 @@ except ImportError as e:
     pass
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
+DIR_BACKEND = BASE_DIR
+DIR_FRONTEND = os.path.join(os.path.dirname(BASE_DIR), 'frontend')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get(
@@ -105,13 +106,13 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
     # We do this so that django's collectstatic copies or our bundles to
     # the STATIC_ROOT or syncs them to whatever storage we use.
-    os.path.join(BASE_DIR, 'webpack', 'assets'),
+    os.path.join(DIR_FRONTEND, 'dist'),
 )
 
 WEBPACK_LOADER = {
     'DEFAULT': {
-        'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': os.path.join(BASE_DIR, 'webpack', 'stats.json'),
+        'BUNDLE_DIR_NAME': 'assets/',
+        'STATS_FILE': os.path.join(DIR_FRONTEND, 'webpack', 'stats.json'),
         'CACHE': not DEBUG
     }
 }

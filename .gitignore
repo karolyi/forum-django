@@ -26,6 +26,7 @@ target/
 
 node_modules/
 frontend/dist
+frontend/webpack/stats.json
 static/
 *.sublime*
 logs/

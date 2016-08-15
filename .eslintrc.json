@@ -15,10 +15,8 @@
     "max-len": [2, {"code": 80, "tabWidth": 4, "ignoreUrls": true}]
   },
   "globals": {
-    "riot": true
   },
   "plugins": [
-    "riot"
   ],
-  "extends": ["eslint:recommended", "airbnb/base"]
+  "extends": ["eslint:recommended"]
 }

@@ -2,9 +2,10 @@
 /* global riot, describe, it, beforeEach, assert, before */
 
 describe('Test tag tests', () => {
-  let tagNode;
+  let tagNode
 
   before((done) => {
+    console.log(document.location.href)
     riot.compile('/base/frontend/src/js/skin-default/test.tag', () => {
       done()
     })

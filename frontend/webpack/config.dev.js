@@ -15,12 +15,9 @@ configBase.devtool = 'source-map'
 configBase.output.filename = '[name].js'
 
 configBase.plugins = [
-  new webpack.ProvidePlugin({
-    riot: 'riot',
-  }),
   new BundleTracker({
     path: __dirname,
-    filename: path.join('..', 'dist', 'assets', 'stats.json'),
+    filename: path.join('..', 'webpack', 'stats.json'),
   }),
   new ExtractTextPlugin('[name].css'),
   // keeps hashes consistent between compilations

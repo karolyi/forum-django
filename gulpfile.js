@@ -6,25 +6,25 @@ const webpack = require('webpack')
 const WebpackDevServer = require('webpack-dev-server')
 const path = require('path')
 const del = require('del')
-const htmlreplace = require('gulp-html-replace')
-const bundleHelper = require('./frontend/src/js/loader/bundlehelper')
+// const htmlreplace = require('gulp-html-replace')
+// const bundleHelper = require('./frontend/src/js/loader/bundlehelper')
 const eslint = require('gulp-eslint')
 
-const htmlReplaceSkeleton = () =>
-  gulp.src('frontend/src/index.html')
-    .pipe(htmlreplace({
-      loader: {
-        src: null,
-        tpl: bundleHelper.createHeader(),
-      },
-    }))
-    .pipe(gulp.dest('frontend/dist/'))
+// const htmlReplaceSkeleton = () =>
+//   gulp.src('frontend/src/index.html')
+//     .pipe(htmlreplace({
+//       loader: {
+//         src: null,
+//         tpl: bundleHelper.createHeader(),
+//       },
+//     }))
+//     .pipe(gulp.dest('frontend/dist/'))
 
 // Cleanup task
 gulp.task('clean', () => del(['./frontend/dist/**/*']))
 
 // Lint Task
-gulp.task('lint', () => gulp.src('frontend/src/**/*.{tag,js,html}')
+gulp.task('lint', () => gulp.src('frontend/src/**/*.{js,html}')
   // eslint() attaches the lint output to the "eslint" property
   // of the file object so it can be used by other modules.
   .pipe(eslint())
@@ -44,11 +44,8 @@ gulp.task('webpack-dev', ['lint'], () => gulp.src('')
   .pipe(webpackStream(require('./frontend/webpack/config.dev')))
   .pipe(gulp.dest('frontend/dist/assets/')))
 
-gulp.task('prepare-index-dev', ['webpack-dev'], htmlReplaceSkeleton)
-gulp.task('prepare-index-prod', ['webpack-prod'], htmlReplaceSkeleton)
-
-gulp.task('build', ['clean', 'webpack-prod', 'prepare-index-prod'])
-gulp.task('build-dev', ['clean', 'webpack-dev', 'prepare-index-dev'])
+gulp.task('build', ['clean', 'webpack-prod'])
+gulp.task('build-dev', ['clean', 'webpack-dev'])
 
 gulp.task('webpack-dev-server', ['clean'], () => {
   const config = require('./frontend/webpack/config.dev-server')
@@ -59,15 +56,15 @@ gulp.task('webpack-dev-server', ['clean'], () => {
     historyApiFallback: true,
     progress: true,
     contentBase: path.join(__dirname, 'frontend', 'src'),
-    publicPath: '/assets/',
+    publicPath: '/static/assets/',
     stats: {
       colors: true,
     },
   })
-  server.listen(8081, '0.0.0.0', (err) => {
+  server.listen(3000, '0.0.0.0', (err) => {
     if (err) throw new gutil.PluginError('webpack-dev-server', err)
     // Server listening
-    gutil.log('[webpack-dev-server]', 'http://localhost:8081/')
+    gutil.log('[webpack-dev-server]', 'http://localhost:3000/')
   })
 })
 

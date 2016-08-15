@@ -5,9 +5,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+    {% render_bundle 'vendor' %}
     {% render_bundle 'default' %}
     <title>{% block title %}{% get_setting SITE_NAME %}{% endblock title %}</title>
-    <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
 {% comment %}
     <script type="text/javascript">
         require(['common'], function (common) {

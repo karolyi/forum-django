@@ -17,7 +17,7 @@ module.exports = {
 
   output: {
     path: path.resolve(path.join(__dirname, '..', 'dist', 'assets')),
-    publicPath: '/assets/',
+    publicPath: '/static/assets/',
     filename: '[name]-[hash].js',
   },
 
@@ -25,12 +25,6 @@ module.exports = {
 
   module: {
     loaders: [
-      {
-        test: /\.tag$/,
-        include: /src/,
-        exclude: /node_modules/,
-        loader: 'riotjs',
-      },
       {
         // Transpile ES6 to ES5
         test: /\.js?$/,
@@ -45,13 +39,22 @@ module.exports = {
       // },
       {
         test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: 'url-loader?limit=10000&mimetype=application/font-woff',
+        loader: 'url?limit=10000&mimetype=application/font-woff',
       },
       {
         test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         loader: 'file-loader',
       },
     ],
+  },
+
+  urlLoader: {
+    limit: 10000,
+    mimetype: 'application/font-woff'
+  },
+
+  resolveUrlLoader: {
+    root: '/assets/'
   },
 
   sassLoader: {
@@ -65,6 +68,6 @@ module.exports = {
       'node_modules',
       'bower_components',
     ],
-    extensions: ['', '.js', '.tag'],
+    extensions: ['', '.js'],
   },
 }
