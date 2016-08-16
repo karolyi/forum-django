@@ -12,18 +12,13 @@
     <link rel="icon" href="{% static "favicon.ico" %}" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script type="text/javascript">
-        window.onload = function() {
-            console.debug('Forum.common', Forum.common);
-        }
-        // require(['common'], function (common) {
-        //   Forum.common.init({
-        //     languageInfo: {
-        //       code: '{{ current_language.code|escapejs }}',
-        //       localName: '{{ current_language.name_local|escapejs }}',
-        //       name: '{{ current_language.name|escapejs }}'
-        //     }
-        //   });
-        // });
+        Forum.common.init({
+          languageInfo: {
+            code: '{{ current_language.code|escapejs }}',
+            localName: '{{ current_language.name_local|escapejs }}',
+            name: '{{ current_language.name|escapejs }}'
+          }
+        });
     </script>
 </head>
 <body>

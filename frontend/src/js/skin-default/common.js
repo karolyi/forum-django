@@ -1,5 +1,8 @@
-exports.test = 'aaa'
+exports.options = {}
 
-exports.x = 2
-
-console.debug('running', exports.test)
+exports.init = (optionsPassed) => {
+  let key
+  for (key of Object.keys(optionsPassed)) {
+    exports.options[key] = optionsPassed[key]
+  }
+}

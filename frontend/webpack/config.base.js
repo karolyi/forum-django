@@ -13,6 +13,9 @@ module.exports = {
       '../src/scss/skin-default/base.scss',
       '../src/js/skin-default/common',
     ],
+    topicGroup: [
+      '../src/js/skin-default/topicGroup',
+    ],
   },
 
   output: {
