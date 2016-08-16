@@ -6,24 +6,25 @@
 <html>
 <head>
     {% render_bundle 'vendor' %}
-    {% render_bundle 'default' %}
+    {% render_bundle 'common' %}
     <title>{% block title %}{% get_setting SITE_NAME %}{% endblock title %}</title>
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
-{% comment %}
-    <script type="text/javascript">
-        require(['common'], function (common) {
-          common.init({
-            languageInfo: {
-              code: '{{ current_language.code|escapejs }}',
-              localName: '{{ current_language.name_local|escapejs }}',
-              name: '{{ current_language.name|escapejs }}'
-            }
-          });
-        });
-    </script>
-{% endcomment %}
     <link rel="icon" href="{% static "favicon.ico" %}" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <script type="text/javascript">
+        window.onload = function() {
+            console.debug('Forum.common', Forum.common);
+        }
+        // require(['common'], function (common) {
+        //   Forum.common.init({
+        //     languageInfo: {
+        //       code: '{{ current_language.code|escapejs }}',
+        //       localName: '{{ current_language.name_local|escapejs }}',
+        //       name: '{{ current_language.name|escapejs }}'
+        //     }
+        //   });
+        // });
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-fixed-top navbar-default">

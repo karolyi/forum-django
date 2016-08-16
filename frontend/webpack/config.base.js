@@ -7,11 +7,11 @@ module.exports = {
     loader: [
       '../src/js/loader',
     ],
-    default: [
-      // entry point of our app. assets/js/index.js should require other
-      // js modules and dependencies it needs
-      '../src/js/skin-default/index',
+    common: [
+      // Put the JS entries always at the end, otherwise libraryTarget
+      // variable exportin will not work!
       '../src/scss/skin-default/base.scss',
+      '../src/js/skin-default/common',
     ],
   },
 
