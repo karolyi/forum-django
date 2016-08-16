@@ -39,7 +39,9 @@
             </div>
             <div class="clearfix visible-xs-block"></div>
             <div class="col-xs-6 col-ms-2 text-center">
-                {{ model_topic.last_comment.user.username }}
+                <a href="/{{ model_topic.last_comment.user.settings.slug }}" class="username" data-toggle="tooltip" title="asd">
+                    {{ model_topic.last_comment.user.username }}
+                </a>
             </div>
             <div class="col-xs-6 col-ms-2 text-center">
                 {{ model_topic.comment_count }}
