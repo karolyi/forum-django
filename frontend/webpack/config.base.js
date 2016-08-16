@@ -21,7 +21,7 @@ module.exports = {
     filename: '[name]-[hash].js',
     // http://stackoverflow.com/questions/34357489/calling-webpacked-code-from-outside-html-script-tag
     libraryTarget: 'var',
-    library: ['Forum', '[name]']
+    library: ['Forum', '[name]'],
   },
 
   // configure your plugins at the separate mode level files
@@ -53,11 +53,11 @@ module.exports = {
 
   urlLoader: {
     limit: 10000,
-    mimetype: 'application/font-woff'
+    mimetype: 'application/font-woff',
   },
 
   resolveUrlLoader: {
-    root: '/assets/'
+    root: '/assets/',
   },
 
   sassLoader: {

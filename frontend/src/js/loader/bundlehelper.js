@@ -4,9 +4,11 @@ const fs = require('fs')
 const util = require('util')
 const path = require('path')
 
+let item
+
 const getJsAndCssList = (items) => {
   const resultList = []
-  for (var item of items) {
+  for (item of items) {
     if (item.name.endsWith('.js') || item.name.endsWith('.css')) {
       resultList.push(item.publicPath)
     }

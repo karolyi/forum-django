@@ -1,3 +1,4 @@
+/* eslint global-require: "off", import/no-extraneous-dependencies: "off" */
 // Include gulp
 const gulp = require('gulp')
 const gutil = require('gulp-util')
@@ -24,7 +25,7 @@ const eslint = require('gulp-eslint')
 gulp.task('clean', () => del(['./frontend/dist/**/*']))
 
 // Lint Task
-gulp.task('lint', () => gulp.src('frontend/src/**/*.{js,html}')
+gulp.task('lint', () => gulp.src(['frontend/**/*.{js,html}'])
   // eslint() attaches the lint output to the "eslint" property
   // of the file object so it can be used by other modules.
   .pipe(eslint())
@@ -49,6 +50,7 @@ gulp.task('build-dev', ['clean', 'webpack-dev'])
 
 gulp.task('webpack-dev-server', ['clean'], () => {
   const config = require('./frontend/webpack/config.dev-server')
+
   const compiler = webpack(config)
   const server = new WebpackDevServer(compiler, {
     hot: true,

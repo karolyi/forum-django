@@ -8,8 +8,10 @@ const webpack = require('webpack')
 const BundleTracker = require('webpack-bundle-tracker')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
+let key
 const tempEntry = {}
-for (let key of Object.keys(configBase.entry)) {
+
+for (key of Object.keys(configBase.entry)) {
   const item = configBase.entry[key].slice()
   // Copy the original list
   // item.unshift('webpack/hot/only-dev-server')
