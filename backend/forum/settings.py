@@ -134,7 +134,7 @@ DATABASES = {
         'HOST': '127.0.0.1',
         'PORT': 3306,
         'OPTIONS': {
-            'sql_mode': 'STRICT_TRANS_TABLES',
+            'sql_mode': 'STRICT_ALL_TABLES',
             'charset': 'utf8mb4'
         }
     }
