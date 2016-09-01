@@ -16,6 +16,9 @@ module.exports = {
     topicGroup: [
       '../src/js/skin-default/topicGroup',
     ],
+    userName: [
+      '../src/js/skin-default/userName',
+    ],
   },
 
   output: {

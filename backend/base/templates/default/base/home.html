@@ -2,6 +2,17 @@
 {% load i18n humanize %}
 {% load render_bundle from webpack_loader %}
 
+{% block extra_scripts_head %}
+{% render_bundle 'userName' %}
+<script type="text/javascript">
+Forum.userName.init({
+    urls: {
+        shortData: '/a/b/c/12345'
+    }
+})
+</script>
+{% endblock extra_scripts_head %}
+
 {% block main_content %}
     {% render_bundle 'topicGroup' %}
 
