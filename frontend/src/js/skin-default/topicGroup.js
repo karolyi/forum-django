@@ -1,6 +1,5 @@
 const $ = require('jquery')
-
-console.debug('$', $)
+require('bootstrap-sass/assets/javascripts/bootstrap/tooltip')
 
 class Instance {
   constructor(options) {
@@ -9,8 +8,7 @@ class Instance {
 
   initialize() {
     this.jqRoot = $(this.options.selectors.root)
-    console.debug('jqRoot', this.jqRoot)
-    this.jqRoot.tooltip()
+    this.jqRoot.find('[data-toggle=tooltip]').tooltip()
   }
 }
 

@@ -29,7 +29,7 @@ configBase.plugins = [
 configBase.module.loaders.push({
   test: /\.scss$/,
   loader: ExtractTextPlugin.extract(
-    'style-loader', 'css-loader!sass-loader'),
+    'style-loader', 'css-loader?sourceMap!sass-loader?sourceMap'),
 })
 
 module.exports = configBase

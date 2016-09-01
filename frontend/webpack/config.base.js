@@ -14,7 +14,6 @@ module.exports = {
       '../src/js/skin-default/common',
     ],
     topicGroup: [
-      'bootstrap-loader',
       '../src/js/skin-default/topicGroup',
     ],
   },
@@ -66,7 +65,6 @@ module.exports = {
 
   resolveUrlLoader: {
     // root: [
-    //   path.resolve(__dirname, '../../'),
     //   '/assets/',
     // ],
   },
