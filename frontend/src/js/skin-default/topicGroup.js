@@ -1,5 +1,6 @@
+// require('bootstrap-sass/assets/javascripts/bootstrap/tooltip')
 const $ = require('jquery')
-require('bootstrap-sass/assets/javascripts/bootstrap/tooltip')
+const userName = require('./userName')
 
 class Instance {
   constructor(options) {
@@ -8,7 +9,10 @@ class Instance {
 
   initialize() {
     this.jqRoot = $(this.options.selectors.root)
-    this.jqRoot.find('[data-toggle=tooltip]').tooltip()
+    const jqUsers = this.jqRoot.find('[data-toggle=username]')
+    userName.init({
+      jqUsers,
+    })
   }
 }
 

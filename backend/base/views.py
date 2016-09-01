@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from base.utils.home import collect_topics
-a = '⬆'
 
 
 def home(request):
