@@ -9,11 +9,12 @@ module.exports = {
     ],
     common: [
       // Put the JS entries always at the end, otherwise libraryTarget
-      // variable exportin will not work!
+      // variable exporting will not work!
       '../src/scss/skin-default/base.scss',
       '../src/js/skin-default/common',
     ],
     topicGroup: [
+      'bootstrap-loader',
       '../src/js/skin-default/topicGroup',
     ],
   },
@@ -36,6 +37,10 @@ module.exports = {
         test: /\.js?$/,
         exclude: /node_modules/,
         loaders: ['babel'],
+      },
+      {
+        test: /bootstrap-sass\/assets\/javascripts\//,
+        loader: 'imports?jQuery=jquery',
       },
       // to transform JSX into JS
       // {
@@ -60,7 +65,10 @@ module.exports = {
   },
 
   resolveUrlLoader: {
-    root: '/assets/',
+    // root: [
+    //   path.resolve(__dirname, '../../'),
+    //   '/assets/',
+    // ],
   },
 
   sassLoader: {

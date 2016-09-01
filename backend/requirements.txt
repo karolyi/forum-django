@@ -4,7 +4,7 @@ blessings==1.6
 decorator==4.0.10
 Django==1.10
 django-debug-toolbar==1.5
-django-extensions==1.7.2
+django-extensions==1.7.3
 django-nose==1.4.4
 django-webpack-loader==0.3.3
 filemagic==1.6

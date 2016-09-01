@@ -1,5 +1,6 @@
 const $ = require('jquery')
-// const bootstrap = require('bootstrap-sass')
+
+console.debug('$', $)
 
 class Instance {
   constructor(options) {
@@ -9,7 +10,7 @@ class Instance {
   initialize() {
     this.jqRoot = $(this.options.selectors.root)
     console.debug('jqRoot', this.jqRoot)
-    // this.jqRoot.tooltip()
+    this.jqRoot.tooltip()
   }
 }
 
