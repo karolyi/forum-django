@@ -3,6 +3,7 @@
 {% load render_bundle from webpack_loader %}
 
 {% block extra_scripts_head %}
+{% render_bundle 'topicGroup' %}
 {% render_bundle 'userName' %}
 <script type="text/javascript">
 Forum.userName.init({
@@ -18,7 +19,6 @@ Forum.userName.init({
 {% endblock extra_scripts_head %}
 
 {% block main_content %}
-    {% render_bundle 'topicGroup' %}
     {% include 'default/include/user-tooltip-template.html' %}
 
     {% include 'default/base/include/topic-group.html' with topic_list=topics_highlighted topic_type='highlighted' %}
