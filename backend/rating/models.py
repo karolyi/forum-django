@@ -32,11 +32,11 @@ class UserRating(models.Model):
         verbose_name_plural = _('User ratings')
 
     def __str__(self):
-        return _('%(value)s on user %(ratee)s from user %(rater)s' % {
+        return str(_('%(value)s on user %(ratee)s from user %(rater)s' % {
             'value': self.value,
             'ratee': self.ratee,
             'rater': self.rater
-        })
+        }))
 
     is_enabled = models.BooleanField(
         verbose_name=_('Is approved'), default=False)

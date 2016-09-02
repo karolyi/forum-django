@@ -18,10 +18,10 @@ class Comment(models.Model):
     """
 
     def __str__(self):
-        return _('#%(number)s in \'%(topic)s\'' % {
+        return str(_('#%(number)s in \'%(topic)s\'' % {
             'number': self.number,
             'topic': self.topic
-        })
+        }))
 
     user = models.ForeignKey(User, verbose_name=_('The commenter user'))
     topic = models.ForeignKey('Topic', verbose_name=_('Commented in topic'))
@@ -131,7 +131,7 @@ class Settings(models.Model):
         return slugify(user_instance.username)
 
     def __str__(self):
-        return _('Settings for user %s' % self.user)
+        return str(self.user)
 
     user = models.OneToOneField(User, verbose_name=_('Respective user'))
     slug = AutoSlugField(
@@ -227,11 +227,11 @@ class CommentBookmark(models.Model):
         unique_together = (('user', 'topic'),)
 
     def __str__(self):
-        return _('s(number)s in %(topic)s for %(user)s') % {
+        return str(_('s(number)s in %(topic)s for %(user)s') % {
             'number': self.comment.number,
             'topic': self.topic,
             'user': self.user
-        }
+        })
 
     user = models.ForeignKey(User, verbose_name=_('User'))
     topic = models.ForeignKey(Topic, verbose_name=_('Topic'))
