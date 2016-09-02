@@ -27,8 +27,11 @@ const fillTooltip = () => {
   const clonedTemplate = moduleLocals.tooltipTemplate.clone()
   const userData = userMap.get(userSlug)
   clonedTemplate.find('.quote .value').text(userData.quote)
-  if (!userData.isSuperuser && !userData.isStaff) {
-    clonedTemplate.find('.is-admin').addClass('hide')
+  if (userData.isSuperuser || userData.isStaff) {
+    clonedTemplate.find('.is-admin').removeClass('hide')
+  }
+  if (userData.isBanned) {
+    clonedTemplate.find('.is-banned').removeClass('hide')
   }
   moduleLocals.jqUserHovered.attr('title', clonedTemplate[0].outerHTML)
   moduleLocals.jqUserHovered.tooltip('fixTitle').tooltip('show')

@@ -23,6 +23,7 @@ def v1_user_short(request, slug_list):
         dict_result[model_settings.slug] = {
             'quote': model_settings.quote,
             'isSuperuser': model_settings.user.is_superuser,
-            'isStaff': model_settings.user.is_staff
+            'isStaff': model_settings.user.is_staff,
+            'isBanned': model_settings.is_banned,
         }
     return JsonResponse(dict_result)
