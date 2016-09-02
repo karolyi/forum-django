@@ -26,7 +26,11 @@
   }
 
   .user-tooltip-template {
-    .quote {
+    tr.decorated {
+      border-top: 1px solid $gray-light;
+    }
+
+    .quote, .ratings {
       .property, .value {
         vertical-align: top;
         text-align: left;
@@ -35,7 +39,17 @@
     }
 
     .is-admin, .is-banned {
-      color: red;
+      color: $brand-danger;
+    }
+
+    .ratings .value .average {
+      &.rating-positive {
+        color: $brand-success;
+      }
+
+      &.rating-negative {
+        color: $brand-danger;
+      }
     }
   }
 

@@ -26,15 +26,31 @@ const fillTooltip = () => {
   const userSlug = moduleLocals.jqUserHovered.data('slug')
   const clonedTemplate = moduleLocals.tooltipTemplate.clone()
   const userData = userMap.get(userSlug)
-  clonedTemplate.find('.quote .value').text(userData.quote)
+  const ratingAvg = parseFloat(userData.rating.avg)
+  userData.rating.text = userData.rating.avg
+  if (ratingAvg > 0) userData.rating.text = `+${userData.rating.text}`
+  if (userData.quote) {
+    clonedTemplate.find('.quote .value').text(userData.quote)
+    clonedTemplate.find('.quote').removeClass('hide')
+  }
   if (userData.isSuperuser || userData.isStaff) {
     clonedTemplate.find('.is-admin').removeClass('hide')
   }
   if (userData.isBanned) {
     clonedTemplate.find('.is-banned').removeClass('hide')
   }
+  clonedTemplate.find('.ratings .value .count').text(userData.rating.count)
+  const jqAverage = clonedTemplate.find('.ratings .value .average')
+  jqAverage.text(userData.rating.text)
+  if (ratingAvg > 0) jqAverage.addClass('rating-positive')
+  else if (ratingAvg < 0) jqAverage.addClass('rating-negative')
+
+  // Add decoration to all the visible tr's but the first
+  clonedTemplate.find('tr:not(.hide):not(:first)').addClass('decorated')
+
   moduleLocals.jqUserHovered.attr('title', clonedTemplate[0].outerHTML)
   moduleLocals.jqUserHovered.tooltip('fixTitle').tooltip('show')
+  moduleLocals.jqUserHovered.attr('data-is-filled', true)
 }
 
 const onXhrSuccessShortData = (result) => {

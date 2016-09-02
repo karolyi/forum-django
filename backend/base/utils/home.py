@@ -5,7 +5,9 @@ from django.core.paginator import Paginator
 
 
 def _get_topics_per_page(request):
-    """Return the shown topics per page for a user."""
+    """
+    Return the shown topics per page for a user.
+    """
     topics_per_page = request.session.get('topics_per_page')
     if topics_per_page is not None:
         return topics_per_page
@@ -14,27 +16,26 @@ def _get_topics_per_page(request):
 
 
 def collect_topics(request):
-    """Collect topic list for the home view."""
+    """
+    Collect topic list for the home view.
+    """
     search_kwargs = {
         'is_enabled': True,
     }
     if not request.user.is_staff:
         search_kwargs['is_staff_only'] = False
-    search_kwargs['type'] = TOPIC_TYPE_HIGHLIGHTED
-    topics_highlighted = Topic.objects.filter(**search_kwargs).select_related(
-        'last_comment', 'last_comment__user').only(
-        'name_text', 'comment_count', 'last_comment__user__username',
-        'last_comment__time')
-    search_kwargs['type'] = TOPIC_TYPE_NORMAL
-    topics_normal = Topic.objects.filter(**search_kwargs).select_related(
-        'last_comment', 'last_comment__user').only(
+    search_kwargs['type__in'] = (TOPIC_TYPE_HIGHLIGHTED, TOPIC_TYPE_NORMAL)
+    qs_topics = Topic.objects.filter(**search_kwargs).select_related(
+        'last_comment', 'last_comment__user', 'last_comment__user__settings'
+    ).only(
         'name_text', 'comment_count', 'last_comment__user__username',
         'last_comment__time')
     topics_per_page = _get_topics_per_page(request)
-    print('topics_per_page', topics_per_page)
+    qs_topics_highlighted = qs_topics.filter(type=TOPIC_TYPE_HIGHLIGHTED)
+    qs_topics_normal = qs_topics.filter(type=TOPIC_TYPE_NORMAL)
     paginator_highlighted = Paginator(
-        topics_highlighted, per_page=topics_per_page)
+        qs_topics_highlighted, per_page=topics_per_page)
     paginator_normal = Paginator(
-        topics_normal, per_page=topics_per_page)
+        qs_topics_normal, per_page=topics_per_page)
 
     return paginator_highlighted.page(1), paginator_normal.page(1)
