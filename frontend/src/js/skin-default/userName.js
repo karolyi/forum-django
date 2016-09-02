@@ -21,25 +21,40 @@ const moduleLocals = {}
 //   }
 // }
 const fillTooltip = () => {
-  // Fill the tooltip, if any is still hovered
+  // Fill the tooltip, if any username is still hovered
   if (!moduleLocals.jqUserHovered) return
-  moduleLocals.jqUserHovered = undefined
+  const userSlug = moduleLocals.jqUserHovered.data('slug')
+  const clonedTemplate = moduleLocals.tooltipTemplate.clone()
+  const userData = userMap.get(userSlug)
+  clonedTemplate.find('.quote .value').text(userData.quote)
+  if (!userData.isSuperuser && !userData.isStaff) {
+    clonedTemplate.find('.is-admin').addClass('hide')
+  }
+  moduleLocals.jqUserHovered.attr('title', clonedTemplate[0].outerHTML)
+  moduleLocals.jqUserHovered.tooltip('fixTitle').tooltip('show')
 }
 
 const onXhrSuccessShortData = (result) => {
-  console.debug('onXhrSuccessShortData', result)
+  for (const [userSlug, data] of Object.entries(result)) {
+    userMap.set(userSlug, data)
+  }
   fillTooltip()
 }
 
 const onXhrErrorShortData = (xhr) => {
-  console.debug('onXhrErrorShortData', xhr)
+  // Load has failed for some reason
+  if (!moduleLocals.jqUserHovered) return
+  moduleLocals.jqUserHovered.attr(
+    'title', '<span class="fa fa-chain-broken"></span>')
+  moduleLocals.jqUserHovered.tooltip('fixTitle').tooltip('show')
 }
 
 
-const loadUserData = (userId) => {
+const loadUserData = (userSlug) => {
   // Load the user data
   $.when($.ajax({
-    url: moduleLocals.options.urls.shortData.replace('12345', userId),
+    url: moduleLocals.options.urls.shortData.replace(
+      moduleLocals.options.urls.exampleSlug, userSlug),
     dataType: 'json',
   })).then(onXhrSuccessShortData, onXhrErrorShortData)
 }
@@ -47,11 +62,12 @@ const loadUserData = (userId) => {
 const onMouseInUsername = (event) => {
   const jqUsername = $(event.currentTarget)
   moduleLocals.jqUserHovered = jqUsername
-  const userId = jqUsername.data('userid')
-  if (userMap.has(userId)) {
+  const userSlug = jqUsername.data('slug')
+  if (jqUsername.attr('data-is-filled') === 'true') return
+  if (userMap.has(userSlug)) {
     fillTooltip()
   } else {
-    loadUserData(userId)
+    loadUserData(userSlug)
   }
 }
 
@@ -61,6 +77,10 @@ const onMouseOutUsername = (event) => {
 
 export function init(options) {
   moduleLocals.options = options
+  $.when($.ready).then(() => {
+    moduleLocals.tooltipTemplate =
+      $(moduleLocals.options.selectors.template).remove().removeClass('hide')
+  })
 }
 
 export function add(options) {

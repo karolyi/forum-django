@@ -38,7 +38,11 @@ module.exports = {
         // Transpile ES6 to ES5
         test: /\.js?$/,
         exclude: /node_modules/,
-        loaders: ['babel'],
+        loader: 'babel',
+        query: {
+          babelrc: true,
+          // extends: path.resolve(__dirname, '../../.babelrc'),
+        },
       },
       {
         test: /bootstrap-sass\/assets\/javascripts\//,

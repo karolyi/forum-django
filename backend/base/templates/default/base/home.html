@@ -7,7 +7,11 @@
 <script type="text/javascript">
 Forum.userName.init({
     urls: {
-        shortData: '/a/b/c/12345'
+        shortData: '{% url 'rest-api:v1-user-short' slug_list='example-slug' %}',
+        exampleSlug: 'example-slug',
+    },
+    selectors: {
+        template: '.user-tooltip-template'
     }
 })
 </script>
@@ -15,6 +19,7 @@ Forum.userName.init({
 
 {% block main_content %}
     {% render_bundle 'topicGroup' %}
+    {% include 'default/include/user-tooltip-template.html' %}
 
     {% include 'default/base/include/topic-group.html' with topic_list=topics_highlighted topic_type='highlighted' %}
 

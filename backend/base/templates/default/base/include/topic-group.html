@@ -39,7 +39,7 @@
             </div>
             <div class="clearfix visible-xs-block"></div>
             <div class="col-xs-6 col-ms-2 text-center">
-                <a href="/{{ model_topic.last_comment.user.settings.slug }}" class="username" data-userid="{{ model_topic.last_comment.user_id }}" data-toggle="username">
+                <a href="/{{ model_topic.last_comment.user.settings.slug }}" class="username" data-slug="{{ model_topic.last_comment.user.settings.slug }}" data-toggle="username">
                     {{ model_topic.last_comment.user.username }}
                 </a>
             </div>

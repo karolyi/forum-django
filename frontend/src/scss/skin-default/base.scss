@@ -25,6 +25,20 @@
     padding-left: $sidebar-width-desktop + $grid-gutter-width / 2;
   }
 
+  .user-tooltip-template {
+    .quote {
+      .property, .value {
+        vertical-align: top;
+        text-align: left;
+        padding: $grid-gutter-width / 8;
+      }
+    }
+
+    .is-admin {
+      color: red;
+    }
+  }
+
   padding-top: $navbar-height + $navbar-margin-bottom;
 
   .topic-group-wrapper {
