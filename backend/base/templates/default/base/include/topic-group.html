@@ -39,9 +39,7 @@
             </div>
             <div class="clearfix visible-xs-block"></div>
             <div class="col-xs-6 col-ms-2 text-center">
-                <a href="/{{ model_topic.last_comment.user.settings.slug }}" class="username" data-slug="{{ model_topic.last_comment.user.settings.slug }}" data-toggle="username">
-                    {{ model_topic.last_comment.user.username }}
-                </a>
+                {% include 'default/include/username.html' with model_user=model_topic.last_comment.user %}
             </div>
             <div class="col-xs-6 col-ms-2 text-center">
                 {{ model_topic.comment_count }}
@@ -49,7 +47,7 @@
         </div>
         {% endfor %}
         <div class="pagination-wrapper text-center">
-        {% include 'default/paginator.html' with page=topic_list %}
+        {% include 'default/base/include/topiclist-paginator.html' with page=topic_list %}
         </div>
     </div>
 </div>
