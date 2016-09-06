@@ -28,7 +28,9 @@ const fillTooltip = () => {
   const userData = userMap.get(userSlug)
   const ratingAvg = parseFloat(userData.rating.avg)
   userData.rating.text = userData.rating.avg
-  if (ratingAvg > 0) userData.rating.text = `+${userData.rating.text}`
+  if (ratingAvg > 0) {
+    userData.rating.text = `+${userData.rating.text}`
+  }
   if (userData.quote) {
     clonedTemplate.find('.quote .value').text(userData.quote)
     clonedTemplate.find('.quote').removeClass('hide')

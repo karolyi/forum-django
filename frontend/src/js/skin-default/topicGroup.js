@@ -1,5 +1,6 @@
 const $ = require('jquery')
 const userName = require('./userName')
+const timeActualizer = require('./timeActualizer')
 
 class Instance {
   constructor(options) {
@@ -12,6 +13,8 @@ class Instance {
     userName.add({
       jqUsers,
     })
+    const jqTimeElements = this.jqRoot.find('.forum-time')
+    timeActualizer.add(jqTimeElements)
   }
 }
 

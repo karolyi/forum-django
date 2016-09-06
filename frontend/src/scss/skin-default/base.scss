@@ -25,6 +25,12 @@
     padding-left: $sidebar-width-desktop + $grid-gutter-width / 2;
   }
 
+  .forum-username {
+    &.is-admin {
+      color: $brand-success;
+    }
+  }
+
   .user-tooltip-template {
     tr.decorated {
       border-top: 1px solid $gray-light;
@@ -74,6 +80,10 @@
 
         &:last-child {
           border-bottom: 0;
+        }
+
+        .forum-time {
+          display: block;
         }
       }
     }

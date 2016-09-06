@@ -11,7 +11,7 @@ from rest_api.utils import cast_to_set_of_slug
 def v1_user_short(request, slug_list):
     """
     Serve some short information about the requested user IDs such as
-    quotes, and staff/superuser status.
+    quotes, and staff/superuser status and received ratings.
     """
     try:
         set_slug = cast_to_set_of_slug(slug_list)

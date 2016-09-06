@@ -14,6 +14,7 @@ urlpatterns = [
         urls_api, namespace='rest-api', app_name='rest_api')),
 
     # JavaScript i18n
-    url(r'^jsi18n/$', JavaScriptCatalog.as_view(domain='django'),
-        name='javascript-catalog'),
+    url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+    # url(r'^jsi18n/$', JavaScriptCatalog.as_view(domain='django'),
+    #     name='javascript-catalog'),
 ]

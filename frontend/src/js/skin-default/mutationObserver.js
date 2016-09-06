@@ -4,6 +4,7 @@ const $ = require('jquery')
 const observedNodes = new Map()
 
 const nodeRemoved = (targetNode) => {
+  if (!targetNode.getElementsByTagName) return
   const everyDescendants = [...targetNode.getElementsByTagName('*')]
   for (const [observedNode, callbacks] of observedNodes) {
     if (everyDescendants.indexOf(observedNode) === -1) continue

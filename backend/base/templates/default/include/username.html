@@ -1,5 +1,5 @@
 {% load i18n %}
-<a href="/{{ model_user.settings.slug }}" class="username {% spaceless %}
+<a href="/{{ model_user.settings.slug }}" class="forum-username {% spaceless %}
     {% if model_user.is_superuser or model_user.is_staff %}
         is-admin
     {% endif %}

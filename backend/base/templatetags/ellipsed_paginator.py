@@ -20,7 +20,6 @@ def get_paginated_list(
         return (1,)
     start_page = max(page.number - adjacent_pages, 1)
     end_page = min(page.number + adjacent_pages, num_pages)
-    print(start_page, end_page)
     page_number_list = []
     page_number_list.extend((
         x for x in range(start_page, end_page + 1)))

@@ -19,6 +19,9 @@ module.exports = {
     userName: [
       '../src/js/skin-default/userName',
     ],
+    timeActualizer: [
+      '../src/js/skin-default/timeActualizer',
+    ],
   },
 
   output: {

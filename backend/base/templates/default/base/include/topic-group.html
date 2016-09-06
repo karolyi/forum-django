@@ -35,7 +35,7 @@
                 <a href="">{{ model_topic.name_text }}</a>
             </div>
             <div class="col-xs-6 col-ms-2 text-center">
-                {{ model_topic.last_comment.time|naturaltime }}
+                {% include 'default/include/time.html' with time=model_topic.last_comment.time %}
             </div>
             <div class="clearfix visible-xs-block"></div>
             <div class="col-xs-6 col-ms-2 text-center">
