@@ -153,7 +153,7 @@ const updateInstances = () => {
   }
 }
 
-setInterval(updateInstances, 5000)
+setInterval(updateInstances, 60000)
 
 const onRemoveElement = (domNode) => {
   instanceMap.delete(domNode)
