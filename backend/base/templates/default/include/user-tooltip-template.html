@@ -1,23 +1,25 @@
 {% load i18n %}
-<table class="user-tooltip-template hide">
-    <tbody>
-        <tr class="quote hide">
-            <td class="property">{% trans 'Quote:' %}</td>
-            <td class="value"></td>
-        </tr>
-        <tr class="is-admin hide">
-            <td colspan="2">{% trans 'Administrator' %}</td>
-        </tr>
-        <tr class="is-banned hide">
-            <td colspan="2">{% trans 'User is banned.' %}</td>
-        </tr>
-        <tr class="ratings">
-            <td class="property">{% trans 'Accepted ratings' %}</td>
-            <td class="value">
-                <span class="count"></span>
-                {% trans 'ratings, averaging' %}
-                <span class="average"></span>
-            </td>
-        </tr>
-    </tbody>
-</table>
+<template class="forum-user-tooltip-template">
+    <table class="forum-user-tooltip">
+        <tbody>
+            <tr class="quote hide">
+                <td class="property">{% trans 'Quote:' %}</td>
+                <td class="value"></td>
+            </tr>
+            <tr class="is-admin hide">
+                <td colspan="2">{% trans 'Administrator' %}</td>
+            </tr>
+            <tr class="is-banned hide">
+                <td colspan="2">{% trans 'User is banned.' %}</td>
+            </tr>
+            <tr class="ratings">
+                <td class="property">{% trans 'Accepted ratings' %}</td>
+                <td class="value">
+                    <span class="count"></span>
+                    {% trans 'ratings, averaging' %}
+                    <span class="average"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</template>

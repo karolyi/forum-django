@@ -31,7 +31,11 @@
     }
   }
 
-  .user-tooltip-template {
+  .forum-topic-tooltip {
+    text-align: left;
+  }
+
+  .forum-user-tooltip {
     tr.decorated {
       border-top: 1px solid $gray-light;
     }
@@ -85,6 +89,8 @@
         .forum-time {
           display: block;
         }
+
+        .topic-link {}
       }
     }
   }

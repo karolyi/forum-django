@@ -100,7 +100,9 @@ export function init(options) {
   moduleLocals.options = options
   $.when($.ready).then(() => {
     moduleLocals.tooltipTemplate =
-      $(moduleLocals.options.selectors.template).remove().removeClass('hide')
+      $(document.querySelector(
+        moduleLocals.options.selectors.template).content.querySelector('table'))
+      // $($(moduleLocals.options.selectors.template).html())
   })
 }
 

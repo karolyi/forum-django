@@ -31,8 +31,10 @@
         {% for model_topic in topic_list %}
         <div class="row topic-list-item-row {% cycle 'odd' 'even' %}">
             <div class="col-xs-6 col-ms-6">
-                {# <a href="">{{ model_topic.name_html|safe }}</a> #}
-                <a href="">{{ model_topic.name_text }}</a>
+                <a href="" class="topic-link" data-slug="{{ model_topic.slug }}">
+                    {# {{ model_topic.name_html|safe }} #}
+                    {{ model_topic.name_text }}
+                </a>
             </div>
             <div class="col-xs-6 col-ms-2 text-center">
                 {% include 'default/include/time.html' with time=model_topic.last_comment.time %}
@@ -45,6 +47,11 @@
                 {{ model_topic.comment_count }}
             </div>
         </div>
+        <template class="forum-topic-tooltip-template" data-slug="{{ model_topic.slug }}">
+            <div class="forum-topic-tooltip">
+                {{ model_topic.last_comment.content_html|safe }}
+            </div>
+        </template>
         {% endfor %}
         <div class="pagination-wrapper text-center">
         {% include 'default/base/include/topiclist-paginator.html' with page=topic_list %}
