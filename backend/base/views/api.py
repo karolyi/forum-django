@@ -1,11 +1,15 @@
 from decimal import Decimal
 
-from base.models import Settings
+from base.utils.home import collect_topic_page
 from django.db.models.aggregates import Avg, Count
 from django.http.response import Http404, JsonResponse
+from django.shortcuts import render
 from rating.models import UserRating
 from rest_api.exceptions import NotProduceable
 from rest_api.utils import cast_to_set_of_slug
+
+from ..choices import TOPIC_TYPE_LIST
+from ..models import Settings
 
 
 def v1_user_short(request, slug_list):
@@ -47,3 +51,25 @@ def v1_user_short(request, slug_list):
         dict_result[user_slug]['rating']['avg'] = rating_avg
         dict_result[user_slug]['rating']['count'] = rating['value__count']
     return JsonResponse(dict_result)
+
+
+def v1_topic_list_page(request):
+    """
+    Render a HTML for a topic page, requested by the paginating script.
+    """
+    # Sanitize input
+    topic_type = request.GET.get('topic_type')
+    if request.GET.get('topic_type') not in TOPIC_TYPE_LIST:
+        raise Http404
+    try:
+        page_id = int(request.GET.get('page_id'))
+    except (TypeError, ValueError):
+        raise Http404
+    topic_list = collect_topic_page(
+        request=request, topic_type=topic_type, page_id=page_id)
+    return render(
+        request=request,
+        template_name='default/base/include/topic-group-page.html',
+        context={
+            'topic_list': topic_list
+        })

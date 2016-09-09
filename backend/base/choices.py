@@ -9,3 +9,5 @@ TOPIC_TYPE_CHOICES = (
     (TOPIC_TYPE_ARCHIVED, _('Archived')),
     (TOPIC_TYPE_HIGHLIGHTED, _('Highlighted'))
 )
+
+TOPIC_TYPE_LIST = [x[0] for x in TOPIC_TYPE_CHOICES]

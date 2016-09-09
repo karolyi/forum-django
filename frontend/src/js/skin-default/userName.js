@@ -6,20 +6,6 @@ const userMap = new Map()
 // Fuck ES6 var unavailability
 const moduleLocals = {}
 
-// class Instance {
-//   constructor(options) {
-//     this.options = options
-//   }
-
-//   removeCallback(targetNode) {
-//     console.log('removed', targetNode, this.options)
-//   }
-
-//   initialize() {
-//     mutationObserver.observeRemove(
-//       this.options.jqUsers, this.removeCallback.bind(this))
-//   }
-// }
 const fillTooltip = () => {
   // Fill the tooltip, if any username is still hovered
   if (!moduleLocals.jqUserHovered) return

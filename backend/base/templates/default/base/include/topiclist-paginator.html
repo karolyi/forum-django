@@ -1,21 +1,23 @@
 {% load ellipsed_paginator %}
 {% get_paginated_list page=page adjacent_pages=2 as page_number_list %}
 {% if page_number_list %}
-<ul class="pagination" data-current-page="{{ page.number }}">
-    <li class="{% spaceless %}
+<ul class="pagination">
+    <li class="page-previous {% spaceless %}
         {% if page.number == 1 %}
             disabled
         {% endif %}
     {% endspaceless %}"><a href="#">«</a></li>
 
     {% for page_number in page_number_list %}
-    <li class="{% spaceless %}
+    <li class="page-numbered {% spaceless %}
         {% if page.number == page_number %}
             active
         {% endif %}
-    {% endspaceless %}"><a href="#">{{ page_number }}</a></li>
+    {% endspaceless %}" data-page-id="{{ page_number }}">
+        <a href="#">{{ page_number }}</a>
+    </li>
     {% endfor %}
-    <li class="{% spaceless %}
+    <li class="page-next {% spaceless %}
         {% if page.number == page.paginator.num_pages %}
             disabled
         {% endif %}

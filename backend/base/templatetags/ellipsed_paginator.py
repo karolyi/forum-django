@@ -25,10 +25,12 @@ def get_paginated_list(
         x for x in range(start_page, end_page + 1)))
 
     if 2 not in page_number_list:
+        # Add the first 2 pages when necessary
         page_number_list.insert(0, 2)
         page_number_list.insert(0, 1)
 
     if num_pages - 1 not in page_number_list:
+        # Add the last 2 pages when necessary
         page_number_list.extend((num_pages - 1, num_pages))
 
     return page_number_list

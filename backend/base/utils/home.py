@@ -1,4 +1,3 @@
-from base.choices import TOPIC_TYPE_HIGHLIGHTED, TOPIC_TYPE_NORMAL
 from base.models import Topic
 from django.conf import settings
 from django.core.paginator import Paginator
@@ -15,7 +14,7 @@ def _get_topics_per_page(request):
     return settings.TOPICS_PER_PAGE
 
 
-def collect_topics(request):
+def collect_topic_page(request, topic_type, page_id=1):
     """
     Collect topic list for the home view.
     """
@@ -24,18 +23,12 @@ def collect_topics(request):
     }
     if not request.user.is_staff:
         search_kwargs['is_staff_only'] = False
-    search_kwargs['type__in'] = (TOPIC_TYPE_HIGHLIGHTED, TOPIC_TYPE_NORMAL)
+    search_kwargs['type'] = topic_type
     qs_topics = Topic.objects.filter(**search_kwargs).select_related(
         'last_comment', 'last_comment__user', 'last_comment__user__settings'
     ).only(
         'name_text', 'comment_count', 'last_comment__user__username',
         'last_comment__time')
     topics_per_page = _get_topics_per_page(request)
-    qs_topics_highlighted = qs_topics.filter(type=TOPIC_TYPE_HIGHLIGHTED)
-    qs_topics_normal = qs_topics.filter(type=TOPIC_TYPE_NORMAL)
-    paginator_highlighted = Paginator(
-        qs_topics_highlighted, per_page=topics_per_page)
-    paginator_normal = Paginator(
-        qs_topics_normal, per_page=topics_per_page)
-
-    return paginator_highlighted.page(1), paginator_normal.page(1)
+    paginator = Paginator(qs_topics, per_page=topics_per_page)
+    return paginator.page(page_id)
