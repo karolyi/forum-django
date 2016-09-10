@@ -57,11 +57,33 @@ class Instance {
     })).then(::this.onXhrSuccessLoadPage, ::this.onXhrErrorLoadPage)
   }
 
-  initialize() {
-    this.jqRoot = $(this.options.selectors.root)
-    this.jqWrappers = {
-      topicList: this.jqRoot.find(this.options.selectors.topicListWrapper),
-    }
+  onXhrSuccessArchivedStart(html) {
+    const jqHtml = $(html)
+    // IMPORTANT: keep the same class names in
+    // topic-archived-start.html!
+    this.jqWrappers.topicList.empty().append(
+      jqHtml.filter(this.options.selectors.topicListWrapper).contents())
+    const jqPaginationHtml =
+      jqHtml.filter(this.options.selectors.paginationWrapper)
+    this.options.pageMax = jqPaginationHtml.data('max-pages')
+    this.jqWrappers.paginator.empty().append(jqPaginationHtml.contents())
+    this.initUi()
+  }
+
+  onXhrErrorArchivedStart(xhr) {
+  }
+
+  onClickButtonTopicsArchivedLoad() {
+    this.jqWrappers.loaderTopicsArchived.remove()
+    delete this.jqWrappers.loaderTopicsArchived
+    delete this.jqWrappers.buttonTopicsArchivedLoad
+    $.when($.ajax({
+      url: this.options.urls.archivedTopicsStart,
+      dataType: 'html',
+    })).then(::this.onXhrSuccessArchivedStart, ::this.onXhrErrorArchivedStart)
+  }
+
+  initUi() {
     // Init paginator
     this.paginator = paginator.init({
       currentPageNr: 1,
@@ -70,6 +92,26 @@ class Instance {
       pageMax: this.options.pageMax,
     })
     this.activateContent()
+  }
+
+  initialize() {
+    this.jqRoot = $(this.options.selectors.root)
+    this.jqWrappers = {
+      topicList: this.jqRoot.find(this.options.selectors.topicListWrapper),
+      paginator: this.jqRoot.find(this.options.selectors.paginationWrapper),
+    }
+    // Non archived or archived & shown topics will have a pageMax > 0
+    if (this.options.pageMax > 0) {
+      this.initUi()
+      return
+    }
+    // topicType === 'archived', expandArchived === false
+    this.jqWrappers.loaderTopicsArchived =
+      this.jqRoot.find(this.options.selectors.loaderTopicsArchivedWrapper)
+    this.jqWrappers.buttonTopicsArchivedLoad =
+      this.jqRoot.find(this.options.selectors.buttonTopicsArchivedLoad)
+    this.jqWrappers.buttonTopicsArchivedLoad
+      .click(::this.onClickButtonTopicsArchivedLoad)
   }
 }
 

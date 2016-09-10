@@ -34,9 +34,8 @@ def collect_topic_page(request, topic_type, page_id=1, force=False):
 
     search_kwargs = {
         'is_enabled': True,
+        'is_staff_only': request.user.is_staff,
     }
-    if not request.user.is_staff:
-        search_kwargs['is_staff_only'] = False
     search_kwargs['type'] = topic_type
     qs_topics = Topic.objects.filter(**search_kwargs).select_related(
         'last_comment', 'last_comment__user', 'last_comment__user__settings'

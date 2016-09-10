@@ -9,7 +9,7 @@ from rating.models import UserRating
 from rest_api.exceptions import NotProduceable
 from rest_api.utils import cast_to_set_of_slug
 
-from ..choices import LIST_TOPIC_TYPE
+from ..choices import LIST_TOPIC_TYPE, TOPIC_TYPE_ARCHIVED
 from ..models import Settings
 
 
@@ -68,7 +68,8 @@ def v1_topic_list_page(request):
         raise Http404
     try:
         topic_list = collect_topic_page(
-            request=request, topic_type=topic_type, page_id=page_id)
+            request=request, topic_type=topic_type, page_id=page_id,
+            force=True)
     except InvalidPage:
         raise Http404
     return render(
@@ -76,4 +77,19 @@ def v1_topic_list_page(request):
         template_name='default/base/include/topic-group-page.html',
         context={
             'topic_list': topic_list
+        })
+
+
+def v1_archived_topics_start(request):
+    """
+    Render the starter HTML for the archived topics, including the
+    first page of the topic listing section, and the paginator wrapper.
+    """
+    qs_topics_archived = collect_topic_page(
+        request=request, topic_type=TOPIC_TYPE_ARCHIVED, page_id=1, force=True)
+    return render(
+        request=request,
+        template_name='default/base/include/topic-archived-start.html',
+        context={
+            'topic_list': qs_topics_archived
         })

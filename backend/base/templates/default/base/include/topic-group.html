@@ -34,19 +34,35 @@
         <section class="pagination-wrapper text-center">
         {% include 'default/base/include/topiclist-paginator.html' with page=topic_list %}
         </section>
+        {% if not topic_list.paginator.num_pages and topic_type == 'archived' %}
+        <section class="loader-topics-archived-wrapper text-center">
+            <button class="loader-topics-archived btn btn-primary">
+                <span class="fa fa-arrow-circle-o-down" aria-hidden="true"></span>
+                {% trans 'Load archived topics' %}
+            </button>
+        </section>
+        {% endif %}
     </div>
 </div>
 <script type="text/javascript">
     Forum.topicGroup.add({
         topicType: '{{ topic_type|escapejs }}',
         urls: {
-            topicListPage: '{% url 'rest-api:v1-topic-list-page' %}',
+            topicListPage: '{% url 'rest-api:v1-topic-list-page' %}'
+            {% if not topic_list.paginator.num_pages and topic_type == 'archived' %}
+            , archivedTopicsStart: '{% url 'rest-api:v1-archived-topics-start' %}'
+            {% endif %}
         },
         selectors: {
             root: '.topic-group-wrapper.topic-type-{{ topic_type }}',
             username: '.topic-list-item-row .username',
+            paginationWrapper: '.pagination-wrapper',
             paginator: 'ul.pagination',
             topicListWrapper: '.topic-list-wrapper'
+            {% if not topic_list.paginator.num_pages and topic_type == 'archived' %}
+            , loaderTopicsArchivedWrapper: '.loader-topics-archived-wrapper'
+            , buttonTopicsArchivedLoad: '.loader-topics-archived'
+            {% endif %}
         },
         pageMax: {{ topic_list.paginator.num_pages|default:0 }},
     });
