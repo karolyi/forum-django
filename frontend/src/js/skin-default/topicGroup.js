@@ -1,8 +1,9 @@
 require('bootstrap-sass/assets/javascripts/bootstrap/tooltip')
 const $ = require('jquery')
+const common = require('./common')
+const paginator = require('./paginator')
 const userName = require('./userName')
 const timeActualizer = require('./timeActualizer')
-const paginator = require('./paginator')
 
 class Instance {
   constructor(options) {
@@ -68,9 +69,17 @@ class Instance {
     this.options.pageMax = jqPaginationHtml.data('max-pages')
     this.jqWrappers.paginator.empty().append(jqPaginationHtml.contents())
     this.initUi()
+    this.focusOnHeader()
   }
 
-  onXhrErrorArchivedStart(xhr) {
+  focusOnHeader() {
+    $('html, body').animate({
+      scrollTop: this.jqRoot.offset().top - common.options.navbarHeight,
+    }, 1000)
+  }
+
+  // onXhrErrorArchivedStart(xhr) {
+  onXhrErrorArchivedStart() {
   }
 
   onClickButtonTopicsArchivedLoad() {

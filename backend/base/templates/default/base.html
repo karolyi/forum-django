@@ -17,6 +17,9 @@
             code: '{{ current_language.code|escapejs }}',
             localName: '{{ current_language.name_local|escapejs }}',
             name: '{{ current_language.name|escapejs }}'
+          },
+          selectors: {
+            navbar: 'body > nav.navbar-fixed-top'
           }
         });
     </script>
