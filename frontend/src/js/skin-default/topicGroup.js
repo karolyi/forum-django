@@ -65,9 +65,9 @@ class Instance {
     event.preventDefault()
     const parentElement = event.currentTarget.parentElement
     if (parentElement.classList.contains('active')) return
-    this.currentPageNr =
-      parseInt(parentElement.dataset.pageId, 10)
+    this.currentPageNr = parseInt(parentElement.dataset.pageId, 10)
     if (this.currentPageNr > this.options.pageMax || this.currentPageNr < 1) {
+      // Page number is out of bounds, reset it to 1
       this.currentPageNr = 1
     }
     this.loadPage()

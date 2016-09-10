@@ -1,6 +1,9 @@
 from base.models import Topic
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.core.paginator import Paginator
+
+from ..choices import TOPIC_TYPE_ARCHIVED
 
 
 def _get_topics_per_page(request):
@@ -14,10 +17,21 @@ def _get_topics_per_page(request):
     return settings.TOPICS_PER_PAGE
 
 
-def collect_topic_page(request, topic_type, page_id=1):
+def collect_topic_page(request, topic_type, page_id=1, force=False):
     """
     Collect topic list for the home view.
+
+    `force` signals that even if the user has disabled the expanding
+    of archived topics in their settings, we want to forcibly load
+    those.
     """
+    if topic_type == TOPIC_TYPE_ARCHIVED and not force:
+        if isinstance(request.user, AnonymousUser):
+            # AnonymousUser does not have settings
+            return []
+        if not request.user.settings.expand_archived:
+            return []
+
     search_kwargs = {
         'is_enabled': True,
     }

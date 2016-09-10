@@ -8,7 +8,7 @@ from rating.models import UserRating
 from rest_api.exceptions import NotProduceable
 from rest_api.utils import cast_to_set_of_slug
 
-from ..choices import TOPIC_TYPE_LIST
+from ..choices import LIST_TOPIC_TYPE
 from ..models import Settings
 
 
@@ -59,7 +59,7 @@ def v1_topic_list_page(request):
     """
     # Sanitize input
     topic_type = request.GET.get('topic_type')
-    if request.GET.get('topic_type') not in TOPIC_TYPE_LIST:
+    if request.GET.get('topic_type') not in LIST_TOPIC_TYPE:
         raise Http404
     try:
         page_id = int(request.GET.get('page_id'))
