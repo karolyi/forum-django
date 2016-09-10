@@ -18,7 +18,7 @@ class Comment(models.Model):
     """
 
     def __str__(self):
-        return str(_('#%(number)s in \'%(topic)s\'' % {
+        return str(_('#%(number)s of \'%(topic)s\'' % {
             'number': self.number,
             'topic': self.topic
         }))

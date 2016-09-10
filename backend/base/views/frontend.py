@@ -22,14 +22,16 @@ def home(request):
         context=request_context)
 
 
-def topic(request, slug, comment_id=None):
+def topic(request, topic_slug, comment_id=None):
     """
     List a certain topic.
     """
     page_comments = list_comments(
-        request=request, slug=slug, comment_id=comment_id)
+        request=request, topic_slug=topic_slug, comment_id=comment_id)
     return render(
         request=request, template_name='default/base/topic.html',
         context={
-            'page_comments': page_comments
+            'page_comments': page_comments,
+            'comment_id': comment_id,
+            'topic_slug': topic_slug,
         })

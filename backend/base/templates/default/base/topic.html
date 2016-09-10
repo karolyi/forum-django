@@ -33,6 +33,17 @@ Forum.userName.init({
         selectors: {
             root: '.topic-comment-listing-wrapper',
             template: '.topic-comment-template',
+            commentWrapper: '.topic-comment-wrapper',
+            previousLinks: '.comment-previous a'
+        },
+        scrollTo: {{ comment_id|default:'null' }},
+        topicSlug: '{{ topic_slug|escapejs }}',
+        urls: {
+            commentListing: {
+                backend: '{% url 'topic' topic_slug='example-slug' comment_id=12345 %}',
+                exampleSlug: 'example-slug',
+                commentId: '12345'
+            }
         }
     })
     </script>

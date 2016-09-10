@@ -32,12 +32,12 @@ def _get_comment_pageid(qs_comments, comment_id, comments_per_page):
     return page_id
 
 
-def list_comments(request, slug, comment_id=None):
+def list_comments(request, topic_slug, comment_id=None):
     """
     List a topic page with comments.
     """
     search_kwargs_topic = {
-        'slug': slug,
+        'slug': topic_slug,
         'is_staff_only': request.user.is_staff or request.user.is_superuser
     }
     try:

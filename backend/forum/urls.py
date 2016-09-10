@@ -10,8 +10,8 @@ urlpatterns = [
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', home, name='home'),
-    url(r'^topic/(?P<slug>[a-z0-9-]+)/$', topic, name='topic'),
-    url(r'^topic/(?P<slug>[a-z0-9-]+)/(?P<comment_id>\d+)/$',
+    url(r'^topic/(?P<topic_slug>[a-z0-9-]+)/$', topic, name='topic'),
+    url(r'^topic/(?P<topic_slug>[a-z0-9-]+)/(?P<comment_id>\d+)/$',
         topic, name='topic'),
     url(r'^api/', include(
         urls_api, namespace='rest-api', app_name='rest_api')),

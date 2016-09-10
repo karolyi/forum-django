@@ -76,7 +76,7 @@ class Instance {
   focusOnHeader() {
     $('html, body').animate({
       scrollTop: this.jqRoot.offset().top - common.options.navbarHeight,
-    }, 1000)
+    }, common.options.scrollSpeed)
   }
 
   // onXhrErrorArchivedStart(xhr) {
