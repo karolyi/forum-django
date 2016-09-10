@@ -1,5 +1,5 @@
 {% load ellipsed_paginator %}
-{% get_paginated_list page=page as page_number_list %}
+{% get_paginated_list page=page max_pages=5 as page_number_list %}
 {% if page_number_list %}
 <ul class="pagination">
     <li class="page-previous {% spaceless %}
