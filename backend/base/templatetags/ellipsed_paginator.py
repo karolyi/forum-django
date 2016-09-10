@@ -7,7 +7,7 @@ register = template.Library()
 
 @register.assignment_tag
 def get_paginated_list(
-        page=None, adjacent_pages=settings.PAGINATOR_ADJACENT_PAGES):
+        page=None, max_pages=settings.PAGINATOR_MAX_PAGES_TOPICLIST):
     """
     Generate a paginator list with ellipsis.
     """
@@ -17,20 +17,31 @@ def get_paginated_list(
     paginator = page.paginator
     num_pages = paginator.num_pages
     if num_pages == 1:
-        return (1,)
-    start_page = max(page.number - adjacent_pages, 1)
-    end_page = min(page.number + adjacent_pages, num_pages)
+        return ({
+            'number': 1,
+            'type': 'number'
+        },)
+    page_range = max_pages
+    if page.number > max_pages:
+        # The page is within the shown paginator page amount
+        page_range -= 2
+    if num_pages < max_pages:
+        # The amount of pages is less then the passed max_pages
+        page_range = num_pages
     page_number_list = []
-    page_number_list.extend((
-        x for x in range(start_page, end_page + 1)))
-
-    if 2 not in page_number_list:
-        # Add the first 2 pages when necessary
-        page_number_list.insert(0, 2)
-        page_number_list.insert(0, 1)
-
-    if num_pages - 1 not in page_number_list:
-        # Add the last 2 pages when necessary
-        page_number_list.extend((num_pages - 1, num_pages))
-
+    for idx in range(page_range):
+        page_number_list.append({
+            'number': idx + 1,
+            'type': 'number',
+        })
+    if page.number > max_pages:
+        # Append the last two pages
+        page_number_list.append({
+            'number': page.number,
+            'type': 'number'
+        })
+        page_number_list.append({
+            'number': paginator.num_pages,
+            'type': 'number'
+        })
     return page_number_list

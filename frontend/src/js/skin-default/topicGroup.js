@@ -2,6 +2,7 @@ require('bootstrap-sass/assets/javascripts/bootstrap/tooltip')
 const $ = require('jquery')
 const userName = require('./userName')
 const timeActualizer = require('./timeActualizer')
+const paginator = require('./paginator')
 
 class Instance {
   constructor(options) {
@@ -32,48 +33,14 @@ class Instance {
     this.jqAjaxRequest = null
     this.jqWrappers.topicList.html(html)
     this.activateContent()
-    this.jqWrappers.paginator
-      .find('.page-numbered.active').removeClass('active')
-    this.jqWrappers.paginator
-      .find(`.page-numbered[data-page-id=${this.currentPageNr}]`)
-      .addClass('active')
-    this.jqWrappers.pagePreviousLink.parent()
-      .toggleClass('disabled', this.currentPageNr < 2)
-    this.jqWrappers.pageNextLink.parent()
-      .toggleClass('disabled', this.currentPageNr > this.options.pageMax - 1)
+    this.paginator.updateUi()
   }
 
   onXhrErrorLoadPage(xhr) {
     this.jqAjaxRequest = null
   }
 
-  onClickPaginatePrevious(event) {
-    event.preventDefault()
-    if (this.currentPageNr <= 1) return
-    this.currentPageNr--
-    this.loadPage()
-  }
-
-  onClickPaginateNext(event) {
-    event.preventDefault()
-    if (this.currentPageNr >= this.options.pageMax) return
-    this.currentPageNr++
-    this.loadPage()
-  }
-
-  onClickPaginateNumber(event) {
-    event.preventDefault()
-    const parentElement = event.currentTarget.parentElement
-    if (parentElement.classList.contains('active')) return
-    this.currentPageNr = parseInt(parentElement.dataset.pageId, 10)
-    if (this.currentPageNr > this.options.pageMax || this.currentPageNr < 1) {
-      // Page number is out of bounds, reset it to 1
-      this.currentPageNr = 1
-    }
-    this.loadPage()
-  }
-
-  loadPage() {
+  loadPage(currentPageNr) {
     if (this.jqAjaxRequest) {
       // Abort the existing request
       this.jqAjaxRequest.abort()
@@ -83,7 +50,7 @@ class Instance {
       url: this.options.urls.topicListPage,
       data: {
         topic_type: this.options.topicType,
-        page_id: this.currentPageNr,
+        page_id: currentPageNr,
       },
       dataType: 'html',
     // https://github.com/tc39/proposal-bind-operator
@@ -94,19 +61,15 @@ class Instance {
     this.jqRoot = $(this.options.selectors.root)
     this.jqWrappers = {
       topicList: this.jqRoot.find(this.options.selectors.topicListWrapper),
-      paginator: this.jqRoot.find(this.options.selectors.paginator),
     }
-    this.jqWrappers.pageNextLink =
-      this.jqWrappers.paginator.find('.page-next a')
-    this.jqWrappers.pagePreviousLink =
-      this.jqWrappers.paginator.find('.page-previous a')
-    this.currentPageNr = 1
-    this.activateContent()
     // Init paginator
-    this.jqWrappers.pagePreviousLink.click(::this.onClickPaginatePrevious)
-    this.jqWrappers.pageNextLink.click(::this.onClickPaginateNext)
-    this.jqWrappers.paginator.find('.page-numbered a')
-      .click(::this.onClickPaginateNumber)
+    this.paginator = paginator.init({
+      currentPageNr: 1,
+      jqRoot: this.jqRoot.find(this.options.selectors.paginator),
+      callbackLoadPage: ::this.loadPage,
+      pageMax: this.options.pageMax,
+    })
+    this.activateContent()
   }
 }
 

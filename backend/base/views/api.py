@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from base.utils.home import collect_topic_page
+from django.core.paginator import InvalidPage
 from django.db.models.aggregates import Avg, Count
 from django.http.response import Http404, JsonResponse
 from django.shortcuts import render
@@ -65,8 +66,11 @@ def v1_topic_list_page(request):
         page_id = int(request.GET.get('page_id'))
     except (TypeError, ValueError):
         raise Http404
-    topic_list = collect_topic_page(
-        request=request, topic_type=topic_type, page_id=page_id)
+    try:
+        topic_list = collect_topic_page(
+            request=request, topic_type=topic_type, page_id=page_id)
+    except InvalidPage:
+        raise Http404
     return render(
         request=request,
         template_name='default/base/include/topic-group-page.html',
