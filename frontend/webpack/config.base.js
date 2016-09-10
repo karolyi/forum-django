@@ -22,6 +22,9 @@ module.exports = {
     timeActualizer: [
       '../src/js/skin-default/timeActualizer',
     ],
+    topicCommentListing: [
+      '../src/js/skin-default/topicCommentListing',
+    ],
   },
 
   output: {

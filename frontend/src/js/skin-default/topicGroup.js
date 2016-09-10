@@ -37,7 +37,8 @@ class Instance {
     this.paginator.updateUi()
   }
 
-  onXhrErrorLoadPage(xhr) {
+  // onXhrErrorLoadPage(xhr) {
+  onXhrErrorLoadPage() {
     this.jqAjaxRequest = null
   }
 

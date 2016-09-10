@@ -1,0 +1,39 @@
+{% extends 'default/base.html' %}
+{% load i18n humanize %}
+{% load render_bundle from webpack_loader %}
+
+{% block extra_scripts_head %}
+{% render_bundle 'topicCommentListing' %}
+{% render_bundle 'userName' %}
+<script type="text/javascript">
+Forum.userName.init({
+    urls: {
+        shortData: '{% url 'rest-api:v1-user-short' slug_list='example-slug' %}',
+        exampleSlug: 'example-slug'
+    },
+    selectors: {
+        template: '.forum-user-tooltip-template'
+    }
+})
+</script>
+{% endblock extra_scripts_head %}
+
+{% block main_content %}
+    <article class="topic-comment-listing-wrapper">
+    {% include 'default/include/user-tooltip-template.html' %}
+    <template class="topic-comment-template">
+    {% include 'default/base/include/topic-comment-template.html' %}
+    </template>
+    {% for model_comment in page_comments %}
+        {% include 'default/base/include/topic-comment-template.html' with model_comment=model_comment %}
+    {% endfor %}
+    </article>
+    <script type="text/javascript">
+    Forum.topicCommentListing.init({
+        selectors: {
+            root: '.topic-comment-listing-wrapper',
+            template: '.topic-comment-template',
+        }
+    })
+    </script>
+{% endblock main_content %}

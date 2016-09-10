@@ -185,7 +185,7 @@ LANGUAGES = (
 
 # ### Forum settings ###
 # Default amount of topics to show per category
-TOPICS_PER_PAGE = 10
+PAGINATOR_MAX_COMMENTS_LISTED = 50
 PAGINATOR_MAX_PAGES_TOPICLIST = 10
 
 # Keep this at the end

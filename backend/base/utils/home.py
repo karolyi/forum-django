@@ -13,8 +13,8 @@ def _get_topics_per_page(request):
     topics_per_page = request.session.get('topics_per_page')
     if topics_per_page is not None:
         return topics_per_page
-    request.session['topics_per_page'] = settings.TOPICS_PER_PAGE
-    return settings.TOPICS_PER_PAGE
+    request.session['topics_per_page'] = settings.PAGINATOR_MAX_PAGES_TOPICLIST
+    return settings.PAGINATOR_MAX_PAGES_TOPICLIST
 
 
 def collect_topic_page(request, topic_type, page_id=1, force=False):

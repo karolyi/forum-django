@@ -32,7 +32,7 @@
             {% include 'default/base/include/topic-group-page.html' with topic_list=topic_list %}
         </section>
         <section class="pagination-wrapper text-center">
-        {% include 'default/base/include/topiclist-paginator.html' with page=topic_list %}
+        {% include 'default/include/paginator-generic.html' with page=topic_list %}
         </section>
         {% if not topic_list.paginator.num_pages and topic_type == 'archived' %}
         <section class="loader-topics-archived-wrapper text-center">

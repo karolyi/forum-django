@@ -1,0 +1,27 @@
+<section class="topic-comment-wrapper" data-comment-id="{{ model_comment.id }}">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-xs-2 col-sm-1 comment-number">
+                    #{{ model_comment.number }}
+                </div>
+                <div class="col-xs-3 col-sm-2 commenter-user">
+                    {% include 'default/include/username.html' with model_user=model_comment.user %}
+                </div>
+                <div class="col-xs-3 col-sm-2 comment-time">
+                    {% include 'default/include/time.html' with time=model_comment.time %}
+                </div>
+                <div class="col-xs-4 col-sm-2 comment-previous">
+                    {% if model_comment.prev_comment %}
+                    <a href="{% url 'topic' slug=model_comment.prev_comment.topic.slug comment_id=model_comment.prev_comment_id %}">re:&nbsp;#{{ model_comment.prev_comment.number }} ({{ model_comment.prev_comment.user.username }})</a>
+                    {% else %}
+                    &nbsp;
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="panel-body comment-content">
+            {{ model_comment.content_html|safe }}
+        </div>
+    </div>
+</section>

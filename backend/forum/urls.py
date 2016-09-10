@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.i18n import JavaScriptCatalog
-from base.views.frontend import home
+from base.views.frontend import home, topic
 from rest_api import urls as urls_api
 
 urlpatterns = [
@@ -10,6 +10,9 @@ urlpatterns = [
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', home, name='home'),
+    url(r'^topic/(?P<slug>[a-z0-9-]+)/$', topic, name='topic'),
+    url(r'^topic/(?P<slug>[a-z0-9-]+)/(?P<comment_id>\d+)/$',
+        topic, name='topic'),
     url(r'^api/', include(
         urls_api, namespace='rest-api', app_name='rest_api')),
 
