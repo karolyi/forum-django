@@ -1,3 +1,4 @@
+{% load i18n %}
 <section class="topic-comment-wrapper" data-comment-id="{{ model_comment.id }}">
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -12,20 +13,24 @@
                     {% include 'default/include/time.html' with time=model_comment.time %}
                 </div>
                 <div class="col-xs-4 col-sm-2 comment-previous">
-                    {% if model_comment.prev_comment %}
+                {% if model_comment.prev_comment %}
                     <a href="{% url 'base:topic-comment-listing' topic_slug=model_comment.prev_comment.topic.slug comment_id=model_comment.prev_comment_id %}" data-link-to="{{ model_comment.prev_comment_id }}">
-                        re:&nbsp;#{{ model_comment.prev_comment.number }} ({{ model_comment.prev_comment.user.username }})
+                        {% trans 're:&nbsp;#' %}{{ model_comment.prev_comment.number }} ({{ model_comment.prev_comment.user.username }})
                     </a>
-                    {% else %}
+                {% else %}
                     &nbsp;
-                    {% endif %}
+                {% endif %}
                 </div>
             </div>
         </div>
         <div class="panel-body comment-content">
             {{ model_comment.content_html|safe }}
-        {% if template or model_comment %}
-
+        {% if is_template %}
+            {% include 'default/base/include/topic-comment-oneanswer.html' with is_template=is_template %}
+        {% elif model_comment.answer_set.all %}
+            {% for model_comment in model_comment.answer_set.all %}
+            {% include 'default/base/include/topic-comment-oneanswer.html' with model_comment=model_comment %}
+            {% endfor %}
         {% endif %}
         </div>
     </div>

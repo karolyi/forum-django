@@ -22,7 +22,7 @@ Forum.userName.init({
 <article class="topic-comment-listing-wrapper">
     {% include 'default/include/user-tooltip-template.html' %}
     <template class="topic-comment-template">
-    {% include 'default/base/include/topic-comment-template.html' %}
+    {% include 'default/base/include/topic-comment-template.html' with is_template=True %}
     </template>
     <section class="control-buttons text-center">
         <a href="{% url 'base:topic-listing' %}" class="btn btn-primary">
@@ -45,8 +45,10 @@ Forum.topicCommentListing.init({
         root: '.topic-comment-listing-wrapper',
         template: '.topic-comment-template',
         commentWrapper: '.topic-comment-wrapper',
-        previousLinks: '.comment-previous a'
+        previousLinks: '.comment-previous a',
+        answerLinks: '.to-answer-comment'
     },
+    highlightedClass: 'is-highlighted',
     scrollTo: {{ comment_id|default:'null' }},
     topicSlug: '{{ topic_slug|escapejs }}',
     urls: {

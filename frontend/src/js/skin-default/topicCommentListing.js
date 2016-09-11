@@ -44,12 +44,18 @@ class CommentListing {
   scrollTo(commentId) {
     const jqCommentWrapper =
       this.jqWrappers.comments.filter(`[data-comment-id=${commentId}]`)
+    jqCommentWrapper.addClass(this.options.highlightedClass)
+    setTimeout(() => {
+      jqCommentWrapper.removeClass(this.options.highlightedClass)
+    }, 0)
+    // this.jqWrappers.comments.not(jqCommentWrapper)
+    //   .removeClass(this.options.highlightedClass)
     $('html, body').animate({
       scrollTop: jqCommentWrapper.offset().top - common.options.navbarHeight,
     }, common.options.scrollSpeed)
   }
 
-  onClickPreviousLink(event) {
+  onClickCommentLink(event) {
     const previousCommentId = event.currentTarget.dataset.linkTo
     const jqExistingComment =
       this.jqWrappers.comments.filter(`[data-comment-id=${previousCommentId}]`)
@@ -77,7 +83,9 @@ class CommentListing {
       comments: this.jqRoot.find(this.options.selectors.commentWrapper),
     }
     this.jqWrappers.comments.find(this.options.selectors.previousLinks)
-      .click(::this.onClickPreviousLink)
+      .click(::this.onClickCommentLink)
+    this.jqWrappers.comments.find(this.options.selectors.answerLinks)
+      .click(::this.onClickCommentLink)
     const jqUsers = this.jqRoot.find('[data-toggle=username]')
     userName.add({
       jqUsers,
