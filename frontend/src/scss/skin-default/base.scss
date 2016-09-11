@@ -119,6 +119,9 @@
   }
 
   .topic-comment-listing-wrapper {
+    .control-buttons {
+      margin-bottom: $grid-gutter-width;
+    }
     .topic-comment-wrapper {
       .panel-heading {
         font-family: 'Roboto Condensed';

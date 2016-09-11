@@ -32,7 +32,7 @@ class CommentListing {
     }
     const topCommentId = jqTopComment.data('commentId')
     const constructedUrl = this.constructUrlPath(topCommentId)
-    if (constructedUrl === window.location.pathname) return
+    if (constructedUrl === location.pathname) return
     history.pushState({}, null, constructedUrl)
   }
 
@@ -58,8 +58,14 @@ class CommentListing {
       return
     }
     event.preventDefault()
-    history.pushState({}, null, event.currentTarget.href)
+    history.replaceState({}, null, event.currentTarget.href)
     this.scrollTo(previousCommentId)
+  }
+
+  onPopState() {
+    const commentId = document.location.pathname.split('/')[3]
+    if (!commentId) return
+    this.scrollTo(commentId)
   }
 
   initialize() {
@@ -78,7 +84,7 @@ class CommentListing {
     })
     const jqTimeElements = this.jqRoot.find('.forum-time')
     timeActualizer.add(jqTimeElements)
-    $(window).scroll(::this.onScroll)
+    $(window).scroll(::this.onScroll).on('popstate', ::this.onPopState)
     if (this.options.scrollTo) {
       this.scrollTo(this.options.scrollTo)
     }

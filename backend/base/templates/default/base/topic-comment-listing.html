@@ -19,11 +19,17 @@ Forum.userName.init({
 {% endblock extra_scripts_head %}
 
 {% block main_content %}
-    <article class="topic-comment-listing-wrapper">
+<article class="topic-comment-listing-wrapper">
     {% include 'default/include/user-tooltip-template.html' %}
     <template class="topic-comment-template">
     {% include 'default/base/include/topic-comment-template.html' %}
     </template>
+    <section class="control-buttons text-center">
+        <a href="{% url 'base:topic-listing' %}" class="btn btn-primary">
+            <span class="fa fa-home" aria-hidden="true"></span>
+            {% trans 'Back to topic listing' %}
+        </a>
+    </section>
     {% if model_topic.description %}
     <section class="well">
         {{ model_topic.description|safe }}
@@ -32,24 +38,24 @@ Forum.userName.init({
     {% for model_comment in page_comments %}
         {% include 'default/base/include/topic-comment-template.html' with model_comment=model_comment %}
     {% endfor %}
-    </article>
-    <script type="text/javascript">
-    Forum.topicCommentListing.init({
-        selectors: {
-            root: '.topic-comment-listing-wrapper',
-            template: '.topic-comment-template',
-            commentWrapper: '.topic-comment-wrapper',
-            previousLinks: '.comment-previous a'
-        },
-        scrollTo: {{ comment_id|default:'null' }},
-        topicSlug: '{{ topic_slug|escapejs }}',
-        urls: {
-            commentListing: {
-                backend: '{% url 'base:topic-comment-listing' topic_slug='example-slug' comment_id=12345 %}',
-                exampleSlug: 'example-slug',
-                commentId: '12345'
-            }
+</article>
+<script type="text/javascript">
+Forum.topicCommentListing.init({
+    selectors: {
+        root: '.topic-comment-listing-wrapper',
+        template: '.topic-comment-template',
+        commentWrapper: '.topic-comment-wrapper',
+        previousLinks: '.comment-previous a'
+    },
+    scrollTo: {{ comment_id|default:'null' }},
+    topicSlug: '{{ topic_slug|escapejs }}',
+    urls: {
+        commentListing: {
+            backend: '{% url 'base:topic-comment-listing' topic_slug='example-slug' comment_id=12345 %}',
+            exampleSlug: 'example-slug',
+            commentId: '12345'
         }
-    })
-    </script>
+    }
+})
+</script>
 {% endblock main_content %}

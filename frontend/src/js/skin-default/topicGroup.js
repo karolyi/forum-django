@@ -18,8 +18,8 @@ class Instance {
     const jqTimeElements = this.jqRoot.find('.forum-time')
     timeActualizer.add(jqTimeElements)
     const jqTopicLinkElements = this.jqRoot.find('.topic-link')
-    for (let idx = 0; idx < jqTopicLinkElements.length; idx++) {
-      const jqItem = $(jqTopicLinkElements[idx])
+    for (const item of jqTopicLinkElements) {
+      const jqItem = $(item)
       const slug = jqItem.data('slug')
       const jqTooltip =
         this.jqRoot.find(`.forum-topic-tooltip-template[data-slug="${slug}"]`)
