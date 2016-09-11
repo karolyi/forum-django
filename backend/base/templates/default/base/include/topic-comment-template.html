@@ -24,6 +24,9 @@
         </div>
         <div class="panel-body comment-content">
             {{ model_comment.content_html|safe }}
+        {% if template or model_comment %}
+
+        {% endif %}
         </div>
     </div>
 </section>

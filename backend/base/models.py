@@ -17,6 +17,9 @@ class Comment(models.Model):
     version like that.
     """
 
+    class Meta:
+        ordering = ('-time',)
+
     def __str__(self):
         return str(_('#%(number)s of \'%(topic)s\'' % {
             'number': self.number,
@@ -37,8 +40,8 @@ class Comment(models.Model):
     voting_value = models.SmallIntegerField(
         verbose_name=_('Value of up/downvotes'))
     prev_comment = models.ForeignKey(
-        'self', verbose_name=_('Answered comment'), null=True, default=None,
-        on_delete=models.SET_DEFAULT)
+        'self', related_name='answer_set', verbose_name=_('Answered comment'),
+        null=True, default=None, on_delete=models.SET_DEFAULT)
     # FOR HTML ESCAPING IN MARKDOWN
     # https://pythonhosted.org/Markdown/release-2.6.html#safe_mode-deprecated
     content_md = models.TextField(verbose_name=_('Markdown content'))
