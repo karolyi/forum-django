@@ -79,9 +79,10 @@ class Instance {
     }, common.options.scrollSpeed)
   }
 
-  // onXhrErrorArchivedStart(xhr) {
-  static onXhrErrorArchivedStart() {
+  /* eslint-disable class-methods-use-this, no-unused-vars */
+  onXhrErrorArchivedStart(xhr) {
   }
+  /* eslint-enable class-methods-use-this, no-unused-vars */
 
   onClickButtonTopicsArchivedLoad() {
     this.jqWrappers.loaderTopicsArchived.remove()
