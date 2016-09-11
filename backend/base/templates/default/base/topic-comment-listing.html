@@ -24,6 +24,11 @@ Forum.userName.init({
     <template class="topic-comment-template">
     {% include 'default/base/include/topic-comment-template.html' %}
     </template>
+    {% if model_topic.description %}
+    <section class="well">
+        {{ model_topic.description|safe }}
+    </section>
+    {% endif %}
     {% for model_comment in page_comments %}
         {% include 'default/base/include/topic-comment-template.html' with model_comment=model_comment %}
     {% endfor %}
@@ -40,7 +45,7 @@ Forum.userName.init({
         topicSlug: '{{ topic_slug|escapejs }}',
         urls: {
             commentListing: {
-                backend: '{% url 'topic' topic_slug='example-slug' comment_id=12345 %}',
+                backend: '{% url 'base:topic-comment-listing' topic_slug='example-slug' comment_id=12345 %}',
                 exampleSlug: 'example-slug',
                 commentId: '12345'
             }

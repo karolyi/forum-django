@@ -13,7 +13,7 @@
                 </div>
                 <div class="col-xs-4 col-sm-2 comment-previous">
                     {% if model_comment.prev_comment %}
-                    <a href="{% url 'topic' topic_slug=model_comment.prev_comment.topic.slug comment_id=model_comment.prev_comment_id %}" data-link-to="{{ model_comment.prev_comment_id }}">
+                    <a href="{% url 'base:topic-comment-listing' topic_slug=model_comment.prev_comment.topic.slug comment_id=model_comment.prev_comment_id %}" data-link-to="{{ model_comment.prev_comment_id }}">
                         re:&nbsp;#{{ model_comment.prev_comment.number }} ({{ model_comment.prev_comment.user.username }})
                     </a>
                     {% else %}

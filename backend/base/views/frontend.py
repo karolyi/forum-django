@@ -5,9 +5,9 @@ from base.utils.topic import list_comments
 from django.shortcuts import render
 
 
-def home(request):
+def topic_listing(request):
     """
-    Main page, with the topic listings.
+    Main entry page, with the topic listings.
     """
     request_context = {
         'topics_highlighted': collect_topic_page(
@@ -18,20 +18,22 @@ def home(request):
             request=request, topic_type=TOPIC_TYPE_ARCHIVED, page_id=1),
     }
     return render(
-        request=request, template_name='default/base/home.html',
+        request=request, template_name='default/base/topic-listing.html',
         context=request_context)
 
 
-def topic(request, topic_slug, comment_id=None):
+def topic_comment_listing(request, topic_slug, comment_id=None):
     """
     List a certain topic.
     """
-    page_comments = list_comments(
+    model_topic, page_comments = list_comments(
         request=request, topic_slug=topic_slug, comment_id=comment_id)
     return render(
-        request=request, template_name='default/base/topic.html',
+        request=request,
+        template_name='default/base/topic-comment-listing.html',
         context={
             'page_comments': page_comments,
+            'model_topic': model_topic,
             'comment_id': comment_id,
             'topic_slug': topic_slug,
         })

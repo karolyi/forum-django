@@ -35,6 +35,9 @@ def _get_comment_pageid(qs_comments, comment_id, comments_per_page):
 def list_comments(request, topic_slug, comment_id=None):
     """
     List a topic page with comments.
+
+    Return the topic model and the requested page containing the
+    `comment_id`.
     """
     search_kwargs_topic = {
         'slug': topic_slug,
@@ -59,4 +62,4 @@ def list_comments(request, topic_slug, comment_id=None):
     paginator = Paginator(qs_comments, comments_per_page)
     if not qs_comments.exists():
         raise Http404
-    return paginator.page(page_id)
+    return model_topic, paginator.page(page_id)
