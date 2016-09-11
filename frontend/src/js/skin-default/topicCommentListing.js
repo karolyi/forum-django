@@ -35,7 +35,7 @@ class CommentListing {
     const topCommentId = jqTopComment.data('commentId')
     const constructedUrl = this.constructUrlPath(topCommentId)
     if (constructedUrl === location.pathname) return
-    history.pushState({}, null, constructedUrl)
+    history.replaceState({}, null, constructedUrl)
   }
 
   onScroll() {
@@ -78,7 +78,7 @@ class CommentListing {
       return
     }
     event.preventDefault()
-    history.replaceState({}, null, event.currentTarget.href)
+    history.pushState({}, null, event.currentTarget.href)
     this.scrollTo(previousCommentId)
   }
 
