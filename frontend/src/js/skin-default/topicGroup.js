@@ -80,7 +80,7 @@ class Instance {
   }
 
   // onXhrErrorArchivedStart(xhr) {
-  onXhrErrorArchivedStart() {
+  static onXhrErrorArchivedStart() {
   }
 
   onClickButtonTopicsArchivedLoad() {
@@ -125,7 +125,7 @@ class Instance {
   }
 }
 
-export function init(options) {
+export function init() {
 
 }
 

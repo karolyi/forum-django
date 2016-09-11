@@ -19,14 +19,14 @@ class Paginator {
   onClickPaginatePrevious(event) {
     event.preventDefault()
     if (this.currentPageNr <= 1) return
-    this.currentPageNr--
+    this.currentPageNr -= 1
     this.options.callbackLoadPage(this.currentPageNr)
   }
 
   onClickPaginateNext(event) {
     event.preventDefault()
     if (this.currentPageNr >= this.options.pageMax) return
-    this.currentPageNr++
+    this.currentPageNr += 1
     this.options.callbackLoadPage(this.currentPageNr)
   }
 

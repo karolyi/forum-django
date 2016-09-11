@@ -1,6 +1,6 @@
 const $ = require('jquery')
 const common = require('./common')
-const paginator = require('./paginator')
+// const paginator = require('./paginator')
 const userName = require('./userName')
 const timeActualizer = require('./timeActualizer')
 
@@ -92,7 +92,11 @@ class CommentListing {
     })
     const jqTimeElements = this.jqRoot.find('.forum-time')
     timeActualizer.add(jqTimeElements)
-    $(window).scroll(::this.onScroll).on('popstate', ::this.onPopState)
+    $(window).scroll(::this.onScroll)
+      .on('popstate', ::this.onPopState)
+      // .on('load', (event) => {
+      //   console.debug('load', event)
+      // })
     if (this.options.scrollTo) {
       this.scrollTo(this.options.scrollTo)
     }

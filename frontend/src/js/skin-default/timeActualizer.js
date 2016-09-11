@@ -162,8 +162,8 @@ const onRemoveElement = (domNode) => {
 
 export function add(jqTimeElements) {
   const currentMomentUtc = moment.utc()
-  for (let idx = 0; idx < jqTimeElements.length; idx++) {
-    const domNode = jqTimeElements[idx]
+  for (const item of jqTimeElements) {
+    const domNode = item
     const jqElement = $(domNode)
     const momentInstance = moment.utc(jqElement.attr('datetime'))
     const data = {

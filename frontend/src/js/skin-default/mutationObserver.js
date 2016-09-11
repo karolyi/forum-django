@@ -9,10 +9,7 @@ const nodeRemoved = (targetNode) => {
   for (const [observedNode, callbacks] of observedNodes) {
     if (everyDescendants.indexOf(observedNode) === -1) continue
     // The observed node is a child of the removed node
-    for (let idx = 0; idx < callbacks.length; idx++) {
-      const removeCallback = callbacks[idx]
-      removeCallback(observedNode)
-    }
+    for (const removeCallback of callbacks) removeCallback(observedNode)
     observedNodes.delete(observedNode)
   }
 }
@@ -30,17 +27,12 @@ const watchMutate = (mutation) => {
   if (mutation.type !== 'childList') {
     return
   }
-  for (let idx = 0; idx < mutation.removedNodes.length; idx++) {
-    const targetNode = mutation.removedNodes[idx]
-    nodeRemoved(targetNode)
-  }
+  for (const targetNode of mutation.removedNodes) nodeRemoved(targetNode)
 }
 
 $.when($.ready).then(() => {
   const observer = new MutationObserver((mutations) => {
-    for (let idx = 0; idx < mutations.length; idx++) {
-      watchMutate(mutations[idx])
-    }
+    for (const mutationItem of mutations) watchMutate(mutationItem)
   })
   observer.observe(document.body, {
     attributes: false,
@@ -51,9 +43,6 @@ $.when($.ready).then(() => {
 })
 
 export function observeRemove(jqNode, callback) {
-  for (let idx = 0; idx < jqNode.length; idx++) {
-    const targetNode = jqNode[idx]
-    addObserver(targetNode, callback)
-  }
+  for (const targetNode of jqNode) addObserver(targetNode, callback)
 }
 

@@ -1,5 +1,4 @@
 require('bootstrap-sass/assets/javascripts/bootstrap/tooltip')
-const mutationObserver = require('./mutationObserver')
 const $ = require('jquery')
 
 const userMap = new Map()
@@ -48,7 +47,7 @@ const onXhrSuccessShortData = (result) => {
   fillTooltip()
 }
 
-const onXhrErrorShortData = (xhr) => {
+const onXhrErrorShortData = () => {
   // Load has failed for some reason
   if (!moduleLocals.jqUserHovered) return
   moduleLocals.jqUserHovered.attr(
@@ -78,7 +77,7 @@ const onMouseInUsername = (event) => {
   }
 }
 
-const onMouseOutUsername = (event) => {
+const onMouseOutUsername = () => {
   moduleLocals.jqUserHovered = undefined
 }
 
