@@ -7,6 +7,8 @@ const timeActualizer = require('./timeActualizer')
 class CommentListing {
   constructor(options) {
     this.options = options
+    this.isPageScrolled = false
+    this.isScrollingOnPurpose = false
   }
 
   constructUrlPath(commentId) {
@@ -37,22 +39,34 @@ class CommentListing {
   }
 
   onScroll() {
+    if (!this.isScrollingOnPurpose) this.isPageScrolled = true
     if (this.scrollTimeout) clearTimeout(this.scrollTimeout)
     this.scrollTimeout = setTimeout(::this.scrollCallback, 1000)
+  }
+
+  onCompleteScrollAnimation() {
+    this.isScrollingOnPurpose = false
   }
 
   scrollTo(commentId) {
     const jqCommentWrapper =
       this.jqWrappers.comments.filter(`[data-comment-id=${commentId}]`)
+    const jqDocument = $(document)
+    // Flash the linked comment
     jqCommentWrapper.addClass(this.options.highlightedClass)
     setTimeout(() => {
       jqCommentWrapper.removeClass(this.options.highlightedClass)
     }, 0)
-    // this.jqWrappers.comments.not(jqCommentWrapper)
-    //   .removeClass(this.options.highlightedClass)
-    $('html, body').animate({
-      scrollTop: jqCommentWrapper.offset().top - common.options.navbarHeight,
-    }, common.options.scrollSpeed)
+    // Scroll to it when necessary
+    const newScrollTop =
+      jqCommentWrapper.offset().top - common.options.navbarHeight
+    if (jqDocument.scrollTop() === newScrollTop) return
+    this.isScrollingOnPurpose = true
+    jqDocument.scrollTop(
+      jqCommentWrapper.offset().top - common.options.navbarHeight)
+    // Browsers keep scrolling after scrollTop has been issued, hence
+    // the setTimeout
+    setTimeout(::this.onCompleteScrollAnimation, 10)
   }
 
   onClickCommentLink(event) {
@@ -72,6 +86,11 @@ class CommentListing {
     const commentId = document.location.pathname.split('/')[3]
     if (!commentId) return
     this.scrollTo(commentId)
+  }
+
+  onLoadWindow() {
+    if (this.isPageScrolled) return
+    if (this.options.scrollTo) this.scrollTo(this.options.scrollTo)
   }
 
   initialize() {
@@ -94,12 +113,8 @@ class CommentListing {
     timeActualizer.add(jqTimeElements)
     $(window).scroll(::this.onScroll)
       .on('popstate', ::this.onPopState)
-      // .on('load', (event) => {
-      //   console.debug('load', event)
-      // })
-    if (this.options.scrollTo) {
-      this.scrollTo(this.options.scrollTo)
-    }
+    $.when(common.options.promiseWindowLoad).then(::this.onLoadWindow)
+    if (this.options.scrollTo) this.scrollTo(this.options.scrollTo)
   }
 }
 

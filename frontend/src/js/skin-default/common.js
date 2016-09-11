@@ -1,6 +1,14 @@
 const $ = require('jquery')
 
-export const options = {}
+export const options = {
+  /* eslint-disable new-cap */
+  promiseWindowLoad: $.Deferred(),
+  /* eslint-enable new-cap */
+}
+
+$(window).on('load', () => {
+  options.promiseWindowLoad.resolve()
+})
 
 export function init(optionsPassed) {
   for (const key of Object.keys(optionsPassed)) {
