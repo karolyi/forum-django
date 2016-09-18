@@ -58,7 +58,12 @@ def list_comments(request, topic_slug, comment_id=None):
         page_id = _get_comment_pageid(
             qs_comments, comment_id, comments_per_page)
     qs_comments = qs_comments.select_related(
-        'user__settings', 'prev_comment__user__settings')
+        'topic', 'user', 'user__settings', 'prev_comment',
+        'prev_comment__user', 'prev_comment__user__settings',
+        'prev_comment__topic'
+    ).prefetch_related(
+        'answer_set', 'answer_set__user', 'answer_set__topic',
+        'answer_set__user__settings')
     paginator = Paginator(qs_comments, comments_per_page)
     if not qs_comments.exists():
         raise Http404
