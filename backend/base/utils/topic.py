@@ -24,10 +24,12 @@ def _get_comment_pageid(qs_comments, comment_id, comments_per_page):
 
     Return the page ID, raise `Http404` if the comment doesn't exist.
     """
-    if not qs_comments.filter(id=comment_id).exists():
+    try:
+        model_comment = qs_comments.get(id=comment_id)
+    except Comment.DoesNotExist:
         # This comment does not exist here
         raise Http404
-    amount_newer = qs_comments.filter(id__gt=comment_id).count()
+    amount_newer = qs_comments.filter(time__gt=model_comment.time).count()
     page_id = amount_newer // comments_per_page + 1
     return page_id
 
