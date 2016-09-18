@@ -1,20 +1,6 @@
-$icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
 $fa-font-path: "~font-awesome/fonts";
 
-$font-size-base: 15px;
+$enable-flex: true;
+$enable-transitions: true;
 
-// 320px is the smallest viewport width (iPhone 4)
-$sidebar-width-offcanvas: 300px;
-$sidebar-width-desktop: 200px;
-$sidebar-extra-left: 30px;
-
-// So the popping out effect doesn't show the left edge
-$sidebar-transition-duration: 0.2s;
-$sidebar-transition-timing-function: cubic-bezier(0.18, 0.89, 0.32, 1.28);
-$sidebar-overlay-opacity: 0.3;
-$sidebar-overlay-transition-timing-function: ease-out;
-
-// Adjustments for bootstrap
-$screen-sm: 769px;
-$screen-xs: 569px;
-$screen-xs-max: 568px;
+$font-size-root: 15px;

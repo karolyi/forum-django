@@ -1,5 +1,5 @@
 /* global npgettext, interpolate, pgettext, gettext */
-require('bootstrap-sass/assets/javascripts/bootstrap/tooltip')
+require('bootstrap/js/src/tooltip')
 const $ = require('jquery')
 const moment = require('moment')
 // const momentTimezone = require('moment-timezone')

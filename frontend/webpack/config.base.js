@@ -51,8 +51,20 @@ module.exports = {
         },
       },
       {
-        test: /bootstrap-sass\/assets\/javascripts\//,
-        loader: 'imports?jQuery=jquery',
+        // Transpile ES6 to ES5 in Bootstrap V4
+        test: /bootstrap\/js\/src\/.*\.js$/,
+        loaders: [
+          'imports?jQuery=jquery',
+          'babel?babelrc=true',
+        ],
+      },
+      {
+        // Transpile ES6 to ES5 in Bootstrap V4
+        test: /bootstrap\/js\/src\/tooltip.js$/,
+        loaders: [
+          'imports?jQuery=jquery,Tether=tether',
+          'babel?babelrc=true',
+        ],
       },
       // to transform JSX into JS
       // {

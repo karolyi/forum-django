@@ -1,4 +1,4 @@
-require('bootstrap-sass/assets/javascripts/bootstrap/tooltip')
+require('bootstrap/js/src/tooltip')
 const $ = require('jquery')
 const common = require('./common')
 const paginator = require('./paginator')

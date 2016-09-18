@@ -18,26 +18,15 @@
 }
 
 // Import bootstrap itself
-@import "bootstrap-sass/assets/stylesheets/bootstrap.scss";
+@import "node_modules/bootstrap/scss/bootstrap.scss";
 
 // Font-awesome
 @import "font-awesome/scss/font-awesome.scss";
 
-// Bootstrap ms grid
-@import "grid-ms.scss";
-
-// Bootswatch customizations
-// @import "../../../node_modules/bootswatch/paper/_bootswatch.scss";
-
-// Import navbar & sidebar adjustments
-@import "navbar.scss";
-@import "sidebar.scss";
+// Import local adjustments
+@import "forum-user-tooltip";
 
 .page-content-wrapper {
-  @media (min-width: $grid-float-breakpoint) {
-    padding-left: $sidebar-width-desktop + $grid-gutter-width / 2;
-  }
-
   .forum-username {
     word-wrap: break-word;
 
@@ -50,46 +39,16 @@
     text-align: left;
   }
 
-  .forum-user-tooltip {
-    tr.decorated {
-      border-top: 1px solid $gray-light;
-    }
-
-    .quote, .ratings {
-      .property, .value {
-        vertical-align: top;
-        text-align: left;
-        padding: $grid-gutter-width / 8;
-      }
-    }
-
-    .is-admin, .is-banned {
-      color: $brand-danger;
-    }
-
-    .ratings .value .average {
-      &.rating-positive {
-        color: $brand-success;
-      }
-
-      &.rating-negative {
-        color: $brand-danger;
-      }
-    }
-  }
-
-  padding-top: $navbar-height + $navbar-margin-bottom;
-
   .topic-group-wrapper {
     .panel-body {
       .topic-header-row {
-        border-bottom: 2px solid $panel-default-border;
+        // border-bottom: 2px solid $panel-default-border;
         font-weight: bold;
       }
 
       .topic-list-item-row {
-        border-bottom: 1px solid $panel-default-border;
-        padding: $padding-base-vertical 0;
+        // border-bottom: 1px solid $panel-default-border;
+        // padding: $padding-base-vertical 0;
 
         @include transition(background-color 0.2s linear);
 
@@ -123,31 +82,6 @@
       margin-bottom: $grid-gutter-width;
     }
 
-    .topic-comment-wrapper {
-      &.is-highlighted {
-        .panel-heading,
-        .panel-body {
-          background-color: lighten($brand-primary, 30%);
-
-          @include transition(background 0s linear);
-        }
-      }
-
-      .panel-heading,
-      .panel-body {
-        @include transition(background 1s linear);
-      }
-
-      .panel-heading {
-        font-family: 'Roboto Condensed';
-      }
-
-      .panel-body {
-        .topic-comment-oneanswer {
-          text-align: right;
-          font-family: "Roboto Condensed";
-        }
-      }
-    }
+    @import "topic-comment-wrapper";
   }
 }

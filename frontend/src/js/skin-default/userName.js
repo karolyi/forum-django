@@ -1,4 +1,4 @@
-require('bootstrap-sass/assets/javascripts/bootstrap/tooltip')
+require('bootstrap/js/src/tooltip')
 const $ = require('jquery')
 
 const userMap = new Map()
@@ -18,14 +18,11 @@ const fillTooltip = () => {
   }
   if (userData.quote) {
     clonedTemplate.find('.quote .value').text(userData.quote)
-    clonedTemplate.find('.quote').removeClass('hide')
   }
-  if (userData.isSuperuser || userData.isStaff) {
-    clonedTemplate.find('.is-admin').removeClass('hide')
-  }
-  if (userData.isBanned) {
-    clonedTemplate.find('.is-banned').removeClass('hide')
-  }
+  clonedTemplate.find('.quote').toggle(!!userData.quote)
+  clonedTemplate.find('.is-admin')
+    .toggle(!!(userData.isSuperuser || userData.isStaff))
+  clonedTemplate.find('.is-banned').toggle(userData.isBanned)
   clonedTemplate.find('.ratings .value .count').text(userData.rating.count)
   const jqAverage = clonedTemplate.find('.ratings .value .average')
   jqAverage.text(userData.rating.text)
@@ -36,7 +33,7 @@ const fillTooltip = () => {
   clonedTemplate.find('tr:not(.hide):not(:first)').addClass('decorated')
 
   moduleLocals.jqUserHovered.attr('title', clonedTemplate[0].outerHTML)
-  moduleLocals.jqUserHovered.tooltip('fixTitle').tooltip('show')
+  moduleLocals.jqUserHovered.tooltip('_fixTitle').tooltip('show')
   moduleLocals.jqUserHovered.attr('data-is-filled', true)
 }
 
@@ -52,7 +49,7 @@ const onXhrErrorShortData = () => {
   if (!moduleLocals.jqUserHovered) return
   moduleLocals.jqUserHovered.attr(
     'title', '<span class="fa fa-chain-broken"></span>')
-  moduleLocals.jqUserHovered.tooltip('fixTitle').tooltip('show')
+  moduleLocals.jqUserHovered.tooltip('_fixTitle').tooltip('show')
 }
 
 
@@ -85,9 +82,8 @@ export function init(options) {
   moduleLocals.options = options
   $.when($.ready).then(() => {
     moduleLocals.tooltipTemplate =
-      $(document.querySelector(
-        moduleLocals.options.selectors.template).content.querySelector('table'))
-      // $($(moduleLocals.options.selectors.template).html())
+      $(document.querySelector(moduleLocals.options.selectors.template)
+        .content.querySelector('table').outerHTML)
   })
 }
 
