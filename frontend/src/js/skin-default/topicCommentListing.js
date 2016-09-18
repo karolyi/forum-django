@@ -24,7 +24,7 @@ class CommentListing {
    * to that, so the URL will reflect what comment is in focus
    * currently.
    */
-  scrollCallback() {
+  updateUrl() {
     const minY = common.options.navbarHeight + window.scrollY
     let jqTopComment
     for (const item of this.jqWrappers.comments) {
@@ -35,8 +35,9 @@ class CommentListing {
       }
     }
     if (!jqTopComment) {
-      // This shouldn't be reached normally
-      return
+      // When this is reached, it means we're at the bottom at the page,
+      // where the header of the bottom comment is not visible
+      jqTopComment = this.jqWrappers.comments.last()
     }
     const topCommentId = jqTopComment.data('commentId')
     const constructedUrl = this.constructUrlPath(topCommentId)
@@ -49,8 +50,8 @@ class CommentListing {
       this.isPageScrolled = true
       this.clearInitialScrollInterval()
     }
-    if (this.scrollTimeout) clearTimeout(this.scrollTimeout)
-    this.scrollTimeout = setTimeout(::this.scrollCallback, 1000)
+    if (this.timeoutUpdateUrl) clearTimeout(this.timeoutUpdateUrl)
+    this.timeoutUpdateUrl = setTimeout(::this.updateUrl, 1000)
   }
 
   onCompleteScrollAnimation() {
