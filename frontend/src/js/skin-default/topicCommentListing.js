@@ -9,6 +9,7 @@ class CommentListing {
     this.options = options
     this.isPageScrolled = false
     this.isScrollingOnPurpose = false
+    this.intervalInitialScroll = null
   }
 
   constructUrlPath(commentId) {
@@ -18,6 +19,11 @@ class CommentListing {
       .replace(urlTemplate.exampleSlug, this.options.topicSlug)
   }
 
+  /**
+   * Look for the current visible comment, and change the current URL
+   * to that, so the URL will reflect what comment is in focus
+   * currently.
+   */
   scrollCallback() {
     const minY = common.options.navbarHeight + window.scrollY
     let jqTopComment
@@ -39,7 +45,10 @@ class CommentListing {
   }
 
   onScroll() {
-    if (!this.isScrollingOnPurpose) this.isPageScrolled = true
+    if (!this.isScrollingOnPurpose) {
+      this.isPageScrolled = true
+      this.clearInitialScrollInterval()
+    }
     if (this.scrollTimeout) clearTimeout(this.scrollTimeout)
     this.scrollTimeout = setTimeout(::this.scrollCallback, 1000)
   }
@@ -57,7 +66,7 @@ class CommentListing {
     setTimeout(() => {
       jqCommentWrapper.removeClass(this.options.highlightedClass)
     }, 0)
-    // Scroll to it when necessary
+    // Scroll to it only when necessary
     const newScrollTop =
       jqCommentWrapper.offset().top - common.options.navbarHeight
     if (jqDocument.scrollTop() === newScrollTop) return
@@ -91,6 +100,14 @@ class CommentListing {
   onLoadWindow() {
     if (this.isPageScrolled) return
     if (this.options.scrollTo) this.scrollTo(this.options.scrollTo)
+    this.clearInitialScrollInterval()
+  }
+
+  clearInitialScrollInterval() {
+    if (this.intervalInitialScroll) {
+      clearInterval(this.intervalInitialScroll)
+      this.intervalInitialScroll = null
+    }
   }
 
   initialize() {
@@ -111,10 +128,15 @@ class CommentListing {
     })
     const jqTimeElements = this.jqRoot.find('.forum-time')
     timeActualizer.add(jqTimeElements)
-    $(window).scroll(::this.onScroll)
-      .on('popstate', ::this.onPopState)
+    $(window).scroll(::this.onScroll).on('popstate', ::this.onPopState)
     $.when(common.options.promiseWindowLoad).then(::this.onLoadWindow)
-    if (this.options.scrollTo) this.scrollTo(this.options.scrollTo)
+    if (this.options.scrollTo) {
+      this.scrollTo(this.options.scrollTo)
+      // Start the scroll interval
+      this.intervalInitialScroll = setInterval(() => {
+        this.scrollTo(this.options.scrollTo)
+      }, 1000)
+    }
   }
 }
 
