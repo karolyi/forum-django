@@ -19,6 +19,9 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('-time',)
+        index_together = (
+            ('topic', 'time'),
+        )
 
     def __str__(self):
         return str(_('#%(number)s of \'%(topic)s\'' % {
