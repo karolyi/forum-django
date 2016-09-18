@@ -3,8 +3,16 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <div class="row">
-                <div class="col-xs-2 col-sm-1 comment-number">
-                    #{{ model_comment.number }}
+                <div class="col-xs-2 col-sm-1 comment-number-wrapper">
+                    {% if not is_template %}
+                        <a href="{% url 'base:topic-comment-listing' topic_slug=model_comment.topic.slug comment_id=model_comment.id %}" data-link-to="{{ model_comment.id }}" class="comment-number">
+                            #{{ model_comment.number }}
+                        </a>
+                    {% else %}
+                        <a href="" data-link-to="" class="comment-number">
+                            #<span class="comment-number-inside"></span>
+                        </a>
+                    {% endif %}
                 </div>
                 <div class="col-xs-3 col-sm-2 commenter-user">
                     {% include 'default/include/username.html' with model_user=model_comment.user %}

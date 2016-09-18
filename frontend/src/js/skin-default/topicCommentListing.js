@@ -122,6 +122,8 @@ class CommentListing {
       .click(::this.onClickCommentLink)
     this.jqWrappers.comments.find(this.options.selectors.answerLinks)
       .click(::this.onClickCommentLink)
+    this.jqWrappers.comments.find(this.options.selectors.selfLinks)
+      .click(::this.onClickCommentLink)
     const jqUsers = this.jqRoot.find('[data-toggle=username]')
     userName.add({
       jqUsers,

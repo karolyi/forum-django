@@ -46,7 +46,8 @@ Forum.topicCommentListing.init({
         template: '.topic-comment-template',
         commentWrapper: '.topic-comment-wrapper',
         previousLinks: '.comment-previous a',
-        answerLinks: '.to-answer-comment'
+        answerLinks: '.to-answer-comment',
+        selfLinks: '.comment-number'
     },
     highlightedClass: 'is-highlighted',
     scrollTo: {{ comment_id|default:'null' }},
