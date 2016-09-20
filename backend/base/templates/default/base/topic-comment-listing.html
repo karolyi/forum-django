@@ -19,8 +19,10 @@
         </a>
     </section>
     {% if model_topic.description %}
-    <section class="well">
-        {{ model_topic.description|safe }}
+    <section class="card card-block card-outline-primary" aria-label="{% trans 'Topic description' %}">
+        <div class="card-text">
+            {{ model_topic.description|safe }}
+        </div>
     </section>
     {% endif %}
     {% for model_comment in page_comments %}
