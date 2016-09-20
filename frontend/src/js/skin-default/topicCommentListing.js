@@ -1,3 +1,4 @@
+require('bootstrap/js/src/popover')
 const $ = require('jquery')
 const common = require('./common')
 // const paginator = require('./paginator')
@@ -125,6 +126,10 @@ class CommentListing {
       .click(::this.onClickCommentLink)
     this.jqWrappers.comments.find(this.options.selectors.selfLinks)
       .click(::this.onClickCommentLink)
+    this.jqWrappers.comments.find(this.options.selectors.commentActions)
+      .popover({
+        trigger: 'hover'
+      })
     const jqUsers = this.jqRoot.find('[data-toggle=username]')
     userName.add({
       jqUsers,

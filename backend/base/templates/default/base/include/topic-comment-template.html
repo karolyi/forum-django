@@ -40,9 +40,10 @@
                     {% if model_comment.voting_value > 0 %}+{% endif %}{{ model_comment.voting_value }}
                 </span>
             </div>
-            <div class="col-xs-2 col-sm-1">
-                <a href="#" class="btn-sm btn-default">⬅</a>
-                <a href="#" class="btn-sm btn-default">⬆</a>
+            <div class="col-xs-1">
+                <button class="btn btn-sm btn-link comment-actions" data-content="stuff">
+                    <span class="fa fa-cog"></span>
+                </button>
             </div>
         </div>
     </div>
