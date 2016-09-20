@@ -1,5 +1,6 @@
 require('bootstrap/js/src/tooltip')
 const $ = require('jquery')
+const common = require('./common')
 
 const userMap = new Map()
 // Fuck ES6 var unavailability
@@ -56,8 +57,8 @@ const onXhrErrorShortData = () => {
 const loadUserData = (userSlug) => {
   // Load the user data
   $.when($.ajax({
-    url: moduleLocals.options.urls.shortData.replace(
-      moduleLocals.options.urls.exampleSlug, userSlug),
+    url: common.options.urls.user.shortData.replace(
+      common.options.urls.user.exampleSlug, userSlug),
     dataType: 'json',
   })).then(onXhrSuccessShortData, onXhrErrorShortData)
 }
@@ -82,7 +83,7 @@ export function init(options) {
   moduleLocals.options = options
   $.when($.ready).then(() => {
     moduleLocals.tooltipTemplate =
-      $(document.querySelector(moduleLocals.options.selectors.template)
+      $(document.querySelector(common.options.selectors.user.tooltipTemplate)
         .content.querySelector('table').outerHTML)
   })
 }

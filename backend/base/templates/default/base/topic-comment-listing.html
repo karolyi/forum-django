@@ -4,18 +4,6 @@
 
 {% block extra_scripts_head %}
 {% render_bundle 'topicCommentListing' %}
-{% render_bundle 'userName' %}
-<script type="text/javascript">
-Forum.userName.init({
-    urls: {
-        shortData: '{% url 'rest-api:v1-user-short' slug_list='example-slug' %}',
-        exampleSlug: 'example-slug'
-    },
-    selectors: {
-        template: '.forum-user-tooltip-template'
-    }
-})
-</script>
 {% endblock extra_scripts_head %}
 
 {% block main_content %}

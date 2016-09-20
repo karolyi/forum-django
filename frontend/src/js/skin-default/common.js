@@ -12,7 +12,7 @@ $(window).on('load', () => {
 
 export function init(optionsPassed) {
   for (const key of Object.keys(optionsPassed)) {
-    exports.options[key] = optionsPassed[key]
+    options[key] = optionsPassed[key]
   }
 }
 
