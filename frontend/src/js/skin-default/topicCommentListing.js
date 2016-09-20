@@ -105,6 +105,21 @@ class CommentListing {
     this.clearInitialScrollInterval()
   }
 
+  static onMouseOutCommentActionsTip(jqElement) {
+    jqElement.popover('hide')
+  }
+
+  static onHoverCommentActionsButton(event) {
+    const jqElement = $(event.target)
+    jqElement.popover('show')
+    const popOverInstance = jqElement.data('bs.popover')
+    const jqTipElement = $(popOverInstance.getTipElement())
+    console.debug('jqTipElement', jqTipElement)
+    jqTipElement.mouseout(() => {
+      CommentListing.onMouseOutCommentActionsTip(jqElement)
+    })
+  }
+
   clearInitialScrollInterval() {
     if (this.intervalInitialScroll) {
       clearInterval(this.intervalInitialScroll)
@@ -128,8 +143,8 @@ class CommentListing {
       .click(::this.onClickCommentLink)
     this.jqWrappers.comments.find(this.options.selectors.commentActions)
       .popover({
-        trigger: 'hover'
-      })
+        trigger: 'manual',
+      }).mouseenter(CommentListing.onHoverCommentActionsButton)
     const jqUsers = this.jqRoot.find('[data-toggle=username]')
     userName.add({
       jqUsers,
