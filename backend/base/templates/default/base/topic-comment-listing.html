@@ -11,6 +11,9 @@
     <template class="topic-comment-template">
     {% include 'default/base/include/topic-comment-template.html' with is_template=True %}
     </template>
+    <template class="topic-comment-action-template">
+    {% include 'default/base/include/topic-comment-action-template.html' %}
+    </template>
 
     <section class="control-buttons text-center">
         <a href="{% url 'base:topic-listing' %}" class="btn btn-primary">

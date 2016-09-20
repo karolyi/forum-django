@@ -1,0 +1,19 @@
+{% load i18n %}
+{% if request.user.is_authenticated %}
+<button class="btn vote-up" data-toggle="tooltip" title="{% trans 'Vote up' %}">
+    <span class="fa fa-thumbs-o-up" aria-hidden="true"></span>
+    <span class="sr-only">{% trans 'Vote up' %}</span>
+</button>
+<button class="btn vote-down" data-toggle="tooltip" title="{% trans 'Vote down' %}">
+    <span class="fa fa-thumbs-o-down" aria-hidden="true"></span>
+    <span class="sr-only">{% trans 'Vote down' %}</span>
+</button>
+{% endif %}
+<button class="btn expand-comments-down" data-toggle="tooltip" title="{% trans 'Show all previous comments' %}">
+    <span class="fa fa-level-down" aria-hidden="true"></span>
+    <span class="sr-only">{% trans 'Show all previous comments' %}</span>
+</button>
+<button class="btn expand-comments-up" data-toggle="tooltip" title="{% trans 'Show all answers to this comment' %}">
+    <span class="fa fa-level-up" aria-hidden="true"></span>
+    <span class="sr-only">{% trans 'Show all answers to this comment' %}</span>
+</button>
