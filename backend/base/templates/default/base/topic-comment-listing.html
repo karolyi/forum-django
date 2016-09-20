@@ -44,7 +44,14 @@ Forum.topicCommentListing.init({
         previousLinks: '.comment-previous a[data-link-to]',
         answerLinks: '.to-answer-comment',
         selfLinks: '.comment-number-wrapper .comment-number',
-        commentActions: '.comment-actions'
+        commentActions: '.comment-actions',
+        action: {
+            voteUp: '.vote-up',
+            voteDown: '.vote-down',
+            expandCommentsDown: '.expand-comments-down',
+            expandCommentsUp: '.expand-comments-up',
+            replyToThis: '.reply-to-this'
+        }
     },
     highlightedClass: 'is-highlighted',
     scrollTo: {{ comment_id|default:'null' }},

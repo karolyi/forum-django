@@ -22,8 +22,8 @@
 </button>
 
 {% if request.user.is_authenticated %}
-<button class="btn btn-outline-secondary btn-sm expand-comments-up" data-toggle="tooltip" title="{% trans 'Reply to this comment' %}">
+<a class="btn btn-outline-secondary btn-sm reply-to-this" data-toggle="tooltip" title="{% trans 'Reply to this comment' %}" href="">
     <span class="fa fa-reply" aria-hidden="true"></span>
     <span class="sr-only">{% trans 'Reply to this comment' %}</span>
-</button>
+</a>
 {% endif %}

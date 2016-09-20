@@ -110,7 +110,18 @@ class CommentListing {
     if (jqTip.data('isInitialized')) return
     jqTip.data('isInitialized', true)
     jqButton.on('inserted.bs.popover', () => {
+      const jqCommentWrapper =
+        jqButton.parents(this.options.selectors.commentWrapper)
+      const hasPreviousComment =
+        !!jqCommentWrapper.has(this.options.selectors.previousLinks).length
+      const hasAnswers =
+        !!jqCommentWrapper.has(this.options.selectors.answerLinks).length
       const jqTemplate = this.jqTemplates.commentActions.clone()
+      // Buttons are topmost in jqTemplate, hence .filter and not .find
+      jqTemplate.filter(this.options.selectors.action.expandCommentsDown)
+        .toggle(hasPreviousComment)
+      jqTemplate.filter(this.options.selectors.action.expandCommentsUp)
+        .toggle(hasAnswers)
       jqTip.find('.popover-content').empty().append(jqTemplate)
       jqTip.find('[data-toggle="tooltip"]').tooltip()
     })
