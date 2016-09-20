@@ -1,4 +1,5 @@
 require('bootstrap/js/src/popover')
+require('bootstrap/js/src/tooltip')
 const $ = require('jquery')
 const common = require('./common')
 // const paginator = require('./paginator')
@@ -105,6 +106,16 @@ class CommentListing {
     this.clearInitialScrollInterval()
   }
 
+  initializeCommentActionsContent(jqButton, jqTip) {
+    if (jqTip.data('isInitialized')) return
+    jqTip.data('isInitialized', true)
+    jqButton.on('inserted.bs.popover', () => {
+      const jqTemplate = this.jqTemplates.commentActions.clone()
+      jqTip.find('.popover-content').empty().append(jqTemplate)
+      jqTip.find('[data-toggle="tooltip"]').tooltip()
+    })
+  }
+
   static bindEventsToCommentActionsTip(jqButton, jqTip) {
     // Don't bind mouseleave/mouseenter events more than once
     if (jqTip.data('isAlreadyBound')) return
@@ -129,12 +140,13 @@ class CommentListing {
     jqTip.data('isTipMouseEntered', true)
   }
 
-  static onMouseEnterCommentActionsButton(event) {
+  onMouseEnterCommentActionsButton(event) {
     const jqButton = $(event.currentTarget)
     jqButton.data('isButtonMouseEntered', true)
     const popOverInstance = jqButton.data('bs.popover')
     const jqTip = $(popOverInstance.getTipElement())
     if (!jqTip.data('isShown')) {
+      this.initializeCommentActionsContent(jqButton, jqTip)
       jqTip.data('isShown', true)
       jqButton.popover('show')
     }
@@ -153,13 +165,14 @@ class CommentListing {
     })
   }
 
-  static onClickCommentActionsButton(event) {
+  onClickCommentActionsButton(event) {
     const jqButton = $(event.currentTarget)
     const popOverInstance = jqButton.data('bs.popover')
     const jqTip = $(popOverInstance.getTipElement())
     if (!jqTip.data('isShown')) {
-      jqTip.data('isShown', true)
+      this.initializeCommentActionsContent(jqButton, jqTip)
       jqButton.popover('show')
+      jqTip.data('isShown', true)
     } else {
       jqButton.popover('hide')
       jqTip.data('isShown', false)
@@ -177,8 +190,8 @@ class CommentListing {
   initialize() {
     this.jqRoot = $(this.options.selectors.root)
     this.jqTemplates = {
-      commentActions: common.extractTemplateHtml(
-        this.jqRoot.find(this.options.selectors.template.action)[0]),
+      commentActions: $(common.extractTemplateHtml(
+        this.jqRoot.find(this.options.selectors.template.action)[0])),
     }
     this.jqWrappers = {
       comments: this.jqRoot.find(this.options.selectors.commentWrapper),
@@ -190,9 +203,9 @@ class CommentListing {
     this.jqWrappers.comments.find(this.options.selectors.selfLinks)
       .click(::this.onClickCommentLink)
     this.jqWrappers.comments.find(this.options.selectors.commentActions)
-      .mouseenter(CommentListing.onMouseEnterCommentActionsButton)
+      .mouseenter(::this.onMouseEnterCommentActionsButton)
       .mouseleave(CommentListing.onMouseLeaveCommentActionsButton)
-      .click(CommentListing.onClickCommentActionsButton)
+      .click(::this.onClickCommentActionsButton)
       .popover({
         trigger: 'manual',
       })
