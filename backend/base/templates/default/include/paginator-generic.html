@@ -1,28 +1,40 @@
-{% load ellipsed_paginator %}
+{% load ellipsed_paginator i18n %}
 {% get_paginated_list page=page max_pages=5 as page_number_list %}
 {% if page_number_list %}
-<ul class="pagination">
-    <li class="page-previous {% spaceless %}
-        {% if page.number == 1 %}
-            disabled
-        {% endif %}
-    {% endspaceless %}"><a href="#">«</a></li>
-
-    {% for dict_page in page_number_list %}
-        {% if dict_page.type == 'number' %}
-        <li class="page-numbered {% spaceless %}
-            {% if page.number == dict_page.number %}
-                active
+<nav aria-label="{{ aria_label }}">
+    <ul class="pagination">
+        <li class="page-item page-previous {% spaceless %}
+            {% if page.number == 1 %}
+                disabled
             {% endif %}
-        {% endspaceless %}" data-page-id="{{ dict_page.number }}">
-            <a href="#">{{ dict_page.number }}</a>
+        {% endspaceless %}">
+            <a class="page-link" href="#" aria-label="{% trans 'Previous' %}">
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only">{% trans 'Previous' %}</span>
+            </a>
         </li>
-        {% endif %}
-    {% endfor %}
-    <li class="page-next {% spaceless %}
-        {% if page.number == page.paginator.num_pages %}
-            disabled
-        {% endif %}
-    {% endspaceless %}"><a href="#">»</a></li>
-</ul>
+
+        {% for dict_page in page_number_list %}
+            {% if dict_page.type == 'number' %}
+            <li class="page-item page-numbered {% spaceless %}
+                {% if page.number == dict_page.number %}
+                    active
+                {% endif %}
+            {% endspaceless %}" data-page-id="{{ dict_page.number }}">
+                <a class="page-link" href="#">{{ dict_page.number }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+        <li class="page-item page-next {% spaceless %}
+            {% if page.number == page.paginator.num_pages %}
+                disabled
+            {% endif %}
+        {% endspaceless %}">
+            <a class="page-link" href="#" aria-label="{% trans 'Next' %}">
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only">{% trans 'Next' %}</span>
+            </a>
+        </li>
+    </ul>
+</nav>
 {% endif %}
