@@ -105,19 +105,66 @@ class CommentListing {
     this.clearInitialScrollInterval()
   }
 
-  static onMouseOutCommentActionsTip(jqElement) {
-    jqElement.popover('hide')
+  static bindEventsToCommentActionsTip(jqButton, jqTip) {
+    // Don't bind mouseleave/mouseenter events more than once
+    if (jqTip.data('isAlreadyBound')) return
+    jqTip.mouseleave(() => {
+      CommentListing.onMouseLeaveCommentActionsTip(jqButton, jqTip)
+    }).mouseenter(() => {
+      CommentListing.onMouseEnterCommentActionsTip(jqButton, jqTip)
+    })
+    jqTip.data('isAlreadyBound', true)
   }
 
-  static onHoverCommentActionsButton(event) {
-    const jqElement = $(event.target)
-    jqElement.popover('show')
-    const popOverInstance = jqElement.data('bs.popover')
-    const jqTipElement = $(popOverInstance.getTipElement())
-    console.debug('jqTipElement', jqTipElement)
-    jqTipElement.mouseout(() => {
-      CommentListing.onMouseOutCommentActionsTip(jqElement)
+  static onMouseLeaveCommentActionsTip(jqButton, jqTip) {
+    jqTip.data('isTipMouseEntered', false)
+    setTimeout(() => {
+      if (jqButton.data('isButtonMouseEntered')) return
+      jqButton.popover('hide')
+      jqTip.data('isShown', false)
     })
+  }
+
+  static onMouseEnterCommentActionsTip(jqButton, jqTip) {
+    jqTip.data('isTipMouseEntered', true)
+  }
+
+  static onMouseEnterCommentActionsButton(event) {
+    const jqButton = $(event.currentTarget)
+    jqButton.data('isButtonMouseEntered', true)
+    const popOverInstance = jqButton.data('bs.popover')
+    const jqTip = $(popOverInstance.getTipElement())
+    if (!jqTip.data('isShown')) {
+      jqTip.data('isShown', true)
+      jqButton.popover('show')
+    }
+    CommentListing.bindEventsToCommentActionsTip(jqButton, jqTip)
+  }
+
+  static onMouseLeaveCommentActionsButton(event) {
+    const jqButton = $(event.currentTarget)
+    jqButton.data('isButtonMouseEntered', false)
+    setTimeout(() => {
+      const popOverInstance = jqButton.data('bs.popover')
+      const jqTip = $(popOverInstance.getTipElement())
+      if (jqTip.data('isTipMouseEntered')) return
+      jqButton.popover('hide')
+      jqTip.data('isShown', false)
+    })
+  }
+
+  static onClickCommentActionsButton(event) {
+    const jqButton = $(event.currentTarget)
+    const popOverInstance = jqButton.data('bs.popover')
+    const jqTip = $(popOverInstance.getTipElement())
+    if (!jqTip.data('isShown')) {
+      jqTip.data('isShown', true)
+      jqButton.popover('show')
+    } else {
+      jqButton.popover('hide')
+      jqTip.data('isShown', false)
+    }
+    CommentListing.bindEventsToCommentActionsTip(jqButton, jqTip)
   }
 
   clearInitialScrollInterval() {
@@ -142,9 +189,12 @@ class CommentListing {
     this.jqWrappers.comments.find(this.options.selectors.selfLinks)
       .click(::this.onClickCommentLink)
     this.jqWrappers.comments.find(this.options.selectors.commentActions)
+      .mouseenter(CommentListing.onMouseEnterCommentActionsButton)
+      .mouseleave(CommentListing.onMouseLeaveCommentActionsButton)
+      .click(CommentListing.onClickCommentActionsButton)
       .popover({
         trigger: 'manual',
-      }).mouseenter(CommentListing.onHoverCommentActionsButton)
+      })
     const jqUsers = this.jqRoot.find('[data-toggle=username]')
     userName.add({
       jqUsers,
