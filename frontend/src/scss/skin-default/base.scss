@@ -26,6 +26,11 @@
 // Import local adjustments
 @import "forum-user-tooltip";
 
+.navbar-content-spacer {
+  // Adjust when necessary
+  height: 51px;
+}
+
 .page-content-wrapper {
   .forum-username {
     word-wrap: break-word;
@@ -40,16 +45,12 @@
   }
 
   .topic-group-wrapper {
-    .panel-body {
+    .card-block {
       .topic-header-row {
-        // border-bottom: 2px solid $panel-default-border;
         font-weight: bold;
       }
 
       .topic-list-item-row {
-        // border-bottom: 1px solid $panel-default-border;
-        // padding: $padding-base-vertical 0;
-
         @include transition(background-color 0.2s linear);
 
         &:hover {
@@ -82,6 +83,31 @@
       margin-bottom: $grid-gutter-width;
     }
 
-    @import "topic-comment-wrapper";
+    .topic-comment-wrapper {
+      &.is-highlighted {
+        .card-header,
+        .card-block {
+          background-color: lighten($brand-primary, 30%);
+
+          @include transition(background 0s linear);
+        }
+      }
+
+      .card-header,
+      .card-block {
+        @include transition(background 1s linear);
+      }
+
+      .card-header {
+        font-family: 'Roboto Condensed';
+      }
+
+      .card-block {
+        .topic-comment-oneanswer {
+          text-align: right;
+          font-family: "Roboto Condensed";
+        }
+      }
+    }
   }
 }
