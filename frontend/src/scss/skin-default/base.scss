@@ -60,11 +60,11 @@
         @include transition(background-color 0.2s linear);
 
         &.even {
-          background-color: darken($gray-lighter, 1%);
+          background-color: lighten($nav-link-hover-bg, 4%);
         }
 
         &.odd {
-          background-color: darken($gray-lighter, 3%);
+          background-color: lighten($nav-link-hover-bg, 6%);
         }
 
         &:hover {
