@@ -177,7 +177,8 @@ class CommentListing {
   initialize() {
     this.jqRoot = $(this.options.selectors.root)
     this.jqTemplates = {
-
+      commentActions: common.extractTemplateHtml(
+        this.jqRoot.find(this.options.selectors.template.action)[0]),
     }
     this.jqWrappers = {
       comments: this.jqRoot.find(this.options.selectors.commentWrapper),

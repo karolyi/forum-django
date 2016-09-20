@@ -36,12 +36,15 @@
 Forum.topicCommentListing.init({
     selectors: {
         root: '.topic-comment-listing-wrapper',
-        template: '.topic-comment-template',
+        template: {
+            comment:'.topic-comment-template',
+            action: '.topic-comment-action-template'
+        },
         commentWrapper: '.topic-comment-wrapper',
         previousLinks: '.comment-previous a[data-link-to]',
         answerLinks: '.to-answer-comment',
         selfLinks: '.comment-number-wrapper .comment-number',
-        commentActions: '.comment-actions'
+        commentActions: '.comment-actions',
     },
     highlightedClass: 'is-highlighted',
     scrollTo: {{ comment_id|default:'null' }},

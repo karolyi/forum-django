@@ -16,6 +16,15 @@ export function init(optionsPassed) {
   }
 }
 
+export function extractTemplateHtml(domTemplateElement) {
+  const tempElement = document.createElement('p')
+  // const templateCopy = document.importNode(domTemplateElement, true)
+  const templateCopyArray = Array.prototype.slice.call(
+    domTemplateElement.content.childNodes)
+  for (const item of templateCopyArray) tempElement.appendChild(item)
+  return tempElement.innerHTML
+}
+
 const calcNavbarHeight = () => {
   // Calculate navbar height
   const cssNavbarHeight = $(options.selectors.navbar).css('height')
