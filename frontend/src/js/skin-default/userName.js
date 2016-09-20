@@ -31,7 +31,7 @@ const fillTooltip = () => {
   else if (ratingAvg < 0) jqAverage.addClass('rating-negative')
 
   // Add decoration to all the visible tr's but the first
-  clonedTemplate.find('tr:not(.hide):not(:first)').addClass('decorated')
+  clonedTemplate.find('tr').not('[style]').not(':first').addClass('decorated')
 
   moduleLocals.jqUserHovered.attr('title', clonedTemplate[0].outerHTML)
   moduleLocals.jqUserHovered.tooltip('_fixTitle').tooltip('show')
