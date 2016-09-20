@@ -45,6 +45,12 @@
   }
 
   .topic-group-wrapper {
+    .card-header {
+      .card-title {
+        margin-bottom: 0;
+      }
+    }
+
     .card-block {
       .topic-header-row {
         font-weight: bold;
@@ -52,6 +58,14 @@
 
       .topic-list-item-row {
         @include transition(background-color 0.2s linear);
+
+        &.even {
+          background-color: darken($gray-lighter, 1%);
+        }
+
+        &.odd {
+          background-color: darken($gray-lighter, 3%);
+        }
 
         &:hover {
           background-color: $nav-link-hover-bg;

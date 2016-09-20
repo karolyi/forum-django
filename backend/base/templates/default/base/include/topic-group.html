@@ -1,7 +1,7 @@
 {% load i18n humanize %}
 <div class="card topic-group-wrapper topic-type-{{ topic_type }}">
     <div class="card-header">
-        <h3 class="card-title">
+        <h4 class="card-title">
             {% if topic_type == 'highlighted' %}
                 {% trans 'Highlighted topics' %}
             {% elif topic_type == 'normal' %}
@@ -9,8 +9,7 @@
             {% elif topic_type == 'archived' %}
                 {% trans 'Archived topics' %}
             {% endif %}
-            <span class="glyphicon glyphicon-arrow-up"></span>
-        </h3>
+        </h4>
     </div>
     <div class="card-block">
         <div class="card-text">
