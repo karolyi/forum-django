@@ -20,7 +20,6 @@ const calcNavbarHeight = () => {
   // Calculate navbar height
   const cssNavbarHeight = $(options.selectors.navbar).css('height')
   options.navbarHeight = Math.ceil(parseFloat(cssNavbarHeight.split('px')[0]))
-  console.debug('cssNavbarHeight', cssNavbarHeight, options.navbarHeight)
 }
 
 $.when($.ready).then(() => {
