@@ -71,11 +71,11 @@ export class ScrollFix {
   initialize() {
     $(window).scroll(::this.onScroll)
     $.when(common.options.promiseWindowLoad).then(::this.onLoadWindow)
-    if (this.options.initialScrollToElement) {
-      this.scrollTo(this.options.initialScrollToElement)
+    if (this.options.scrollToInitial) {
+      this.scrollTo(this.options.scrollToInitial)
       // Start the scroll interval
       this.intervalInitialScroll = setInterval(() => {
-        this.scrollTo(this.options.initialScrollToElement)
+        this.scrollTo(this.options.scrollToInitial)
       }, 1000)
     }
   }
