@@ -1,5 +1,4 @@
 /* eslint strict: 0, prefer-const: 1 */
-'use strict'
 const fs = require('fs')
 const util = require('util')
 const path = require('path')
@@ -40,9 +39,11 @@ const createJsTag = (options) => {
   `${defer}></script>\n`
 }
 
-const createSettingsTag = (settings) => util.format(
+const createSettingsTag = (settings) => {
+  util.format(
   '<script type="text/javascript">\nvar __assetData = %j\n</script>\n',
   settings)
+}
 
 exports.createHeader = () => {
   const skinData = loadSkinData()
