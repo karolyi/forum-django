@@ -1,3 +1,5 @@
+import { ScrollFix } from './scrollFix'
+
 require('bootstrap/js/src/popover')
 require('bootstrap/js/src/tooltip')
 const $ = require('jquery')
@@ -9,9 +11,6 @@ const timeActualizer = require('./timeActualizer')
 class CommentListing {
   constructor(options) {
     this.options = options
-    this.isPageScrolled = false
-    this.isScrollingOnPurpose = false
-    this.intervalInitialScroll = null
   }
 
   constructUrlPath(commentId) {
@@ -47,63 +46,34 @@ class CommentListing {
     history.replaceState({}, null, constructedUrl)
   }
 
-  onScroll() {
-    if (!this.isScrollingOnPurpose) {
-      this.isPageScrolled = true
-      this.clearInitialScrollInterval()
-    }
-    if (this.timeoutUpdateUrl) clearTimeout(this.timeoutUpdateUrl)
-    this.timeoutUpdateUrl = setTimeout(::this.updateUrl, 1000)
+  getScrollToElement(commentId) {
+    return this.jqWrappers.comments.filter(`[data-comment-id=${commentId}]`)
   }
 
-  onCompleteScrollAnimation() {
-    this.isScrollingOnPurpose = false
-  }
-
-  scrollTo(commentId) {
-    const jqCommentWrapper =
-      this.jqWrappers.comments.filter(`[data-comment-id=${commentId}]`)
-    const jqDocument = $(document)
+  afterScrollTo(jqElement /* , isScrolled */) {
     // Flash the linked comment
-    jqCommentWrapper.addClass(this.options.highlightedClass)
+    jqElement.addClass(this.options.highlightedClass)
     setTimeout(() => {
-      jqCommentWrapper.removeClass(this.options.highlightedClass)
-    }, 0)
-    // Scroll to it only when necessary
-    const newScrollTop =
-      jqCommentWrapper.offset().top - common.options.navbarHeight
-    if (jqDocument.scrollTop() === newScrollTop) return
-    this.isScrollingOnPurpose = true
-    jqDocument.scrollTop(
-      jqCommentWrapper.offset().top - common.options.navbarHeight)
-    // Browsers keep scrolling after scrollTop has been issued, hence
-    // the setTimeout
-    setTimeout(::this.onCompleteScrollAnimation, 10)
+      jqElement.removeClass(this.options.highlightedClass)
+    }, 100)
   }
 
   onClickCommentLink(event) {
     const previousCommentId = event.currentTarget.dataset.linkTo
-    const jqExistingComment =
-      this.jqWrappers.comments.filter(`[data-comment-id=${previousCommentId}]`)
+    const jqExistingComment = this.getScrollToElement(previousCommentId)
     if (!jqExistingComment.length) {
       // The linked comment is not on this page
       return
     }
     event.preventDefault()
     history.pushState({}, null, event.currentTarget.href)
-    this.scrollTo(previousCommentId)
+    this.scrollFix.scrollTo(previousCommentId)
   }
 
   onPopState() {
     const commentId = document.location.pathname.split('/')[3]
     if (!commentId) return
-    this.scrollTo(commentId)
-  }
-
-  onLoadWindow() {
-    if (this.isPageScrolled) return
-    if (this.options.scrollTo) this.scrollTo(this.options.scrollTo)
-    this.clearInitialScrollInterval()
+    this.scrollFix.scrollTo(commentId)
   }
 
   initializeCommentActionsContent(jqButton, jqTip) {
@@ -191,13 +161,6 @@ class CommentListing {
     CommentListing.bindEventsToCommentActionsTip(jqButton, jqTip)
   }
 
-  clearInitialScrollInterval() {
-    if (this.intervalInitialScroll) {
-      clearInterval(this.intervalInitialScroll)
-      this.intervalInitialScroll = null
-    }
-  }
-
   initialize() {
     this.jqRoot = $(this.options.selectors.root)
     this.jqTemplates = {
@@ -226,18 +189,18 @@ class CommentListing {
     })
     const jqTimeElements = this.jqRoot.find('.forum-time')
     timeActualizer.add(jqTimeElements)
-    $(window).scroll(::this.onScroll).on('popstate', ::this.onPopState)
-    $.when(common.options.promiseWindowLoad).then(::this.onLoadWindow)
-    if (this.options.scrollTo) {
-      this.scrollTo(this.options.scrollTo)
-      // Start the scroll interval
-      this.intervalInitialScroll = setInterval(() => {
-        this.scrollTo(this.options.scrollTo)
-      }, 1000)
-    }
+    $(window).on('popstate', ::this.onPopState)
+    this.scrollFix = new ScrollFix({
+      callbacks: {
+        getScrollToElement: ::this.getScrollToElement,
+        afterScrollTo: ::this.afterScrollTo,
+        updateUrl: ::this.updateUrl,
+      },
+      scrollToInitial: this.options.scrollTo,
+    })
+    this.scrollFix.initialize()
   }
 }
-
 
 export function init(options) {
   $.when($.ready).then(() => {
