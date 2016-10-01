@@ -4,10 +4,19 @@ const common = require('./common')
 const paginator = require('./paginator')
 const userName = require('./userName')
 const timeActualizer = require('./timeActualizer')
+const popOverHoverContent = require('./popOverHoverContent')
 
 class Instance {
   constructor(options) {
     this.options = options
+  }
+
+  initializePopoverContent(jqLink, jqTip) {
+    const slug = jqLink.data('slug')
+    const jqTipTemplate =
+      this.jqRoot.find(`.forum-topic-tooltip-template[data-slug="${slug}"]`)
+    const contentHtml = common.extractTemplateHtml(jqTipTemplate[0])
+    jqTip.find('.popover-content').empty().append(contentHtml)
   }
 
   activateContent() {
@@ -18,16 +27,14 @@ class Instance {
     const jqTimeElements = this.jqRoot.find('.forum-time')
     timeActualizer.add(jqTimeElements)
     const jqTopicLinkElements = this.jqRoot.find('.topic-link')
-    for (const item of jqTopicLinkElements) {
-      const jqItem = $(item)
-      const slug = jqItem.data('slug')
-      const jqTooltip =
-        this.jqRoot.find(`.forum-topic-tooltip-template[data-slug="${slug}"]`)
-      jqItem.attr('title', jqTooltip.html())
+    for (const node of jqTopicLinkElements) {
+      popOverHoverContent.add(node, {
+        clickTakeOver: false,
+        callbacks: {
+          contentInit: ::this.initializePopoverContent,
+        },
+      })
     }
-    jqTopicLinkElements.tooltip({
-      html: true,
-    })
   }
 
   onXhrSuccessLoadPage(html) {

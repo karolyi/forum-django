@@ -1,6 +1,7 @@
+require('bootstrap/js/src/popover')
 const $ = require('jquery')
-const common = require('./common')
 const mutationObserver = require('./mutationObserver')
+
 const elementsMap = new Map()
 
 /**
@@ -98,6 +99,9 @@ export function add(element, options) {
   const optionsPopOver = options.popover || {}
   optionsPopOver.trigger = 'manual'
   jqElement
+    // an empty 'data-content' has to be added, otherwise popover won't
+    // initialize
+    .attr('data-content', ' ')
     .mouseenter(onMouseEnterElement)
     .mouseleave(onMouseLeaveElement)
     .popover(optionsPopOver)

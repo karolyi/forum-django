@@ -1,6 +1,5 @@
 import { ScrollFix } from './scrollFix'
 
-require('bootstrap/js/src/popover')
 require('bootstrap/js/src/tooltip')
 const popOverHoverContent = require('./popOverHoverContent')
 const $ = require('jquery')
