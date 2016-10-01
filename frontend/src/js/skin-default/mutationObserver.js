@@ -14,14 +14,6 @@ const nodeRemoved = (targetNode) => {
   }
 }
 
-const addObserver = (targetNode, callback) => {
-  if (observedNodes.has(targetNode)) {
-    observedNodes.get(targetNode).push(callback)
-  } else {
-    observedNodes.set(targetNode, [callback])
-  }
-}
-
 const watchMutate = (mutation) => {
   // Check for removed nodes
   if (mutation.type !== 'childList') {
@@ -42,7 +34,15 @@ $.when($.ready).then(() => {
   })
 })
 
-export function observeRemove(jqNode, callback) {
-  for (const targetNode of jqNode) addObserver(targetNode, callback)
+export function observeRemoveNode(targetNode, callback) {
+  if (observedNodes.has(targetNode)) {
+    observedNodes.get(targetNode).push(callback)
+  } else {
+    observedNodes.set(targetNode, [callback])
+  }
+}
+
+export function observeRemoveJq(jqNode, callback) {
+  for (const targetNode of jqNode) observeRemoveNode(targetNode, callback)
 }
 

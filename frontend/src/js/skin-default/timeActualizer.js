@@ -176,7 +176,7 @@ export function add(jqTimeElements) {
       jqElement.tooltip()
     }
   }
-  mutationObserver.observeRemove(jqTimeElements, onRemoveElement)
+  mutationObserver.observeRemoveJq(jqTimeElements, onRemoveElement)
 }
 
 export function init(optionsPassed) {

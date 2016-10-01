@@ -2,6 +2,7 @@ import { ScrollFix } from './scrollFix'
 
 require('bootstrap/js/src/popover')
 require('bootstrap/js/src/tooltip')
+const popOverHoverContent = require('./popOverHoverContent')
 const $ = require('jquery')
 const common = require('./common')
 // const paginator = require('./paginator')
@@ -77,88 +78,20 @@ class CommentListing {
   }
 
   initializeCommentActionsContent(jqButton, jqTip) {
-    if (jqTip.data('isInitialized')) return
-    jqTip.data('isInitialized', true)
-    jqButton.on('inserted.bs.popover', () => {
-      const jqCommentWrapper =
-        jqButton.parents(this.options.selectors.commentWrapper)
-      const hasPreviousComment =
-        !!jqCommentWrapper.has(this.options.selectors.previousLinks).length
-      const hasAnswers =
-        !!jqCommentWrapper.has(this.options.selectors.answerLinks).length
-      const jqTemplate = this.jqTemplates.commentActions.clone()
-      // Buttons are topmost in jqTemplate, hence .filter and not .find
-      jqTemplate.filter(this.options.selectors.action.expandCommentsDown)
-        .toggle(hasPreviousComment)
-      jqTemplate.filter(this.options.selectors.action.expandCommentsUp)
-        .toggle(hasAnswers)
-      jqTip.find('.popover-content').empty().append(jqTemplate)
-      jqTip.find('[data-toggle="tooltip"]').tooltip()
-    })
-  }
-
-  static bindEventsToCommentActionsTip(jqButton, jqTip) {
-    // Don't bind mouseleave/mouseenter events more than once
-    if (jqTip.data('isAlreadyBound')) return
-    jqTip.mouseleave(() => {
-      CommentListing.onMouseLeaveCommentActionsTip(jqButton, jqTip)
-    }).mouseenter(() => {
-      CommentListing.onMouseEnterCommentActionsTip(jqButton, jqTip)
-    })
-    jqTip.data('isAlreadyBound', true)
-  }
-
-  static onMouseLeaveCommentActionsTip(jqButton, jqTip) {
-    jqTip.data('isTipMouseEntered', false)
-    setTimeout(() => {
-      if (jqButton.data('isButtonMouseEntered')) return
-      jqButton.popover('hide')
-      jqTip.data('isShown', false)
-    })
-  }
-
-  static onMouseEnterCommentActionsTip(jqButton, jqTip) {
-    jqTip.data('isTipMouseEntered', true)
-  }
-
-  onMouseEnterCommentActionsButton(event) {
-    const jqButton = $(event.currentTarget)
-    jqButton.data('isButtonMouseEntered', true)
-    const popOverInstance = jqButton.data('bs.popover')
-    const jqTip = $(popOverInstance.getTipElement())
-    if (!jqTip.data('isShown')) {
-      this.initializeCommentActionsContent(jqButton, jqTip)
-      jqTip.data('isShown', true)
-      jqButton.popover('show')
-    }
-    CommentListing.bindEventsToCommentActionsTip(jqButton, jqTip)
-  }
-
-  static onMouseLeaveCommentActionsButton(event) {
-    const jqButton = $(event.currentTarget)
-    jqButton.data('isButtonMouseEntered', false)
-    setTimeout(() => {
-      const popOverInstance = jqButton.data('bs.popover')
-      const jqTip = $(popOverInstance.getTipElement())
-      if (jqTip.data('isTipMouseEntered')) return
-      jqButton.popover('hide')
-      jqTip.data('isShown', false)
-    })
-  }
-
-  onClickCommentActionsButton(event) {
-    const jqButton = $(event.currentTarget)
-    const popOverInstance = jqButton.data('bs.popover')
-    const jqTip = $(popOverInstance.getTipElement())
-    if (!jqTip.data('isShown')) {
-      this.initializeCommentActionsContent(jqButton, jqTip)
-      jqButton.popover('show')
-      jqTip.data('isShown', true)
-    } else {
-      jqButton.popover('hide')
-      jqTip.data('isShown', false)
-    }
-    CommentListing.bindEventsToCommentActionsTip(jqButton, jqTip)
+    const jqCommentWrapper =
+      jqButton.parents(this.options.selectors.commentWrapper)
+    const hasPreviousComment =
+      !!jqCommentWrapper.has(this.options.selectors.previousLinks).length
+    const hasAnswers =
+      !!jqCommentWrapper.has(this.options.selectors.answerLinks).length
+    const jqTemplate = this.jqTemplates.commentActions.clone()
+    // Buttons are topmost in jqTemplate, hence .filter and not .find
+    jqTemplate.filter(this.options.selectors.action.expandCommentsDown)
+      .toggle(hasPreviousComment)
+    jqTemplate.filter(this.options.selectors.action.expandCommentsUp)
+      .toggle(hasAnswers)
+    jqTip.find('.popover-content').empty().append(jqTemplate)
+    jqTip.find('[data-toggle="tooltip"]').tooltip()
   }
 
   initialize() {
@@ -176,13 +109,16 @@ class CommentListing {
       .click(::this.onClickCommentLink)
     this.jqWrappers.comments.find(this.options.selectors.selfLinks)
       .click(::this.onClickCommentLink)
-    this.jqWrappers.comments.find(this.options.selectors.commentActions)
-      .mouseenter(::this.onMouseEnterCommentActionsButton)
-      .mouseleave(CommentListing.onMouseLeaveCommentActionsButton)
-      .click(::this.onClickCommentActionsButton)
-      .popover({
-        trigger: 'manual',
+    const jqButtonCommentActions =
+      this.jqWrappers.comments.find(this.options.selectors.commentActions)
+    for (const button of jqButtonCommentActions) {
+      popOverHoverContent.add(button, {
+        clickTakeOver: true,
+        callbacks: {
+          contentInit: ::this.initializeCommentActionsContent,
+        },
       })
+    }
     const jqUsers = this.jqRoot.find('[data-toggle=username]')
     userName.add({
       jqUsers,
