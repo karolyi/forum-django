@@ -1,8 +1,5 @@
 require('bootstrap/js/src/popover')
 const $ = require('jquery')
-const mutationObserver = require('./mutationObserver')
-
-const elementsMap = new Map()
 
 /**
  * This module expands the bootstrap provided popover with showing the
@@ -15,7 +12,7 @@ const elementsMap = new Map()
 
 const initializeTipContent = (jqElement, jqTip) => {
   if (jqTip.data('isInitialized')) return
-  const options = elementsMap.get(jqElement[0])
+  const options = jqElement.data('optionsPopOverHoverContent')
   jqTip.data('isInitialized', true)
   if (!options.callbacks.contentInit) return
   jqElement.on('inserted.bs.popover', () => {
@@ -88,14 +85,11 @@ const onClickElement = (event) => {
   bindEventsToTip(jqElement, jqTip)
 }
 
-export function remove(element) {
-  elementsMap.delete(element)
-}
-
-export function add(element, options) {
-  elementsMap.set(element, options)
-  mutationObserver.observeRemoveNode(element, remove)
-  const jqElement = $(element)
+export function add(targetNode, options) {
+  const jqElement = $(targetNode)
+  // Hang all the options on the element, so it doesn't need to be
+  // listened for garbage collection on DOM removal
+  jqElement.data('optionsPopOverHoverContent', options)
   const optionsPopOver = options.popover || {}
   optionsPopOver.trigger = 'manual'
   jqElement
