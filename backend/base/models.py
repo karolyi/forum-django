@@ -43,7 +43,7 @@ class Comment(models.Model):
     voting_value = models.SmallIntegerField(
         verbose_name=_('Value of up/downvotes'))
     prev_comment = models.ForeignKey(
-        'self', related_name='answer_set', verbose_name=_('Answered comment'),
+        'self', related_name='reply_set', verbose_name=_('Replied comment'),
         null=True, default=None, on_delete=models.SET_DEFAULT)
     # FOR HTML ESCAPING IN MARKDOWN
     # https://pythonhosted.org/Markdown/release-2.6.html#safe_mode-deprecated

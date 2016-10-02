@@ -1,14 +1,14 @@
 {% load i18n %}
-<div class="topic-comment-oneanswer">
-    {% trans 'answered by ' %}
+<div class="topic-comment-onereply">
+    {% trans 'replied by ' %}
     {% include 'default/include/username.html' with model_user=model_comment.user is_template=is_template %}
     {% include 'default/include/time.html' with time=model_comment.time is_template=is_template %}:
     {% if is_template %}
-    <a href="" class="to-answer-comment" data-link-to="">
+    <a href="" class="to-reply-comment" data-link-to="">
         #<span class="comment-number"></span>
     </a>
     {% else %}
-    <a href="{% url 'base:topic-comment-listing' topic_slug=model_comment.topic.slug comment_id=model_comment.id %}" class="to-answer-comment" data-link-to="{{ model_comment.id }}">
+    <a href="{% url 'base:topic-comment-listing' topic_slug=model_comment.topic.slug comment_id=model_comment.id %}" class="to-reply-comment" data-link-to="{{ model_comment.id }}">
         #{{ model_comment.number }}
     </a>
     {% endif %}

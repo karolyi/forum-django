@@ -82,7 +82,7 @@ class CommentListing {
     const hasPreviousComment =
       !!jqCommentWrapper.has(this.options.selectors.previousLinks).length
     const hasAnswers =
-      !!jqCommentWrapper.has(this.options.selectors.answerLinks).length
+      !!jqCommentWrapper.has(this.options.selectors.replyLinks).length
     const jqTemplate = this.jqTemplates.commentActions.clone()
     // Buttons are topmost in jqTemplate, hence .filter and not .find
     jqTemplate.filter(this.options.selectors.action.expandCommentsDown)
@@ -104,7 +104,7 @@ class CommentListing {
     }
     this.jqWrappers.comments.find(this.options.selectors.previousLinks)
       .click(::this.onClickCommentLink)
-    this.jqWrappers.comments.find(this.options.selectors.answerLinks)
+    this.jqWrappers.comments.find(this.options.selectors.replyLinks)
       .click(::this.onClickCommentLink)
     this.jqWrappers.comments.find(this.options.selectors.selfLinks)
       .click(::this.onClickCommentLink)

@@ -51,10 +51,10 @@
         <div class="card-text comment-content">
             {{ model_comment.content_html|safe }}
         {% if is_template %}
-            {% include 'default/base/include/topic-comment-oneanswer.html' with is_template=is_template %}
-        {% elif model_comment.answer_set.all %}
-            {% for model_comment in model_comment.answer_set.all %}
-            {% include 'default/base/include/topic-comment-oneanswer.html' with model_comment=model_comment %}
+            {% include 'default/base/include/topic-comment-onereply.html' with is_template=is_template %}
+        {% elif model_comment.reply_set.all %}
+            {% for model_comment in model_comment.reply_set.all %}
+            {% include 'default/base/include/topic-comment-onereply.html' with model_comment=model_comment %}
             {% endfor %}
         {% endif %}
         </div>
