@@ -25,6 +25,9 @@ module.exports = {
     topicCommentListing: [
       '../src/js/skin-default/topicCommentListing',
     ],
+    topicCommentsExpansion: [
+      '../src/js/skin-default/topicCommentsExpansion',
+    ],
   },
 
   output: {

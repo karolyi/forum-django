@@ -3,11 +3,11 @@
 {% load render_bundle from webpack_loader %}
 
 {% block extra_scripts_head %}
-{% render_bundle 'topicCommentListing' %}
+{% render_bundle 'topicCommentsExpansion' %}
 {% endblock extra_scripts_head %}
 
 {% block main_content %}
-<article class="topic-comment-listing-wrapper">
+<article class="topic-comment-expansion-wrapper">
     <template class="topic-comment-template">
     {% include 'default/base/include/topic-comment-template.html' with is_template=True %}
     </template>
@@ -21,24 +21,15 @@
             {% trans 'Back to topic listing' %}
         </a>
     </section>
-    {% if model_topic.description %}
-    <section class="card card-block card-outline-primary" aria-label="{% trans 'Topic description' %}">
-        <div class="card-text">
-            {{ model_topic.description|safe }}
-        </div>
-    </section>
-    {% endif %}
-    {% for model_comment in page_comments %}
+    {% for model_comment in qs_comments %}
         {% include 'default/base/include/topic-comment-template.html' with model_comment=model_comment %}
     {% endfor %}
 </article>
-
 {% jsmin %}
 <script type="text/javascript">
-Forum.topicCommentListing.init({
-    {% include 'default/base/include/js-config-topic-comment.html' with type='commentListing' root='.topic-comment-listing-wrapper' comment_id=comment_id scroll_to_id=comment_id model_topic=model_topic %}
+Forum.topicCommentsExpansion.init({
+    {% include 'default/base/include/js-config-topic-comment.html' with type='expandCommentsUpRecursive' root='.topic-comment-expansion-wrapper' comment_id=comment_id scroll_to_id=scroll_to_id model_topic=model_topic %}
 })
 </script>
 {% endjsmin %}
-
 {% endblock main_content %}

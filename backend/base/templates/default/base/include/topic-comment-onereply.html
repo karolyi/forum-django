@@ -9,7 +9,7 @@
     </a>
     {% else %}
     <a href="{% url 'base:topic-comment-listing' topic_slug=model_comment.topic.slug comment_id=model_comment.id %}" class="to-reply-comment" data-link-to="{{ model_comment.id }}">
-        #{{ model_comment.number }}
+        #<span class="comment-number">{{ model_comment.number }}</span>
     </a>
     {% endif %}
 </div>

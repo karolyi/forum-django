@@ -1,3 +1,4 @@
+/* global interpolate */
 import { ScrollFix } from './scrollFix'
 
 require('bootstrap/js/src/tooltip')
@@ -8,16 +9,45 @@ const common = require('./common')
 const userName = require('./userName')
 const timeActualizer = require('./timeActualizer')
 
-class CommentListing {
+export class CommentListing {
   constructor(options) {
     this.options = options
   }
 
-  constructUrlPath(commentId) {
-    const urlTemplate = this.options.urls.commentListing
-    return urlTemplate.backend
-      .replace(urlTemplate.commentId, commentId)
-      .replace(urlTemplate.exampleSlug, this.options.topicSlug)
+  prepareUrlFormatStrings() {
+    this.urlFormatStrings = {
+      commentListing: this.options.urls.commentListing.backend
+        .replace(this.options.urls.commentListing.exampleSlug, '%(topicSlug)s')
+        .replace(this.options.urls.commentListing.commentId, '%(commentId)s'),
+      expandCommentsUpRecursive:
+        this.options.urls.expandCommentsUpRecursive.backend
+        .replace(
+          this.options.urls.expandCommentsUpRecursive.exampleSlug,
+          '%(topicSlug)s')
+        .replace(
+          this.options.urls.expandCommentsUpRecursive.commentId,
+          '%(commentId)s')
+        .replace(
+          this.options.urls.expandCommentsUpRecursive.scrollToId,
+          '%(scrollToId)s'),
+    }
+  }
+
+  constructPathFromData(topicSlug, commentId, scrollToIdPassed = null) {
+    let scrollToId = scrollToIdPassed
+    if (!scrollToIdPassed) scrollToId = commentId
+    const formatString = this.urlFormatStrings[this.options.listingMode]
+    return interpolate(formatString, {
+      topicSlug,
+      commentId,
+      scrollToId,
+    }, true)
+  }
+
+  constructPathFromWrapper(jqCommentWrapper) {
+    const commentId = jqCommentWrapper.data('commentId')
+    const topicSlug = this.options.topicSlugOriginal
+    return this.constructPathFromData(topicSlug, commentId)
   }
 
   /**
@@ -40,10 +70,9 @@ class CommentListing {
       // where the header of the bottom comment is not visible
       jqTopComment = this.jqWrappers.comments.last()
     }
-    const topCommentId = jqTopComment.data('commentId')
-    const constructedUrl = this.constructUrlPath(topCommentId)
-    if (constructedUrl === location.pathname) return
-    history.replaceState({}, null, constructedUrl)
+    const constructedPath = this.constructPathFromWrapper(jqTopComment)
+    if (constructedPath === location.pathname) return
+    history.replaceState({}, null, constructedPath)
   }
 
   getScrollToElement(commentId) {
@@ -58,16 +87,51 @@ class CommentListing {
     }, 100)
   }
 
-  onClickCommentLink(event) {
-    const previousCommentId = event.currentTarget.dataset.linkTo
-    const jqExistingComment = this.getScrollToElement(previousCommentId)
+  sendBrowserToComment(event) {
+    const commentIdLinked = event.currentTarget.dataset.linkTo
+    const jqExistingComment = this.getScrollToElement(commentIdLinked)
     if (!jqExistingComment.length) {
-      // The linked comment is not on this page
+      // The linked comment is not on this page, send the browser to the
+      // link
       return
     }
     event.preventDefault()
-    history.pushState({}, null, event.currentTarget.href)
-    this.scrollFix.scrollTo(previousCommentId)
+    // Construct the pushed URL
+    const constructedPath = this.constructPathFromData(
+      this.options.topicSlugOriginal, commentIdLinked)
+    history.pushState({}, null, constructedPath)
+    this.scrollFix.scrollTo(commentIdLinked)
+  }
+
+  onClickLinkPreviousComment(event) {
+    this.sendBrowserToComment(event)
+  }
+
+  onClickLinkReplyComment(event) {
+    this.sendBrowserToComment(event)
+  }
+
+  onClickLinkComment(event) {
+    if (this.options.listingMode !== 'commentListing') {
+      // The listing mode is not the topic comment listing page, so we
+      // send the browser to the topic comment listing page.
+      return
+    }
+    this.sendBrowserToComment(event)
+  }
+
+  onClickButtonExpandCommentsUpRecursive(jqCommentWrapper) {
+    const commentId = jqCommentWrapper.data('commentId')
+    const topicSlug = jqCommentWrapper.data('topicSlug')
+    const constructedPath = interpolate(
+      this.urlFormatStrings.expandCommentsUpRecursive, {
+        commentId,
+        topicSlug,
+        scrollToId: commentId,
+      }, true)
+    if (constructedPath === location.pathname) return
+    // Load the constructed url
+    document.location.href = constructedPath
   }
 
   onPopState() {
@@ -85,16 +149,27 @@ class CommentListing {
       !!jqCommentWrapper.has(this.options.selectors.replyLinks).length
     const jqTemplate = this.jqTemplates.commentActions.clone()
     // Buttons are topmost in jqTemplate, hence .filter and not .find
-    jqTemplate.filter(this.options.selectors.action.expandCommentsDown)
-      .toggle(hasPreviousComment)
-    jqTemplate.filter(this.options.selectors.action.expandCommentsUp)
-      .toggle(hasAnswers)
+    const jqButtonExpandCommentsDown =
+      jqTemplate.filter(this.options.selectors.action.expandCommentsDown)
+    jqButtonExpandCommentsDown.toggle(hasPreviousComment)
+    const jqButtonExpandCommentsUp =
+      jqTemplate.filter(this.options.selectors.action.expandCommentsUp)
+    jqButtonExpandCommentsUp.toggle(hasAnswers)
+    const jqButtonExpandCommentsUpRecursive =
+      jqTemplate.filter(this.options.selectors.action.expandCommentsUpRecursive)
+    jqButtonExpandCommentsUpRecursive.toggle(hasAnswers)
+    if (hasAnswers) {
+      jqButtonExpandCommentsUpRecursive.click(() => {
+        this.onClickButtonExpandCommentsUpRecursive(jqCommentWrapper)
+      })
+    }
     jqTip.find('.popover-content').empty().append(jqTemplate)
     jqTip.find('[data-toggle="tooltip"]').tooltip()
   }
 
   initialize() {
     this.jqRoot = $(this.options.selectors.root)
+    this.prepareUrlFormatStrings()
     this.jqTemplates = {
       commentActions: $(common.extractTemplateHtml(
         this.jqRoot.find(this.options.selectors.template.action)[0])),
@@ -103,11 +178,11 @@ class CommentListing {
       comments: this.jqRoot.find(this.options.selectors.commentWrapper),
     }
     this.jqWrappers.comments.find(this.options.selectors.previousLinks)
-      .click(::this.onClickCommentLink)
+      .click(::this.onClickLinkPreviousComment)
     this.jqWrappers.comments.find(this.options.selectors.replyLinks)
-      .click(::this.onClickCommentLink)
+      .click(::this.onClickLinkReplyComment)
     this.jqWrappers.comments.find(this.options.selectors.selfLinks)
-      .click(::this.onClickCommentLink)
+      .click(::this.onClickLinkComment)
     const jqButtonCommentActions =
       this.jqWrappers.comments.find(this.options.selectors.commentActions)
     for (const button of jqButtonCommentActions) {
@@ -125,13 +200,14 @@ class CommentListing {
     const jqTimeElements = this.jqRoot.find('.forum-time')
     timeActualizer.add(jqTimeElements)
     $(window).on('popstate', ::this.onPopState)
+    console.debug('scrolling init', this.options.scrollToId);
     this.scrollFix = new ScrollFix({
       callbacks: {
         getScrollToElement: ::this.getScrollToElement,
         afterScrollTo: ::this.afterScrollTo,
         updateUrl: ::this.updateUrl,
       },
-      scrollToInitial: this.options.scrollTo,
+      scrollToInitial: this.options.scrollToId,
     })
     this.scrollFix.initialize()
   }

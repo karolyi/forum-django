@@ -16,9 +16,13 @@
     <span class="fa fa-level-down" aria-hidden="true"></span>
     <span class="sr-only">{% trans 'Show all previous comments' %}</span>
 </button>
-<button class="btn btn-outline-secondary btn-sm expand-comments-up" data-toggle="tooltip" title="{% trans 'Show all answers to this comment' %}">
+<button class="btn btn-outline-secondary btn-sm expand-comments-up" data-toggle="tooltip" title="{% trans 'Show replies to this comment' %}">
     <span class="fa fa-level-up" aria-hidden="true"></span>
-    <span class="sr-only">{% trans 'Show all answers to this comment' %}</span>
+    <span class="sr-only">{% trans 'Show replies to this comment' %}</span>
+</button>
+<button class="btn btn-outline-secondary btn-sm expand-comments-up-recursive" data-toggle="tooltip" title="{% trans 'Show all replies to this comment recursively' %}">
+    <span class="fa fa-arrows-v" aria-hidden="true"></span>
+    <span class="sr-only">{% trans 'Show all replies to this comment recursively' %}</span>
 </button>
 
 {% if request.user.is_authenticated %}

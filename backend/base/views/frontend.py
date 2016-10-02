@@ -1,8 +1,10 @@
-from base.choices import (
-    TOPIC_TYPE_ARCHIVED, TOPIC_TYPE_HIGHLIGHTED, TOPIC_TYPE_NORMAL)
-from base.utils.home import collect_topic_page
-from base.utils.topic import list_comments
 from django.shortcuts import render
+
+from ..choices import (
+    TOPIC_TYPE_ARCHIVED, TOPIC_TYPE_HIGHLIGHTED, TOPIC_TYPE_NORMAL)
+from ..exceptions import HttpResponsePermanentRedirect
+from ..utils.home import collect_topic_page
+from ..utils.topic import list_comments, replies_up_recursive
 
 
 def topic_listing(request):
@@ -34,6 +36,26 @@ def topic_comment_listing(request, topic_slug, comment_id=None):
         context={
             'page_comments': page_comments,
             'model_topic': model_topic,
+            'comment_id': comment_id
+        })
+
+
+def expand_comments_up_recursive(
+        request, topic_slug, comment_id, scroll_to_id):
+    """
+    Expand replies to a given comment, by expanding all that is a reply
+    to the given comment upwards.
+    """
+    try:
+        model_topic, qs_comments = replies_up_recursive(
+            request=request, topic_slug=topic_slug, comment_id=comment_id)
+    except HttpResponsePermanentRedirect as exc:
+        return exc.http_response()
+    return render(
+        request=request, template_name='default/base/comments-expansion.html',
+        context={
+            'model_topic': model_topic,
             'comment_id': comment_id,
-            'topic_slug': topic_slug,
+            'qs_comments': qs_comments,
+            'scroll_to_id': scroll_to_id
         })

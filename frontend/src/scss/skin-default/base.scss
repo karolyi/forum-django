@@ -92,7 +92,8 @@
     }
   }
 
-  .topic-comment-listing-wrapper {
+  .topic-comment-listing-wrapper,
+  .topic-comment-expansion-wrapper {
     .control-buttons {
       margin-bottom: $grid-gutter-width;
     }
