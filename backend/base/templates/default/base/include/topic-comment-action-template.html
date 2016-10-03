@@ -12,22 +12,22 @@
 </div>
 {% endif %}
 
-<button class="btn btn-outline-secondary btn-sm expand-comments-down" data-toggle="tooltip" title="{% trans 'Show all previous comments' %}">
+<a class="btn btn-outline-secondary btn-sm expand-comments-down" data-toggle="tooltip" title="{% trans 'Show all previous comments' %}">
     <span class="fa fa-level-down" aria-hidden="true"></span>
     <span class="sr-only">{% trans 'Show all previous comments' %}</span>
-</button>
-<button class="btn btn-outline-secondary btn-sm expand-comments-up" data-toggle="tooltip" title="{% trans 'Show replies to this comment' %}">
+</a>
+<a class="btn btn-outline-secondary btn-sm expand-comments-up" data-toggle="tooltip" title="{% trans 'Show replies to this comment' %}">
     <span class="fa fa-level-up" aria-hidden="true"></span>
     <span class="sr-only">{% trans 'Show replies to this comment' %}</span>
-</button>
-<button class="btn btn-outline-secondary btn-sm expand-comments-up-recursive" data-toggle="tooltip" title="{% trans 'Show all replies to this comment recursively' %}">
+</a>
+<a class="btn btn-outline-secondary btn-sm expand-comments-up-recursive" data-toggle="tooltip" title="{% trans 'Show all replies to this comment recursively' %}">
     <span class="fa fa-long-arrow-up" aria-hidden="true"></span>
     <span class="sr-only">{% trans 'Show all replies to this comment recursively' %}</span>
-</button>
+</a>
 
 {% if request.user.is_authenticated %}
-<a class="btn btn-outline-secondary btn-sm reply-to-this" data-toggle="tooltip" title="{% trans 'Reply to this comment' %}" href="">
+<button class="btn btn-outline-secondary btn-sm reply-to-this" data-toggle="tooltip" title="{% trans 'Reply to this comment' %}" href="">
     <span class="fa fa-reply" aria-hidden="true"></span>
     <span class="sr-only">{% trans 'Reply to this comment' %}</span>
-</a>
+</button>
 {% endif %}

@@ -34,5 +34,17 @@
             exampleSlug: 'example-slug',
             commentId: '12345',
             scrollToId: '67890'
+        },
+        expandCommentsUp: {
+            backend: '{% url 'base:comments-up' topic_slug='example-slug' comment_id=12345 scroll_to_id=67890 %}',
+            exampleSlug: 'example-slug',
+            commentId: '12345',
+            scrollToId: '67890'
+        },
+        expandCommentsDown: {
+            backend: '{% url 'base:comments-down' topic_slug='example-slug' comment_id=12345 scroll_to_id=67890 %}',
+            exampleSlug: 'example-slug',
+            commentId: '12345',
+            scrollToId: '67890'
         }
     }

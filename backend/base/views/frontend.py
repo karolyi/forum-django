@@ -4,7 +4,8 @@ from ..choices import (
     TOPIC_TYPE_ARCHIVED, TOPIC_TYPE_HIGHLIGHTED, TOPIC_TYPE_NORMAL)
 from ..exceptions import HttpResponsePermanentRedirect
 from ..utils.home import collect_topic_page
-from ..utils.topic import list_comments, replies_up_recursive
+from ..utils.topic import (
+    list_comments, prev_comments_down, replies_up, replies_up_recursive)
 
 
 def topic_listing(request):
@@ -48,6 +49,48 @@ def expand_comments_up_recursive(
     """
     try:
         model_topic, qs_comments = replies_up_recursive(
+            request=request, topic_slug=topic_slug, comment_id=comment_id)
+    except HttpResponsePermanentRedirect as exc:
+        return exc.http_response()
+    return render(
+        request=request, template_name='default/base/comments-expansion.html',
+        context={
+            'model_topic': model_topic,
+            'comment_id': comment_id,
+            'qs_comments': qs_comments,
+            'scroll_to_id': scroll_to_id
+        })
+
+
+def expand_comments_up(
+        request, topic_slug, comment_id, scroll_to_id):
+    """
+    Expand replies to a given comment in a non-recursive way. That is,
+    only expand the replies to the passed comment ID.
+    """
+    try:
+        model_topic, qs_comments = replies_up(
+            request=request, topic_slug=topic_slug, comment_id=comment_id)
+    except HttpResponsePermanentRedirect as exc:
+        return exc.http_response()
+    return render(
+        request=request, template_name='default/base/comments-expansion.html',
+        context={
+            'model_topic': model_topic,
+            'comment_id': comment_id,
+            'qs_comments': qs_comments,
+            'scroll_to_id': scroll_to_id
+        })
+
+
+def expand_comments_down(
+        request, topic_slug, comment_id, scroll_to_id):
+    """
+    Expand previous replies to a given comment in a recursive way. That
+    is, expand all the previous replies until the passed comment ID.
+    """
+    try:
+        model_topic, qs_comments = prev_comments_down(
             request=request, topic_slug=topic_slug, comment_id=comment_id)
     except HttpResponsePermanentRedirect as exc:
         return exc.http_response()

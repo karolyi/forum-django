@@ -30,6 +30,28 @@ export class CommentListing {
         .replace(
           this.options.urls.expandCommentsUpRecursive.scrollToId,
           '%(scrollToId)s'),
+      expandCommentsUp:
+        this.options.urls.expandCommentsUp.backend
+        .replace(
+          this.options.urls.expandCommentsUp.exampleSlug,
+          '%(topicSlug)s')
+        .replace(
+          this.options.urls.expandCommentsUp.commentId,
+          '%(commentId)s')
+        .replace(
+          this.options.urls.expandCommentsUp.scrollToId,
+          '%(scrollToId)s'),
+      expandCommentsDown:
+        this.options.urls.expandCommentsDown.backend
+        .replace(
+          this.options.urls.expandCommentsDown.exampleSlug,
+          '%(topicSlug)s')
+        .replace(
+          this.options.urls.expandCommentsDown.commentId,
+          '%(commentId)s')
+        .replace(
+          this.options.urls.expandCommentsDown.scrollToId,
+          '%(scrollToId)s'),
     }
   }
 
@@ -121,20 +143,6 @@ export class CommentListing {
     this.sendBrowserToComment(event)
   }
 
-  onClickButtonExpandCommentsUpRecursive(jqCommentWrapper) {
-    const commentId = jqCommentWrapper.data('commentId')
-    const topicSlug = jqCommentWrapper.data('topicSlug')
-    const constructedPath = interpolate(
-      this.urlFormatStrings.expandCommentsUpRecursive, {
-        commentId,
-        topicSlug,
-        scrollToId: commentId,
-      }, true)
-    if (constructedPath === location.pathname) return
-    // Load the constructed url
-    document.location.href = constructedPath
-  }
-
   highlightCommentId(commentId) {
     const jqCommentWrapper = this.getCommentWrapper(commentId)
     jqCommentWrapper.addClass(this.options.highlightedClass)
@@ -174,9 +182,11 @@ export class CommentListing {
   initializeCommentActionsContent(jqButton, jqTip) {
     const jqCommentWrapper =
       jqButton.parents(this.options.selectors.commentWrapper)
+    const commentId = jqCommentWrapper.data('commentId')
+    const topicSlug = jqCommentWrapper.data('topicSlug')
     const hasPreviousComment =
       !!jqCommentWrapper.has(this.options.selectors.previousLinks).length
-    const hasAnswers =
+    const hasReplies =
       !!jqCommentWrapper.has(this.options.selectors.replyLinks).length
     const jqTemplate = this.jqTemplates.commentActions.clone()
     // Buttons are topmost in jqTemplate, hence .filter and not .find
@@ -185,14 +195,35 @@ export class CommentListing {
     jqButtonExpandCommentsDown.prop('hidden', !hasPreviousComment)
     const jqButtonExpandCommentsUp =
       jqTemplate.filter(this.options.selectors.action.expandCommentsUp)
-    jqButtonExpandCommentsUp.prop('hidden', !hasAnswers)
+    jqButtonExpandCommentsUp.prop('hidden', !hasReplies)
     const jqButtonExpandCommentsUpRecursive =
       jqTemplate.filter(this.options.selectors.action.expandCommentsUpRecursive)
-    jqButtonExpandCommentsUpRecursive.prop('hidden', !hasAnswers)
-    if (hasAnswers) {
-      jqButtonExpandCommentsUpRecursive.click(() => {
-        this.onClickButtonExpandCommentsUpRecursive(jqCommentWrapper)
-      })
+    jqButtonExpandCommentsUpRecursive.prop('hidden', !hasReplies)
+    if (hasReplies) {
+      const constructedPathUpRecursive = interpolate(
+        this.urlFormatStrings.expandCommentsUpRecursive, {
+          commentId,
+          topicSlug,
+          scrollToId: commentId,
+        }, true)
+      const constructedPathUp = interpolate(
+        this.urlFormatStrings.expandCommentsUp, {
+          commentId,
+          topicSlug,
+          scrollToId: commentId,
+        }, true)
+      jqButtonExpandCommentsUpRecursive
+        .prop('href', constructedPathUpRecursive)
+      jqButtonExpandCommentsUp.prop('href', constructedPathUp)
+    }
+    if (hasPreviousComment) {
+      const constructedPathDown = interpolate(
+        this.urlFormatStrings.expandCommentsDown, {
+          commentId,
+          topicSlug,
+          scrollToId: commentId,
+        }, true)
+      jqButtonExpandCommentsDown.prop('href', constructedPathDown)
     }
     jqTip.find('.popover-content').empty().append(jqTemplate)
     jqTip.find('[data-toggle="tooltip"]').tooltip()

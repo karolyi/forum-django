@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.http.response import Http404
 from django.urls.base import reverse
 
@@ -36,6 +37,33 @@ def _prefetch_for_comments(qs_comments):
     ).prefetch_related(
         'reply_set', 'reply_set__user', 'reply_set__topic',
         'reply_set__user__settings')
+
+
+def _expansion_sanitize(request, topic_slug, comment_id):
+    """
+    Sanitize the expansion parameters and check if a requested topic
+    is available to the requesting user.
+
+    Raise Http404 if not.
+
+    Return the :model:`base.Comment` for further expansion, and the
+    extra kwargs for the comment selection query (don't display comments
+    that are in a topic not visible to the user).
+    """
+    # Get the requested comment (cast to int before)
+    comment_id = int(comment_id)
+    search_kwargs_comment = {
+        'id': comment_id
+    }
+    if not request.user.is_staff and not request.user.is_superuser:
+        search_kwargs_comment['topic__is_staff_only'] = False
+    try:
+        model_comment = Comment.objects.select_related(
+            'topic').only('id', 'topic__slug').get(**search_kwargs_comment)
+    except Comment.DoesNotExist:
+        raise Http404
+    del(search_kwargs_comment['id'])
+    return model_comment, search_kwargs_comment
 
 
 def _get_comment_pageid(qs_comments, comment_id, comments_per_page):
@@ -80,7 +108,7 @@ def list_comments(request, topic_slug, comment_id=None):
     page_id = 1
     if comment_id is not None:
         page_id = _get_comment_pageid(
-            qs_comments, comment_id, comments_per_page)
+            qs_comments, int(comment_id), comments_per_page)
     qs_comments = _prefetch_for_comments(qs_comments)
     paginator = Paginator(qs_comments, comments_per_page)
     if not qs_comments.exists():
@@ -90,42 +118,109 @@ def list_comments(request, topic_slug, comment_id=None):
 
 def replies_up_recursive(request, topic_slug, comment_id):
     """
-    Expand comments in a thread upwards from a given comment ID.
+    Expand comments in a thread upwards from a given comment ID
+    recursively.
 
-    Return the :model:`base.Topic` and list of expanded comments (time
-    descending)  when successfully gathered them.
+    Return the :model:`base.Topic` and QuerySet of expanded comments
+    (time descending)  when successfully gathered them.
 
     Raise `HttpResponsePermanentRedirect` when the comment exists but
     is in another topic, `Http404` when not found.
     """
     # Get the requested comment
-    search_kwargs_comment = {
-        'id': comment_id
-    }
-    if not request.user.is_staff and not request.user.is_superuser:
-        search_kwargs_comment['topic__is_staff_only'] = False
-    try:
-        model_comment = Comment.objects.select_related(
-            'topic').only('id', 'topic__slug').get(**search_kwargs_comment)
-    except Comment.DoesNotExist:
-        raise Http404
+    model_comment, search_kwargs_comment = _expansion_sanitize(
+        request=request, topic_slug=topic_slug, comment_id=comment_id)
     if model_comment.topic.slug != topic_slug:
         url = reverse(
             'base:comments-up-recursive',
             kwargs={
                 'topic_slug': model_comment.topic.slug,
-                'comment_id': comment_id})
+                'comment_id': model_comment.id,
+                'scroll_to_id': model_comment.id})
         raise HttpResponsePermanentRedirect(url=url)
-    set_comment_ids = set([comment_id])
-    set_iteration_ids = set([comment_id])
+    set_comment_ids = set([model_comment.id])
+    set_iteration_ids = set([model_comment.id])
     while True:
+        search_kwargs_comment['prev_comment__in'] = set_iteration_ids
         qs_comments = Comment.objects.filter(
-            prev_comment__in=set_iteration_ids).only('id').order_by()
-        set_iteration_ids = set((x.id for x in qs_comments))
+            **search_kwargs_comment).only('id').order_by()
+        set_iteration_ids = set([x.id for x in qs_comments])
         if len(set_iteration_ids) == 0:
             # No more comments fetchable
             break
         set_comment_ids.update(set_iteration_ids)
+    qs_comments = Comment.objects.filter(id__in=set_comment_ids)
+    qs_comments = _prefetch_for_comments(qs_comments)
+    return model_comment.topic, qs_comments
+
+
+def replies_up(request, topic_slug, comment_id):
+    """
+    Expand comments in a thread upwards from a given comment ID.
+
+    Return the :model:`base.Topic` and QuerySet of expanded comments
+    (time descending)  when successfully gathered them.
+
+    Raise `HttpResponsePermanentRedirect` when the comment exists but
+    is in another topic, `Http404` when not found.
+    """
+    # Get the requested comment
+    model_comment, search_kwargs_comment = _expansion_sanitize(
+        request=request, topic_slug=topic_slug, comment_id=comment_id)
+    if model_comment.topic.slug != topic_slug:
+        url = reverse(
+            'base:comments-up',
+            kwargs={
+                'topic_slug': model_comment.topic.slug,
+                'comment_id': model_comment.id,
+                'scroll_to_id': model_comment.id})
+        raise HttpResponsePermanentRedirect(url=url)
+    search_kwargs_replies = search_kwargs_comment.copy()
+    search_kwargs_comment['id'] = model_comment.id
+    search_kwargs_replies['prev_comment_id'] = model_comment.id
+    qs_comments = Comment.objects.filter(
+        Q(**search_kwargs_comment) | Q(**search_kwargs_replies))
+    qs_comments = _prefetch_for_comments(qs_comments)
+    return model_comment.topic, qs_comments
+
+
+def prev_comments_down(request, topic_slug, comment_id):
+    """
+    Expand the previous comments in the thread along with the requested
+    comment ID.
+
+    Return the :model:`base.Topic` and QuerySet of expanded comments
+    (time descending)  when successfully gathered them.
+
+    Raise `HttpResponsePermanentRedirect` when the comment exists but
+    is in another topic, `Http404` when not found.
+    """
+    # Get the requested comment
+    model_comment, search_kwargs_comment = _expansion_sanitize(
+        request=request, topic_slug=topic_slug, comment_id=comment_id)
+    if model_comment.topic.slug != topic_slug:
+        url = reverse(
+            'base:comments-up-recursive',
+            kwargs={
+                'topic_slug': model_comment.topic.slug,
+                'comment_id': model_comment.id,
+                'scroll_to_id': model_comment.id})
+        raise HttpResponsePermanentRedirect(url=url)
+    set_comment_ids = set()
+    last_id = model_comment.id
+    while True:
+        search_kwargs_comment['id'] = last_id
+        set_comment_ids.add(last_id)
+        try:
+            model_comment_iter = Comment.objects.only(
+                'id', 'prev_comment_id').get(**search_kwargs_comment)
+        except Comment.DoesNotExist:
+            # No such comment (or in a topic that's not visible)
+            break
+        if model_comment_iter.prev_comment_id is None:
+            # This comment is the root comment, not a reply
+            break
+        last_id = model_comment_iter.prev_comment_id
     qs_comments = Comment.objects.filter(id__in=set_comment_ids)
     qs_comments = _prefetch_for_comments(qs_comments)
     return model_comment.topic, qs_comments
