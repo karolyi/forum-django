@@ -75,7 +75,7 @@ export class CommentListing {
     history.replaceState({}, null, constructedPath)
   }
 
-  getScrollToElement(commentId) {
+  getCommentWrapper(commentId) {
     return this.jqWrappers.comments.filter(`[data-comment-id=${commentId}]`)
   }
 
@@ -89,7 +89,8 @@ export class CommentListing {
 
   sendBrowserToComment(event) {
     const commentIdLinked = event.currentTarget.dataset.linkTo
-    const jqExistingComment = this.getScrollToElement(commentIdLinked)
+    const jqExistingComment = this.getCommentWrapper(commentIdLinked)
+
     if (!jqExistingComment.length) {
       // The linked comment is not on this page, send the browser to the
       // link
@@ -134,6 +135,36 @@ export class CommentListing {
     document.location.href = constructedPath
   }
 
+  highlightCommentId(commentId) {
+    const jqCommentWrapper = this.getCommentWrapper(commentId)
+    jqCommentWrapper.addClass(this.options.highlightedClass)
+  }
+
+  deHighlightCommentId(commentId) {
+    const jqCommentWrapper = this.getCommentWrapper(commentId)
+    jqCommentWrapper.removeClass(this.options.highlightedClass)
+  }
+
+  onMouseEnterLinkPreviousComment(event) {
+    const commentIdLinked = event.currentTarget.dataset.linkTo
+    this.highlightCommentId(commentIdLinked)
+  }
+
+  onMouseLeaveLinkPreviousComment(event) {
+    const commentIdLinked = event.currentTarget.dataset.linkTo
+    this.deHighlightCommentId(commentIdLinked)
+  }
+
+  onMouseEnterLinkReplyComment(event) {
+    const commentIdLinked = event.currentTarget.dataset.linkTo
+    this.highlightCommentId(commentIdLinked)
+  }
+
+  onMouseLeaveLinkReplyComment(event) {
+    const commentIdLinked = event.currentTarget.dataset.linkTo
+    this.deHighlightCommentId(commentIdLinked)
+  }
+
   onPopState() {
     const commentId = document.location.pathname.split('/')[3]
     if (!commentId) return
@@ -151,13 +182,13 @@ export class CommentListing {
     // Buttons are topmost in jqTemplate, hence .filter and not .find
     const jqButtonExpandCommentsDown =
       jqTemplate.filter(this.options.selectors.action.expandCommentsDown)
-    jqButtonExpandCommentsDown.toggle(hasPreviousComment)
+    jqButtonExpandCommentsDown.prop('hidden', !hasPreviousComment)
     const jqButtonExpandCommentsUp =
       jqTemplate.filter(this.options.selectors.action.expandCommentsUp)
-    jqButtonExpandCommentsUp.toggle(hasAnswers)
+    jqButtonExpandCommentsUp.prop('hidden', !hasAnswers)
     const jqButtonExpandCommentsUpRecursive =
       jqTemplate.filter(this.options.selectors.action.expandCommentsUpRecursive)
-    jqButtonExpandCommentsUpRecursive.toggle(hasAnswers)
+    jqButtonExpandCommentsUpRecursive.prop('hidden', !hasAnswers)
     if (hasAnswers) {
       jqButtonExpandCommentsUpRecursive.click(() => {
         this.onClickButtonExpandCommentsUpRecursive(jqCommentWrapper)
@@ -179,8 +210,14 @@ export class CommentListing {
     }
     this.jqWrappers.comments.find(this.options.selectors.previousLinks)
       .click(::this.onClickLinkPreviousComment)
+      .hover(
+        ::this.onMouseEnterLinkPreviousComment,
+        ::this.onMouseLeaveLinkPreviousComment)
     this.jqWrappers.comments.find(this.options.selectors.replyLinks)
       .click(::this.onClickLinkReplyComment)
+      .hover(
+        ::this.onMouseEnterLinkReplyComment,
+        ::this.onMouseLeaveLinkReplyComment)
     this.jqWrappers.comments.find(this.options.selectors.selfLinks)
       .click(::this.onClickLinkComment)
     const jqButtonCommentActions =
@@ -200,10 +237,9 @@ export class CommentListing {
     const jqTimeElements = this.jqRoot.find('.forum-time')
     timeActualizer.add(jqTimeElements)
     $(window).on('popstate', ::this.onPopState)
-    console.debug('scrolling init', this.options.scrollToId);
     this.scrollFix = new ScrollFix({
       callbacks: {
-        getScrollToElement: ::this.getScrollToElement,
+        getScrollToElement: ::this.getCommentWrapper,
         afterScrollTo: ::this.afterScrollTo,
         updateUrl: ::this.updateUrl,
       },

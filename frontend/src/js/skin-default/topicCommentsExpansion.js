@@ -12,7 +12,7 @@ class CommentsExpansion extends CommentListing {
    */
   sendBrowserToComment(event) {
     const commentIdLinked = event.currentTarget.dataset.linkTo
-    const jqExistingComment = this.getScrollToElement(commentIdLinked)
+    const jqExistingComment = this.getCommentWrapper(commentIdLinked)
     if (!jqExistingComment.length) {
       // The linked comment is not on this page, send the browser to the
       // link
