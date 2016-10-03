@@ -144,7 +144,7 @@ def replies_up_recursive(request, topic_slug, comment_id):
         search_kwargs_comment['prev_comment__in'] = set_iteration_ids
         qs_comments = Comment.objects.filter(
             **search_kwargs_comment).only('id').order_by()
-        set_iteration_ids = set([x.id for x in qs_comments])
+        set_iteration_ids = set((x.id for x in qs_comments))
         if len(set_iteration_ids) == 0:
             # No more comments fetchable
             break
