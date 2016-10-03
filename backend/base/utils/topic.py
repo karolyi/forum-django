@@ -175,11 +175,9 @@ def replies_up(request, topic_slug, comment_id):
                 'comment_id': model_comment.id,
                 'scroll_to_id': model_comment.id})
         raise HttpResponsePermanentRedirect(url=url)
-    search_kwargs_replies = search_kwargs_comment.copy()
-    search_kwargs_comment['id'] = model_comment.id
-    search_kwargs_replies['prev_comment_id'] = model_comment.id
     qs_comments = Comment.objects.filter(
-        Q(**search_kwargs_comment) | Q(**search_kwargs_replies))
+        Q(id=model_comment.id) | Q(prev_comment_id=model_comment.id),
+        **search_kwargs_comment)
     qs_comments = _prefetch_for_comments(qs_comments)
     return model_comment.topic, qs_comments
 

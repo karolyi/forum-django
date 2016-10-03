@@ -22,7 +22,7 @@
     topicSlugOriginal: '{{ model_topic.slug }}',
     commentId: {{ comment_id|default:'null' }},
     scrollToId: {{ scroll_to_id|default:'null' }},
-    listingMode: '{{ type|default:'commentListing' }}',
+    listingMode: '{{ listing_mode|default:'commentListing' }}',
     urls: {
         commentListing: {
             backend: '{% url 'base:topic-comment-listing' topic_slug='example-slug' comment_id=12345 %}',

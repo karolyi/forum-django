@@ -48,7 +48,7 @@
 {% jsmin %}
 <script type="text/javascript">
 Forum.topicCommentsExpansion.init({
-    {% include 'default/base/include/js-config-topic-comment.html' with type='expandCommentsUpRecursive' root='.topic-comment-expansion-wrapper' comment_id=comment_id scroll_to_id=scroll_to_id model_topic=model_topic %}
+    {% include 'default/base/include/js-config-topic-comment.html' with listing_mode=listing_mode root='.topic-comment-expansion-wrapper' comment_id=comment_id scroll_to_id=scroll_to_id model_topic=model_topic %}
 })
 </script>
 {% endjsmin %}

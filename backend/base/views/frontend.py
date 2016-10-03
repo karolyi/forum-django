@@ -58,7 +58,8 @@ def expand_comments_up_recursive(
             'model_topic': model_topic,
             'comment_id': comment_id,
             'qs_comments': qs_comments,
-            'scroll_to_id': scroll_to_id
+            'scroll_to_id': scroll_to_id,
+            'listing_mode': 'expandCommentsUpRecursive',
         })
 
 
@@ -79,7 +80,8 @@ def expand_comments_up(
             'model_topic': model_topic,
             'comment_id': comment_id,
             'qs_comments': qs_comments,
-            'scroll_to_id': scroll_to_id
+            'scroll_to_id': scroll_to_id,
+            'listing_mode': 'expandCommentsUp',
         })
 
 
@@ -100,5 +102,6 @@ def expand_comments_down(
             'model_topic': model_topic,
             'comment_id': comment_id,
             'qs_comments': qs_comments,
-            'scroll_to_id': scroll_to_id
+            'scroll_to_id': scroll_to_id,
+            'listing_mode': 'expandCommentsDown',
         })
