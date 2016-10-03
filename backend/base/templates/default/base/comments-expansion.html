@@ -22,7 +22,27 @@
         </a>
     </section>
     {% for model_comment in qs_comments %}
+
+        {% ifchanged model_comment.topic %}
+        {% if not forloop.first %}
+            </div>
+        </section>
+        {% endif %}
+        <section class="card card-block card-outline-primary group-comments-in-topic" aria-label="{% trans 'Comments in the same topic' %}">
+            <div class="card-text">
+                <div class="topic-button-wrapper">
+                    <a class="btn btn-primary" href="{% url 'base:topic-comment-listing' topic_slug=model_comment.topic.slug %}">
+                        {{ model_comment.topic.name_html|safe }}
+                    </a>
+                </div>
+        {% endifchanged %}
+
         {% include 'default/base/include/topic-comment-template.html' with model_comment=model_comment %}
+
+        {% if forloop.last %}
+            </div>
+        </section>
+        {% endif %}
     {% endfor %}
 </article>
 {% jsmin %}
