@@ -105,3 +105,7 @@ def expand_comments_down(
             'scroll_to_id': scroll_to_id,
             'listing_mode': 'expandCommentsDown',
         })
+
+
+def jinja_test(request):
+    return render(request=request, template_name='test.html')

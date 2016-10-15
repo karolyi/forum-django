@@ -10,9 +10,10 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-import mimetypes
 
+import mimetypes
 from django.utils.translation import ugettext_lazy as _
+from django_jinja.builtins import DEFAULT_EXTENSIONS
 
 # Keep this at the beginning, after module imports
 try:
@@ -35,6 +36,33 @@ except NameError:
     DEBUG = True
 
 TEMPLATES = [
+    {
+        'BACKEND': 'django_jinja.backend.Jinja2',
+        'APP_DIRS': True,
+        'DIRS': [],
+        'OPTIONS': {
+            'app_dirname': 'jinja2',
+            'match_extension': None,
+            'extensions': DEFAULT_EXTENSIONS + [
+                'django_jinja.builtins.extensions.DjangoExtraFiltersExtension',
+                'webpack_loader.contrib.jinja2ext.WebpackExtension',
+                'jinja2.ext.with_',
+                'forum.jinja2.SpacelessExtension',
+                'forum.jinja2.SettingsExtension',
+                'forum.jinja2.JsMinExtension',
+                'forum.jinja2.CommentExtension',
+                'forum.jinja2.MyLanguageInfoExtension',
+            ],
+            'bytecode_cache': {
+                'name': 'default',
+                'backend': 'django_jinja.cache.BytecodeCache',
+                'enabled': not DEBUG,
+            },
+            'autoescape': True,
+            'auto_reload': DEBUG,
+            'translation_engine': 'django.utils.translation',
+        },
+    },
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
@@ -80,6 +108,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'django_extensions',
+    'django_jinja',
     'webpack_loader',
     'debug_toolbar',
     'forum',

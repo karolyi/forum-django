@@ -1,0 +1,24 @@
+<template class="forum-user-tooltip-template">
+    <table class="forum-user-tooltip">
+        <tbody>
+            <tr class="quote">
+                <td class="property">{{ _('Quote:') }}</td>
+                <td class="value"></td>
+            </tr>
+            <tr class="is-admin">
+                <td colspan="2">{{ _('Administrator') }}</td>
+            </tr>
+            <tr class="is-banned">
+                <td colspan="2">{{ _('User is banned') }}</td>
+            </tr>
+            <tr class="ratings">
+                <td class="property">{{ _('Accepted ratings') }}</td>
+                <td class="value">
+                    <span class="count"></span>
+                    {{ _('ratings, averaging') }}
+                    <span class="average"></span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</template>

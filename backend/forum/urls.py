@@ -5,9 +5,6 @@ from django.views.i18n import JavaScriptCatalog
 from rest_api import urls as urls_api
 
 urlpatterns = [
-    # Examples:
-    # url(r'^blog/', include('blog.urls')),
-
     url(r'^admin/', include(admin.site.urls)),
     url(r'^', include(urls_base, namespace='base', app_name='base')),
     url(r'^api/', include(

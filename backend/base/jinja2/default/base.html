@@ -1,0 +1,68 @@
+{# {% get_current_language as LANGUAGE_CODE  %}
+{% get_language_info for LANGUAGE_CODE as current_language %}
+ #}
+{% get_my_language_info as current_language %}
+<!DOCTYPE html>
+<html>
+<head>
+    {{ render_bundle('vendor') }}
+    {{ render_bundle('common') }}
+    {{ render_bundle('userName') }}
+    <title>{% block title %}{{ settings.SITE_NAME }}{% endblock title %}</title>
+    <script type="text/javascript" src="{{ url('javascript-catalog') }}"></script>
+    <link rel="icon" href="{{ static('favicon.ico') }}" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1, user-scalable=no">
+
+    {% jsmin %}
+    <script type="text/javascript">
+        // Init the common module
+        Forum.common.init({
+          languageInfo: {
+            code: '{{ current_language.code|escapejs }}',
+            localName: '{{ current_language.name_local|escapejs }}',
+            name: '{{ current_language.name|escapejs }}'
+          },
+          urls: {
+            user: {
+                shortData: '{{ url('rest-api:v1-user-short', slug_list='example-slug') }}',
+                exampleSlug: 'example-slug'
+            }
+          },
+          selectors: {
+            navbar: 'body > nav.navbar-fixed-top',
+            user: {
+                tooltipTemplate: '.forum-user-tooltip-template'
+            }
+          },
+          scrollSpeed: 300
+        });
+        // Init the username module
+        Forum.userName.init({})
+    </script>
+    {% endjsmin %}
+    {% block extra_scripts_head %}{% endblock extra_scripts_head %}
+</head>
+<body>
+    <nav class="navbar navbar-fixed-top navbar-light bg-faded">
+      <a class="navbar-brand" href="/">Forum</a>
+    </nav>
+    <div class="navbar-content-spacer"></div>
+{% comment %}
+    <script type="text/javascript">
+        require(['sidebar'], function (sidebar) {
+          sidebar.init({
+            selectors: {
+              buttonToggle: '.navbar-toggle',
+              sidebarWrapper: '.sidebar-wrapper',
+              sidebarOverlay: '.sidebar-offcanvas-overlay'
+            }
+          });
+        });
+    </script>
+{% endcomment %}
+    <div class="container-fluid page-content-wrapper">
+        {% block main_content %}{% endblock main_content %}
+    </div>
+    {% include 'default/include/user-tooltip-template.html' %}
+</body>
+</html>
