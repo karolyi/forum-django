@@ -1,3 +1,4 @@
+from debug_toolbar.panels.templates import TemplatesPanel as BaseTemplatesPanel
 from django.conf import settings
 from django.utils.html import strip_spaces_between_tags
 from django.utils.translation import (
@@ -7,10 +8,6 @@ from jinja2.ext import Extension
 from rjsmin import jsmin
 
 
-# get_language_info
-# get_current_language
-
-
 class SettingsExtension(Extension):
     """
     Puts the settings variable into the global template context.
@@ -18,7 +15,7 @@ class SettingsExtension(Extension):
 
     def __init__(self, environment):
         super(SettingsExtension, self).__init__(environment)
-        environment.globals['settings'] = settings
+        environment.globals['django_settings'] = settings
 
 
 class JsMinExtension(Extension):
@@ -27,7 +24,7 @@ class JsMinExtension(Extension):
     newline characters.
     """
 
-    tags = set(['jsmin'])
+    tags = {'jsmin'}
 
     def parse(self, parser):
         lineno = parser.stream.__next__().lineno
@@ -106,3 +103,17 @@ class MyLanguageInfoExtension(Extension):
     def _get_current_language_info(self, context):
         lang_code = get_language_from_request(request=context['request'])
         return get_language_info(lang_code=lang_code)
+
+
+class TemplatesPanel(BaseTemplatesPanel):
+    """
+    A fix for django debug toolbar.
+
+    http://stackoverflow.com/a/39036820/1067833
+    """
+
+    def generate_stats(self, *args):
+        template = self.templates[0]['template']
+        if not hasattr(template, 'engine') and hasattr(template, 'backend'):
+            template.engine = template.backend
+        return super().generate_stats(*args)

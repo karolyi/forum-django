@@ -43,10 +43,13 @@ TEMPLATES = [
         'OPTIONS': {
             'app_dirname': 'jinja2',
             'match_extension': None,
+            # 'match_regex': r'^(?!debug_toolbar/).*',
+            'newstyle_gettext': True,
             'extensions': DEFAULT_EXTENSIONS + [
                 'django_jinja.builtins.extensions.DjangoExtraFiltersExtension',
                 'webpack_loader.contrib.jinja2ext.WebpackExtension',
                 'jinja2.ext.with_',
+                'jinja2.ext.i18n',
                 'forum.jinja2.SpacelessExtension',
                 'forum.jinja2.SettingsExtension',
                 'forum.jinja2.JsMinExtension',
@@ -108,9 +111,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'django_extensions',
-    'django_jinja',
     'webpack_loader',
-    'debug_toolbar',
+    'django_jinja',
     'forum',
     'base',
     'cdn',
@@ -131,7 +133,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 STATICFILES_FINDERS = (
@@ -196,6 +197,25 @@ if DEBUG:
     mimetypes.add_type('image/x-sass', '.sass', True)
     mimetypes.add_type('image/svg+xml', '.svg', True)
     mimetypes.add_type('image/svg+xml', '.svgz', True)
+    INSTALLED_APPS += ('debug_toolbar',)
+    MIDDLEWARE_CLASSES += (
+        'debug_toolbar.middleware.DebugToolbarMiddleware',)
+    INTERNAL_IPS = ('127.0.0.1',)
+    DEBUG_TOOLBAR_PANELS = [
+        'debug_toolbar.panels.versions.VersionsPanel',
+        'debug_toolbar.panels.timer.TimerPanel',
+        'debug_toolbar.panels.settings.SettingsPanel',
+        'debug_toolbar.panels.headers.HeadersPanel',
+        'debug_toolbar.panels.request.RequestPanel',
+        'debug_toolbar.panels.sql.SQLPanel',
+        'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+        # original broken by django-jinja, remove this whole block later
+        'forum.jinja2.TemplatesPanel',
+        'debug_toolbar.panels.cache.CachePanel',
+        'debug_toolbar.panels.signals.SignalsPanel',
+        'debug_toolbar.panels.logging.LoggingPanel',
+        'debug_toolbar.panels.redirects.RedirectsPanel',
+    ]
 
 TMP_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'tmp'))
 if not os.path.exists(TMP_DIR):
@@ -224,6 +244,7 @@ LANGUAGES = (
 # Default amount of topics to show per category
 PAGINATOR_MAX_COMMENTS_LISTED = 50
 PAGINATOR_MAX_PAGES_TOPICLIST = 10
+
 
 # Keep this at the end
 try:

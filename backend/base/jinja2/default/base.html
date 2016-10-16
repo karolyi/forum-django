@@ -8,7 +8,7 @@
     {{ render_bundle('vendor') }}
     {{ render_bundle('common') }}
     {{ render_bundle('userName') }}
-    <title>{% block title %}{{ settings.SITE_NAME }}{% endblock title %}</title>
+    <title>{% block title %}{{ django_settings.SITE_NAME }}{% endblock title %}</title>
     <script type="text/javascript" src="{{ url('javascript-catalog') }}"></script>
     <link rel="icon" href="{{ static('favicon.ico') }}" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1, user-scalable=no">

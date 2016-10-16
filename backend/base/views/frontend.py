@@ -108,4 +108,14 @@ def expand_comments_down(
 
 
 def jinja_test(request):
-    return render(request=request, template_name='test.html')
+    request_context = {
+        'topics_highlighted': collect_topic_page(
+            request=request, topic_type=TOPIC_TYPE_HIGHLIGHTED, page_id=1),
+        'topics_normal': collect_topic_page(
+            request=request, topic_type=TOPIC_TYPE_NORMAL, page_id=1),
+        'topics_archived': collect_topic_page(
+            request=request, topic_type=TOPIC_TYPE_ARCHIVED, page_id=1),
+    }
+    return render(
+        request=request, template_name='test.html',
+        context=request_context)
