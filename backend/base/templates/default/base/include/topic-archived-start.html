@@ -1,6 +1,0 @@
-<section class="topic-list-wrapper">
-    {% include 'default/base/include/topic-group-page.html' with topic_list=topic_list %}
-</section>
-<section class="pagination-wrapper text-center" data-max-pages="{{ topic_list.paginator.num_pages|default:0 }}">
-{% include 'default/include/paginator-generic.html' with page=topic_list %}
-</section>

@@ -1,0 +1,14 @@
+{% extends 'default/base.html' %}
+{% from 'default/base/macros/topic-group.html' import topic_group %}
+
+{% block extra_scripts_head %}
+{{ render_bundle('topicGroup') }}
+{% endblock extra_scripts_head %}
+
+{% block main_content %}
+    {{ topic_group(topic_list=topics_highlighted, topic_type='highlighted') }}
+
+    {{ topic_group(topic_list=topics_normal, topic_type='normal') }}
+
+    {{ topic_group(topic_list=topics_archived, topic_type='archived') }}
+{% endblock main_content %}

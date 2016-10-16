@@ -1,0 +1,52 @@
+{% macro js_config_topic_comment(listing_mode='commentListing', root='', comment_id=None, scroll_to_id=None, model_topic=None) -%}
+    selectors: {
+        root: '{{ root }}',
+        template: {
+            comment:'.topic-comment-template',
+            action: '.topic-comment-action-template'
+        },
+        commentWrapper: '.topic-comment-wrapper',
+        previousLinks: '.comment-previous a[data-link-to]',
+        replyLinks: '.to-reply-comment',
+        selfLinks: '.comment-number-wrapper .comment-number',
+        commentActions: '.comment-actions',
+        action: {
+            voteUp: '.vote-up',
+            voteDown: '.vote-down',
+            expandCommentsDown: '.expand-comments-down',
+            expandCommentsUp: '.expand-comments-up',
+            expandCommentsUpRecursive: '.expand-comments-up-recursive',
+            replyToThis: '.reply-to-this'
+        }
+    },
+    highlightedClass: 'is-highlighted',
+    topicSlugOriginal: '{{ model_topic.slug }}',
+    commentId: {{ comment_id|default('null') }},
+    scrollToId: {{ scroll_to_id|default('null') }},
+    listingMode: '{{ listing_mode|default('commentListing') }}',
+    urls: {
+        commentListing: {
+            backend: '{{ url('base:topic-comment-listing', topic_slug='example-slug', comment_id=12345) }}',
+            exampleSlug: 'example-slug',
+            commentId: '12345'
+        },
+        expandCommentsUpRecursive: {
+            backend: '{{ url('base:comments-up-recursive', topic_slug='example-slug', comment_id=12345, scroll_to_id=67890) }}',
+            exampleSlug: 'example-slug',
+            commentId: '12345',
+            scrollToId: '67890'
+        },
+        expandCommentsUp: {
+            backend: '{{ url('base:comments-up', topic_slug='example-slug', comment_id=12345, scroll_to_id=67890) }}',
+            exampleSlug: 'example-slug',
+            commentId: '12345',
+            scrollToId: '67890'
+        },
+        expandCommentsDown: {
+            backend: '{{ url('base:comments-down', topic_slug='example-slug', comment_id=12345, scroll_to_id=67890) }}',
+            exampleSlug: 'example-slug',
+            commentId: '12345',
+            scrollToId: '67890'
+        }
+    }
+{%- endmacro %}

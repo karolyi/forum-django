@@ -27,10 +27,11 @@ def collect_topic_page(request, topic_type, page_id=1, force=False):
     """
     if topic_type == TOPIC_TYPE_ARCHIVED and not force:
         if isinstance(request.user, AnonymousUser):
-            # AnonymousUser does not have settings
-            return []
+            # AnonymousUser does not have settings, return False
+            return False
         if not request.user.settings.expand_archived:
-            return []
+            # Return False
+            return False
 
     search_kwargs = {
         'is_enabled': True,

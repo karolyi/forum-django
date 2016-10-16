@@ -1,0 +1,45 @@
+{% extends 'default/base.html' %}
+{% from 'default/base/macros/topic-comment-template.html' import topic_comment_template %}
+{% from 'default/base/macros/topic-comment-action-template.html' import topic_comment_action_template with context %}
+{% from 'default/base/macros/js-config-topic-comment.html' import js_config_topic_comment %}
+
+{% block extra_scripts_head %}
+{{ render_bundle('topicCommentListing') }}
+{% endblock extra_scripts_head %}
+
+{% block main_content %}
+<article class="topic-comment-listing-wrapper">
+    <template class="topic-comment-template">
+    {{ topic_comment_template(is_template=True) }}
+    </template>
+    <template class="topic-comment-action-template">
+    {{ topic_comment_action_template() }}
+    </template>
+
+    <section class="control-buttons text-center">
+        <a href="{{ url('base:topic-listing') }}" class="btn btn-primary">
+            <span class="fa fa-home" aria-hidden="true"></span>
+            {{_ ('Back to topic listing') }}
+        </a>
+    </section>
+    {% if model_topic.description %}
+    <section class="card card-block card-outline-primary" aria-label="{{ _('Topic description') }}">
+        <div class="card-text">
+            {{ model_topic.description|safe }}
+        </div>
+    </section>
+    {% endif %}
+    {% for model_comment in page_comments %}
+        {{ topic_comment_template(model_comment=model_comment, is_template=False) }}
+    {% endfor %}
+</article>
+
+{% jsmin %}
+<script type="text/javascript">
+Forum.topicCommentListing.init({
+    {{ js_config_topic_comment(listing_mode='commentListing', root='.topic-comment-listing-wrapper', comment_id=comment_id, scroll_to_id=comment_id, model_topic=model_topic) }}
+})
+</script>
+{% endjsmin %}
+
+{% endblock main_content %}

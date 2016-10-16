@@ -1,21 +1,13 @@
 from debug_toolbar.panels.templates import TemplatesPanel as BaseTemplatesPanel
 from django.conf import settings
+from django.core.paginator import Page
 from django.utils.html import strip_spaces_between_tags
 from django.utils.translation import (
     get_language_from_request, get_language_info)
 from jinja2 import nodes
 from jinja2.ext import Extension
 from rjsmin import jsmin
-
-
-class SettingsExtension(Extension):
-    """
-    Puts the settings variable into the global template context.
-    """
-
-    def __init__(self, environment):
-        super(SettingsExtension, self).__init__(environment)
-        environment.globals['django_settings'] = settings
+from django.contrib.humanize.templatetags.humanize import naturaltime
 
 
 class JsMinExtension(Extension):
@@ -35,6 +27,9 @@ class JsMinExtension(Extension):
         ).set_lineno(lineno)
 
     def _strip_whitespace_js(self, caller=None):
+        if settings.DEBUG:
+            # Debug mode, no minification
+            return caller().strip()
         return jsmin(caller().strip())
 
 # https://github.com/coffin/coffin/blob/master/coffin/common.py
@@ -117,3 +112,61 @@ class TemplatesPanel(BaseTemplatesPanel):
         if not hasattr(template, 'engine') and hasattr(template, 'backend'):
             template.engine = template.backend
         return super().generate_stats(*args)
+
+
+def paginator_generic_get_list(
+        page=None, max_pages=settings.PAGINATOR_MAX_PAGES_TOPICLIST):
+    """
+    Generate a paginator list with ellipsis.
+    """
+    # Sanity check
+    if type(page) is not Page or page.paginator.count == 0:
+        return None
+    paginator = page.paginator
+    num_pages = paginator.num_pages
+    if num_pages == 1:
+        # Early exit, only one page
+        return ({
+            'number': 1,
+            'type': 'number'
+        },)
+    page_range = max_pages
+    if num_pages > max_pages:
+        # The page is NOT within the shown paginator page amount
+        page_range -= 1
+        if page.number > page_range:
+            # The current page cannot be shown amongst one of the the
+            # pages, make a place for it
+            page_range -= 1
+    page_number_list = []
+    for idx in range(page_range):
+        page_number_list.append({
+            'number': idx + 1,
+            'type': 'number',
+        })
+    if page.number > page_range:
+        # Append the current page
+        page_number_list.append({
+            'number': page.number,
+            'type': 'number'
+        })
+    if num_pages > max_pages:
+        # Append the last last page
+        page_number_list.append({
+            'number': paginator.num_pages,
+            'type': 'number'
+        })
+    return page_number_list
+
+
+class SettingsExtension(Extension):
+    """
+    Puts the settings variable into the global template context.
+    """
+
+    def __init__(self, environment):
+        super(SettingsExtension, self).__init__(environment)
+        environment.globals['django_settings'] = settings
+        environment.globals['paginator_generic_get_list'] = \
+            paginator_generic_get_list
+        environment.filters['naturaltime'] = naturaltime

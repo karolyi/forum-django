@@ -1,0 +1,41 @@
+{% macro paginator_generic(page) -%}
+{% set page_number_list = paginator_generic_get_list(page=page, max_pages=5) %}
+{% if page_number_list %}
+<nav aria-label="{{ aria_label }}">
+    <ul class="pagination">
+        <li class="page-item page-previous {% spaceless %}
+            {% if page.number == 1 %}
+                disabled
+            {% endif %}
+        {% endspaceless %}">
+            <a class="page-link" href="#" aria-label="{{ _('Previous') }}">
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only">{{ _('Previous') }}</span>
+            </a>
+        </li>
+
+        {% for dict_page in page_number_list %}
+            {% if dict_page.type == 'number' %}
+            <li class="page-item page-numbered {% spaceless %}
+                {% if page.number == dict_page.number %}
+                    active
+                {% endif %}
+            {% endspaceless %}" data-page-id="{{ dict_page.number }}">
+                <a class="page-link" href="#">{{ dict_page.number }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+        <li class="page-item page-next {% spaceless %}
+            {% if page.number == page.paginator.num_pages %}
+                disabled
+            {% endif %}
+        {% endspaceless %}">
+            <a class="page-link" href="#" aria-label="{{ _('Next') }}">
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only">{{ _('Next') }}</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+{% endif %}
+{%- endmacro %}

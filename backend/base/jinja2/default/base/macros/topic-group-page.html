@@ -1,0 +1,32 @@
+{% from 'default/macros/forum-time.html' import forum_time %}
+{% from 'default/macros/forum-username.html' import forum_username %}
+
+{% macro topic_group_page(topic_list=[]) -%}
+{% if topic_list is iterable %}
+    {% for model_topic in topic_list %}
+    <div class="row topic-list-item-row {{ loop.cycle('odd', 'even') }}">
+        <div class="col-xs-6 col-sm-6">
+            <a href="{{ url('base:topic-comment-listing', topic_slug=model_topic.slug) }}" class="topic-link" data-slug="{{ model_topic.slug }}">
+                {# {{ model_topic.name_html|safe }} #}
+                {{ model_topic.name_text }}
+            </a>
+        </div>
+        <div class="col-xs-6 col-sm-2 text-center">
+            {{ forum_time(time=model_topic.last_comment.time) }}
+        </div>
+        <div class="clearfix visible-xs-block"></div>
+        <div class="col-xs-6 col-sm-2 text-center">
+            {{ forum_username(model_user=model_topic.last_comment.user) }}
+        </div>
+        <div class="col-xs-6 col-sm-2 text-center">
+            {{ model_topic.comment_count }}
+        </div>
+    </div>
+    <template class="forum-topic-tooltip-template" data-slug="{{ model_topic.slug }}">
+        <div class="forum-topic-tooltip">
+            {{ model_topic.last_comment.content_html|safe }}
+        </div>
+    </template>
+    {% endfor %}
+{% endif %}
+{%- endmacro %}

@@ -2,11 +2,10 @@ from django.conf.urls import url
 
 from .views.frontend import (
     expand_comments_down, expand_comments_up, expand_comments_up_recursive,
-    topic_comment_listing, topic_listing, jinja_test)
+    topic_comment_listing, topic_listing)
 
 urlpatterns = [
-    url(r'^$', jinja_test, name='topic-listing'),
-    # url(r'^$', topic_listing, name='topic-listing'),
+    url(r'^$', topic_listing, name='topic-listing'),
     url(r'^topic/(?P<topic_slug>[a-z0-9-]+)/$', topic_comment_listing,
         name='topic-comment-listing'),
     url(r'^topic/(?P<topic_slug>[a-z0-9-]+)/(?P<comment_id>\d+)/$',

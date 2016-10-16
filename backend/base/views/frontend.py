@@ -105,17 +105,3 @@ def expand_comments_down(
             'scroll_to_id': scroll_to_id,
             'listing_mode': 'expandCommentsDown',
         })
-
-
-def jinja_test(request):
-    request_context = {
-        'topics_highlighted': collect_topic_page(
-            request=request, topic_type=TOPIC_TYPE_HIGHLIGHTED, page_id=1),
-        'topics_normal': collect_topic_page(
-            request=request, topic_type=TOPIC_TYPE_NORMAL, page_id=1),
-        'topics_archived': collect_topic_page(
-            request=request, topic_type=TOPIC_TYPE_ARCHIVED, page_id=1),
-    }
-    return render(
-        request=request, template_name='test.html',
-        context=request_context)

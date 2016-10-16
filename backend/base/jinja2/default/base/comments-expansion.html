@@ -1,0 +1,59 @@
+{% extends 'default/base.html' %}
+{% from 'default/base/macros/topic-comment-template.html' import topic_comment_template %}
+{% from 'default/base/macros/topic-comment-action-template.html' import topic_comment_action_template with context %}
+{% from 'default/base/macros/js-config-topic-comment.html' import js_config_topic_comment %}
+
+
+{% block extra_scripts_head %}
+{{ render_bundle('topicCommentsExpansion') }}
+{% endblock extra_scripts_head %}
+
+{% block main_content %}
+<article class="topic-comment-expansion-wrapper">
+    <template class="topic-comment-template">
+    {{ topic_comment_template(is_template=True) }}
+    </template>
+    <template class="topic-comment-action-template">
+    {{ topic_comment_action_template() }}
+    </template>
+
+    <section class="control-buttons text-center">
+        <a href="{{ url('base:topic-listing') }}" class="btn btn-primary">
+            <span class="fa fa-home" aria-hidden="true"></span>
+            {{_ ('Back to topic listing') }}
+        </a>
+    </section>
+    {% set last_model=None %}
+    {% for model_comment in qs_comments %}
+
+        {% if last_model is none or last_model.topic != model_comment.topic %}
+        {% if not loop.first %}
+            </div>
+        </section>
+        {% endif %}
+        <section class="card card-block card-outline-primary group-comments-in-topic" aria-label="{{ _('Comments in the same topic') }}">
+            <div class="card-text">
+                <div class="topic-button-wrapper">
+                    <a class="btn btn-primary" href="{{ url('base:topic-comment-listing', topic_slug=model_comment.topic.slug) }}">
+                        {{ model_comment.topic.name_html|safe }}
+                    </a>
+                </div>
+        {% endif %}
+
+        {{ topic_comment_template(model_comment=model_comment, is_template=False) }}
+
+        {% if loop.last %}
+            </div>
+        </section>
+        {% endif %}
+        {% set last_model = model_comment %}
+    {% endfor %}
+</article>
+{% jsmin %}
+<script type="text/javascript">
+Forum.topicCommentsExpansion.init({
+    {{ js_config_topic_comment(listing_mode=listing_mode, root='.topic-comment-expansion-wrapper', comment_id=comment_id, scroll_to_id=comment_id, model_topic=model_topic) }}
+})
+</script>
+{% endjsmin %}
+{% endblock main_content %}

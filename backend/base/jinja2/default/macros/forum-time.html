@@ -1,0 +1,7 @@
+{% macro forum_time(time, is_template=False) -%}
+{% if not is_template %}
+<time class="forum-time" datetime="{{ time.isoformat() }}" title="{{ time|date('DATETIME_FORMAT') }}">{{ time|naturaltime }}</time>
+{% else %}
+<time class="forum-time" datetime="" title=""></time>
+{% endif %}
+{%- endmacro %}

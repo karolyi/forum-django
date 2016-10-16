@@ -74,7 +74,7 @@ def v1_topic_list_page(request):
         raise Http404
     return render(
         request=request,
-        template_name='default/base/include/topic-group-page.html',
+        template_name='default/base/render-topic-group-page-inside.html',
         context={
             'topic_list': topic_list
         })
@@ -89,7 +89,7 @@ def v1_archived_topics_start(request):
         request=request, topic_type=TOPIC_TYPE_ARCHIVED, page_id=1, force=True)
     return render(
         request=request,
-        template_name='default/base/include/topic-archived-start.html',
+        template_name='default/base/topic-archived-start.html',
         context={
             'topic_list': qs_topics_archived
         })
