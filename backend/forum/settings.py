@@ -61,7 +61,7 @@ TEMPLATES = [
                 'backend': 'django_jinja.cache.BytecodeCache',
                 'enabled': not DEBUG,
             },
-            'autoescape': True,
+            'autoescape': False,
             'auto_reload': DEBUG,
             'translation_engine': 'django.utils.translation',
         },
@@ -96,7 +96,7 @@ TEMPLATES = [
     },
 ]
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['test.localdomain']
 
 SITE_NAME = _('Forum')
 

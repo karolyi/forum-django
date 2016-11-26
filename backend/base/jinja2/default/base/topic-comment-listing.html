@@ -19,13 +19,13 @@
     <section class="control-buttons text-center">
         <a href="{{ url('base:topic-listing') }}" class="btn btn-primary">
             <span class="fa fa-home" aria-hidden="true"></span>
-            {{_ ('Back to topic listing') }}
+            {{ _('Back to topic listing') }}
         </a>
     </section>
     {% if model_topic.description %}
     <section class="card card-block card-outline-primary" aria-label="{{ _('Topic description') }}">
         <div class="card-text">
-            {{ model_topic.description|safe }}
+            {{ model_topic.description }}
         </div>
     </section>
     {% endif %}

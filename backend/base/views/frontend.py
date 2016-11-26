@@ -59,8 +59,7 @@ def expand_comments_up_recursive(
             'comment_id': comment_id,
             'qs_comments': qs_comments,
             'scroll_to_id': scroll_to_id,
-            'listing_mode': 'expandCommentsUpRecursive',
-        })
+            'listing_mode': 'expandCommentsUpRecursive'})
 
 
 def expand_comments_up(

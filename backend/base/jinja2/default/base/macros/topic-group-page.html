@@ -24,7 +24,7 @@
     </div>
     <template class="forum-topic-tooltip-template" data-slug="{{ model_topic.slug }}">
         <div class="forum-topic-tooltip">
-            {{ model_topic.last_comment.content_html|safe }}
+            {{ model_topic.last_comment.content_html }}
         </div>
     </template>
     {% endfor %}

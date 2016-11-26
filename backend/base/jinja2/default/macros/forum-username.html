@@ -5,7 +5,7 @@
         is-admin
     {% endif %}
 {% endspaceless %}" data-slug="{{ model_user.settings.slug }}" data-toggle="username">
-    {{ model_user.username }}
+    {{ model_user.username|escape }}
 </a>
 {% else %}
 <a href="" class="forum-username" data-slug="" data-toggle="username">
