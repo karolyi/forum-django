@@ -9,6 +9,8 @@ from jinja2.ext import Extension
 from rjsmin import jsmin
 from django.contrib.humanize.templatetags.humanize import naturaltime
 
+ForumAuthForm = None
+
 
 class JsMinExtension(Extension):
     """
@@ -159,14 +161,23 @@ def paginator_generic_get_list(
     return page_number_list
 
 
-class SettingsExtension(Extension):
+def forum_auth_form():
+    global ForumAuthForm
+    if ForumAuthForm is None:
+        from account.forms import ForumAuthForm
+    return ForumAuthForm
+
+
+class ForumToolsExtension(Extension):
     """
-    Puts the settings variable into the global template context.
+    Puts the settings variable and other utilities into the global
+    template context.
     """
 
     def __init__(self, environment):
-        super(SettingsExtension, self).__init__(environment)
+        super(ForumToolsExtension, self).__init__(environment)
         environment.globals['django_settings'] = settings
+        environment.globals['forum_auth_form'] = forum_auth_form()
         environment.globals['paginator_generic_get_list'] = \
             paginator_generic_get_list
         environment.filters['naturaltime'] = naturaltime

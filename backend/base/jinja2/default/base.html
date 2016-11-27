@@ -1,6 +1,4 @@
-{# {% get_current_language as LANGUAGE_CODE  %}
-{% get_language_info for LANGUAGE_CODE as current_language %}
- #}
+{% from 'default/macros/login-actions.html' import login_actions with context %}
 {% get_my_language_info as current_language %}
 <!DOCTYPE html>
 <html>
@@ -46,22 +44,15 @@
     <nav class="navbar navbar-fixed-top navbar-light bg-faded">
       <a class="navbar-brand" href="/">Forum</a>
     </nav>
-    <div class="navbar-content-spacer"></div>
-{% comment %}
-    <script type="text/javascript">
-        require(['sidebar'], function (sidebar) {
-          sidebar.init({
-            selectors: {
-              buttonToggle: '.navbar-toggle',
-              sidebarWrapper: '.sidebar-wrapper',
-              sidebarOverlay: '.sidebar-offcanvas-overlay'
-            }
-          });
-        });
-    </script>
-{% endcomment %}
     <div class="container-fluid page-content-wrapper">
-        {% block main_content %}{% endblock main_content %}
+        <main>
+            {% block main_content %}{% endblock main_content %}
+        </main>
+        <footer class="row">
+            <div class="col-xs-12 col-sm-6">
+                {{ login_actions(request) }}
+            </div>
+        </footer>
     </div>
     {% include 'default/include/user-tooltip-template.html' %}
 </body>
