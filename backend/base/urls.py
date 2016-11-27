@@ -4,6 +4,7 @@ from .views.frontend import (
     expand_comments_down, expand_comments_up, expand_comments_up_recursive,
     topic_comment_listing, topic_listing)
 
+
 urlpatterns = [
     url(r'^$', topic_listing, name='topic-listing'),
     url(r'^topic/(?P<topic_slug>[a-z0-9-]+)/$', topic_comment_listing,
