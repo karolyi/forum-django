@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from messaging.choices import MESSAGE_STATUSES
+
+from .choices import MESSAGE_STATUSES
 
 
 class Mail(models.Model):
@@ -10,7 +11,7 @@ class Mail(models.Model):
     Private messaging, mail-like functionality.
     """
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Mail message')
         verbose_name_plural = _('Mail messages')
 
@@ -53,7 +54,7 @@ class GlobalMessage(models.Model):
     A global message shown instantaneously for logged-in users.
     """
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Global message')
         verbose_name_plural = _('Global messages')
 

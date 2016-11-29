@@ -1,10 +1,9 @@
 import os
 
-from django.db import models
 from django.conf import settings
-from django.contrib.auth.models import User
-from django.utils.translation import ugettext_lazy as _
+from django.db import models
 from django.db.models.signals import pre_delete
+from django.utils.translation import ugettext_lazy as _
 
 
 def cdn_delete_file(sender, instance, *args, **kwargs):
@@ -19,7 +18,7 @@ class Image(models.Model):
     The saved image files.
     """
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Image')
         verbose_name_plural = _('Images')
 
@@ -42,7 +41,7 @@ class ImageUrl(models.Model):
     The already downloaded image URLs.
     """
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('ImageUrl')
         verbose_name_plural = _('ImageUrls')
 
@@ -63,7 +62,7 @@ class MissingImage(models.Model):
     The missing images, so they don't need to be downloaded again.
     """
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Missing Image')
         verbose_name_plural = _('Missing Images')
 

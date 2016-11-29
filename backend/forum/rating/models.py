@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 class CommentVote(models.Model):
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Comment vote')
         verbose_name_plural = _('Comment votes')
         unique_together = (('comment', 'user'),)
@@ -27,7 +27,7 @@ class UserRating(models.Model):
     A rating of a user from another user.
     """
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('User rating')
         verbose_name_plural = _('User ratings')
 

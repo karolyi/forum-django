@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.views.i18n import JavaScriptCatalog
 from forum.accounts import urls as urls_accounts
 from forum.base import urls as urls_base
-from rest_api import urls as urls_api
+from forum.rest_api import urls as urls_api
 
 forum_urlpatterns = [
     url(r'^api/', include(

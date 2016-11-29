@@ -117,12 +117,13 @@ INSTALLED_APPS = (
     'forum',
     'forum.accounts',
     'forum.base',
-    'cdn',
-    'event',
-    'messaging',
-    'crowdfunding',
-    'poll',
-    'rating',
+    'forum.cdn',
+    'forum.crowdfunding',
+    'forum.event',
+    'forum.messaging',
+    'forum.poll',
+    'forum.rating',
+    'forum.rest_api',
 )
 
 MIDDLEWARE_CLASSES = (

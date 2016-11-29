@@ -2,9 +2,10 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
-from event.choices import EVENT_RESPONSES
 from forum.base.models import Topic
 from forum.utils import slugify
+
+from .choices import EVENT_RESPONSES
 
 
 class Event(models.Model):
@@ -13,7 +14,7 @@ class Event(models.Model):
     A stored event.
     """
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Event')
         verbose_name_plural = _('Events')
 
@@ -43,7 +44,7 @@ class EventResponse(models.Model):
     An response for a given event.
     """
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Event response')
         verbose_name_plural = _('Event responses')
         unique_together = (('event', 'invitee'),)
