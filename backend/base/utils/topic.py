@@ -22,7 +22,7 @@ def _get_comments_per_page(request):
 
 def _prefetch_for_comments(qs_comments):
     """
-    Take a Django :model:`base.Comment` QuerySet and prefetch/select
+    Take a Django :model:`forum_base.Comment` QuerySet and prefetch/select
     all related models for displaying their variables in the templates.
 
     In general, this caching speed up the comments page generation,
@@ -46,9 +46,9 @@ def _expansion_sanitize(request, topic_slug, comment_id):
 
     Raise Http404 if not.
 
-    Return the :model:`base.Comment` for further expansion, and the
-    extra kwargs for the comment selection query (don't display comments
-    that are in a topic not visible to the user).
+    Return the :model:`forum_base.Comment` for further expansion, and
+    the extra kwargs for the comment selection query (don't display
+    comments that are in a topic not visible to the user).
     """
     # Get the requested comment (cast to int before)
     comment_id = int(comment_id)
@@ -121,8 +121,8 @@ def replies_up_recursive(request, topic_slug, comment_id):
     Expand comments in a thread upwards from a given comment ID
     recursively.
 
-    Return the :model:`base.Topic` and QuerySet of expanded comments
-    (time descending)  when successfully gathered them.
+    Return the :model:`forum_base.Topic` and QuerySet of expanded
+    comments (time descending)  when successfully gathered them.
 
     Raise `HttpResponsePermanentRedirect` when the comment exists but
     is in another topic, `Http404` when not found.
@@ -132,7 +132,7 @@ def replies_up_recursive(request, topic_slug, comment_id):
         request=request, topic_slug=topic_slug, comment_id=comment_id)
     if model_comment.topic.slug != topic_slug:
         url = reverse(
-            'base:comments-up-recursive',
+            'forum:base:comments-up-recursive',
             kwargs={
                 'topic_slug': model_comment.topic.slug,
                 'comment_id': model_comment.id,
@@ -158,8 +158,8 @@ def replies_up(request, topic_slug, comment_id):
     """
     Expand comments in a thread upwards from a given comment ID.
 
-    Return the :model:`base.Topic` and QuerySet of expanded comments
-    (time descending)  when successfully gathered them.
+    Return the :model:`forum_base.Topic` and QuerySet of expanded
+    comments (time descending)  when successfully gathered them.
 
     Raise `HttpResponsePermanentRedirect` when the comment exists but
     is in another topic, `Http404` when not found.
@@ -169,7 +169,7 @@ def replies_up(request, topic_slug, comment_id):
         request=request, topic_slug=topic_slug, comment_id=comment_id)
     if model_comment.topic.slug != topic_slug:
         url = reverse(
-            'base:comments-up',
+            'forum:base:comments-up',
             kwargs={
                 'topic_slug': model_comment.topic.slug,
                 'comment_id': model_comment.id,
@@ -187,7 +187,7 @@ def prev_comments_down(request, topic_slug, comment_id):
     Expand the previous comments in the thread along with the requested
     comment ID.
 
-    Return the :model:`base.Topic` and QuerySet of expanded comments
+    Return the :model:`forum_base.Topic` and QuerySet of expanded comments
     (time descending)  when successfully gathered them.
 
     Raise `HttpResponsePermanentRedirect` when the comment exists but
@@ -198,7 +198,7 @@ def prev_comments_down(request, topic_slug, comment_id):
         request=request, topic_slug=topic_slug, comment_id=comment_id)
     if model_comment.topic.slug != topic_slug:
         url = reverse(
-            'base:comments-up-recursive',
+            'forum:base:comments-up-recursive',
             kwargs={
                 'topic_slug': model_comment.topic.slug,
                 'comment_id': model_comment.id,

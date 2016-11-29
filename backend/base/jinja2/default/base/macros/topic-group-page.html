@@ -6,7 +6,7 @@
     {% for model_topic in topic_list %}
     <div class="row topic-list-item-row {{ loop.cycle('odd', 'even') }}">
         <div class="col-xs-6 col-sm-6">
-            <a href="{{ url('base:topic-comment-listing', topic_slug=model_topic.slug) }}" class="topic-link" data-slug="{{ model_topic.slug }}">
+            <a href="{{ url('forum:base:topic-comment-listing', topic_slug=model_topic.slug) }}" class="topic-link" data-slug="{{ model_topic.slug }}">
                 {# {{ model_topic.name_html|safe }} #}
                 {{ model_topic.name_text }}
             </a>
