@@ -83,7 +83,7 @@
       }
 
       .loader-topics-archived-wrapper {
-        padding-top: $grid-gutter-width;
+        padding-top: $grid-gutter-width-base;
 
         .loader-topics-archived {
           width: 100%;
@@ -95,7 +95,7 @@
   .topic-comment-listing-wrapper,
   .topic-comment-expansion-wrapper {
     .control-buttons {
-      margin-bottom: $grid-gutter-width;
+      margin-bottom: $grid-gutter-width-base;
     }
 
     .topic-comment-wrapper {
