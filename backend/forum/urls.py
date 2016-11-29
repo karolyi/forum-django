@@ -1,10 +1,10 @@
-from base import urls as urls_base
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.i18n import JavaScriptCatalog
-from rest_api import urls as urls_api
 from forum.accounts import urls as urls_accounts
+from forum.base import urls as urls_base
+from rest_api import urls as urls_api
 
 forum_urlpatterns = [
     url(r'^api/', include(

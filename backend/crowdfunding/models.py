@@ -1,9 +1,9 @@
-from base.models import Topic
 from crowdfunding.choices import STATUS_CHOICES
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
+from forum.base.models import Topic
 from forum.utils import slugify
 
 

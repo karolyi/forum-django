@@ -1,11 +1,9 @@
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
 from django_extensions.db.fields import AutoSlugField
-
-from base.models import Topic
 from event.choices import EVENT_RESPONSES
+from forum.base.models import Topic
 from forum.utils import slugify
 
 

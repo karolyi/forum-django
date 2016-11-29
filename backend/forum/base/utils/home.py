@@ -1,7 +1,7 @@
-from base.models import Topic
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.paginator import Paginator
+from forum.base.models import Topic
 
 from ..choices import TOPIC_TYPE_ARCHIVED
 

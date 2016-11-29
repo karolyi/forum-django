@@ -116,7 +116,7 @@ INSTALLED_APPS = (
     'django_jinja',
     'forum',
     'forum.accounts',
-    'base',
+    'forum.base',
     'cdn',
     'event',
     'messaging',

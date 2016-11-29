@@ -1,10 +1,10 @@
 from decimal import Decimal
 
-from base.utils.home import collect_topic_page
 from django.core.paginator import InvalidPage
 from django.db.models.aggregates import Avg, Count
 from django.http.response import Http404, JsonResponse
 from django.shortcuts import render
+from forum.base.utils.home import collect_topic_page
 from rating.models import UserRating
 from rest_api.exceptions import NotProduceable
 from rest_api.utils import cast_to_set_of_slug
