@@ -1,34 +1,36 @@
 {% macro login_actions(request) -%}
-{% if request.user.is_anonymous %}
-<section class="card card-block" aria-label="{{ _('Login') }}">
-    <div class="card-text">
-    <form method="post" action="{{ url('account:login') }}">
-        {% csrf_token %}
-        <legend>{{ _('Login') }}</legend>
-        {% for widget in forum_auth_form() -%}
-            {% set widget_name = widget.field.widget.__class__.__name__ -%}
-            <fieldset class="{% spaceless %}
-                    {% if widget_name in ['TextInput', 'PasswordInput'] %}
-                        form-group
-                    {% elif widget_name == 'CheckboxInput' %}
-                        form-check
-                    {% endif %}
-            {% endspaceless %}">
-            {%- if widget_name == 'CheckboxInput' %}
-                <label class="form-check-label">
-                    {{ widget }}
-                    {{ widget.label }}
-                </label>
-            {% else %}
-                {{ widget -}}
-            {% endif %}
-            </fieldset>
-        {%- endfor %}
-        <button type="submit" class="btn btn-primary">
-            {{ _('Submit') }}
-        </button>
-    </form>
-    </div>
-</section>
+{% if request.path != url('accounts:login') %}
+    {% if request.user.is_anonymous %}
+    <section class="card card-block" aria-label="{{ _('Login') }}">
+        <div class="card-text">
+        <form method="post" action="{{ url('accounts:login') }}">
+            {% csrf_token %}
+            <legend>{{ _('Login') }}</legend>
+            {% for widget in forum_auth_form() -%}
+                {% set widget_name = widget.field.widget.__class__.__name__ -%}
+                <fieldset class="{% spaceless %}
+                        {% if widget_name in ['TextInput', 'PasswordInput'] %}
+                            form-group
+                        {% elif widget_name == 'CheckboxInput' %}
+                            form-check
+                        {% endif %}
+                {% endspaceless %}">
+                {%- if widget_name == 'CheckboxInput' %}
+                    <label class="form-check-label">
+                        {{ widget }}
+                        {{ widget.label }}
+                    </label>
+                {% else %}
+                    {{ widget -}}
+                {% endif %}
+                </fieldset>
+            {%- endfor %}
+            <button type="submit" class="btn btn-primary">
+                {{ _('Submit') }}
+            </button>
+        </form>
+        </div>
+    </section>
+    {% endif %}
 {% endif %}
 {%- endmacro %}

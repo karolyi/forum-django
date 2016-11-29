@@ -4,15 +4,15 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.i18n import JavaScriptCatalog
 from rest_api import urls as urls_api
-from account import urls as urls_account
+from forum.accounts import urls as urls_accounts
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^', include(urls_base, namespace='base', app_name='base')),
     url(r'^api/', include(
         urls_api, namespace='rest-api', app_name='rest_api')),
-    url(r'^account/', include(
-        urls_account, namespace='account', app_name='account')),
+    url(r'^accounts/', include(
+        urls_accounts, namespace='accounts', app_name='forum_accounts')),
 
     # JavaScript i18n
     url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),

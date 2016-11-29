@@ -1,5 +1,6 @@
 from debug_toolbar.panels.templates import TemplatesPanel as BaseTemplatesPanel
 from django.conf import settings
+from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.core.paginator import Page
 from django.utils.html import strip_spaces_between_tags
 from django.utils.translation import (
@@ -7,7 +8,6 @@ from django.utils.translation import (
 from jinja2 import nodes
 from jinja2.ext import Extension
 from rjsmin import jsmin
-from django.contrib.humanize.templatetags.humanize import naturaltime
 
 ForumAuthForm = None
 
@@ -164,7 +164,7 @@ def paginator_generic_get_list(
 def forum_auth_form():
     global ForumAuthForm
     if ForumAuthForm is None:
-        from account.forms import ForumAuthForm
+        from forum.accounts.forms import ForumAuthForm
     return ForumAuthForm
 
 
