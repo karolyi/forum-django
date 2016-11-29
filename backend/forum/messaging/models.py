@@ -16,10 +16,8 @@ class Mail(models.Model):
         verbose_name_plural = _('Mail messages')
 
     def __str__(self):
-        return _('Mail message of user %(recipient)s from user %(sender)s' % {
-            'sender': self.sender,
-            'recipient': self.recipient,
-        })
+        return _('Mail message of user {recipient} from user {sender}').format(
+            sender=self.sender, recipient=self.recipient)
 
     # The collation for thread_id is binary, see the initial migration.
     thread_id = models.CharField(
@@ -60,10 +58,8 @@ class GlobalMessage(models.Model):
 
     def __str__(self):
         return _(
-            'Global message created by user %(user)s at %(created_at)s' % {
-                'user': self.user,
-                'created_at': self.created_at
-            })
+            'Global message created by user {user} at {created_at}').format(
+            user=self.user, created_at=self.created_at)
 
     user = models.ForeignKey(User, verbose_name=_('Created by'))
     created_at = models.DateTimeField(

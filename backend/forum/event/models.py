@@ -51,12 +51,11 @@ class EventResponse(models.Model):
 
     def __str__(self):
         return _(
-            'Event response for \'%(event)s\', from %(invitee)s: '
-            '%(response)s' % {
-                'event': self.event,
-                'invitee': self.invitee,
-                'response': self.get_response_display()
-            })
+            'Event response for \'{event}\', from {invitee}: '
+            '{response}').format(
+            event=self.event,
+            invitee=self.invitee,
+            response=self.get_response_display())
 
     event = models.ForeignKey(Event, verbose_name=_('Event'))
     last_modified = models.DateTimeField(

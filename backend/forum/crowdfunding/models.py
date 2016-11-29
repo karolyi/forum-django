@@ -14,7 +14,7 @@ class Project(models.Model):
     A project for which users can apply for.
     """
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Project')
         verbose_name_plural = _('Projects')
 
@@ -46,7 +46,7 @@ class ProjectBacker(models.Model):
     A backer of a project.
     """
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Project backer')
         verbose_name_plural = _('Project backers')
         unique_together = (('project', 'user'),)

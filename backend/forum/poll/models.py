@@ -12,7 +12,7 @@ class Question(models.Model):
     A poll question.
     """
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Question')
         verbose_name_plural = _('Questions')
 
@@ -37,7 +37,7 @@ class Choice(models.Model):
     A poll choice.
     """
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Choice')
         verbose_name_plural = _('Choices')
 
@@ -54,7 +54,7 @@ class Choice(models.Model):
 
 class Vote(models.Model):
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Vote')
         verbose_name_plural = _('Votes')
         unique_together = (('user', 'question'),)

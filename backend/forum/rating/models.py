@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import force_text
 
 
 class CommentVote(models.Model):
@@ -11,10 +12,8 @@ class CommentVote(models.Model):
         unique_together = (('comment', 'user'),)
 
     def __str__(self):
-        return _('%(value)s on comment %(comment)s' % {
-            'value': self.value,
-            'comment': self.comment,
-        })
+        return _('{value} on comment {comment}').format(
+            value=self.value, comment=self.comment)
 
     comment = models.ForeignKey('base.Comment', verbose_name=_('Comment'))
     user = models.ForeignKey(User, verbose_name=_('User'))
@@ -32,11 +31,9 @@ class UserRating(models.Model):
         verbose_name_plural = _('User ratings')
 
     def __str__(self):
-        return str(_('%(value)s on user %(ratee)s from user %(rater)s' % {
-            'value': self.value,
-            'ratee': self.ratee,
-            'rater': self.rater
-        }))
+        return _(
+            '{value} on user {ratee} from user {rater}').format(
+            value=self.value, ratee=self.ratee, rater=self.rater)
 
     is_enabled = models.BooleanField(
         verbose_name=_('Is approved'), default=False)
