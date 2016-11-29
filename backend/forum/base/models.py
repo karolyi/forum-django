@@ -17,17 +17,16 @@ class Comment(models.Model):
     version like that.
     """
 
-    class Meta:
+    class Meta(object):
         ordering = ('-time',)
         index_together = (
             ('topic', 'time'),
         )
 
     def __str__(self):
-        return str(_('#%(number)s of \'%(topic)s\'' % {
-            'number': self.number,
-            'topic': self.topic
-        }))
+        return str(_(
+            '#{number} of \'{topic}\''.format(
+                number=self.number, topic=self.topic)))
 
     user = models.ForeignKey(User, verbose_name=_('The commenter user'))
     topic = models.ForeignKey('Topic', verbose_name=_('Commented in topic'))
@@ -227,7 +226,7 @@ class CommentBookmark(models.Model):
     left off reading comments the last time.
     """
 
-    class Meta:
+    class Meta(object):
         verbose_name = _('Comment bookmark')
         verbose_name_plural = _('Comment bookmarks')
         unique_together = (('user', 'topic'),)
