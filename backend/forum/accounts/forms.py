@@ -29,8 +29,9 @@ class ForumAuthForm(AuthenticationForm):
                 'class': 'form-check-input'}))
 
     def __init__(self, *args, **kwargs):
+        is_autofocus = kwargs.pop('is_autofocus', False)
         init_val = super(ForumAuthForm, self).__init__(*args, **kwargs)
-        if kwargs.get('autofocus') is True:
+        if is_autofocus:
             # Remove the autofocus for the main page
             self.fields['username'].widget.attrs['autofocus'] = ''
         return init_val

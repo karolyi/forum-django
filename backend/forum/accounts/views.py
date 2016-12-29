@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib.auth import login as login_django
-from django.contrib.auth import authenticate
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import TemplateView
@@ -20,13 +19,14 @@ class LoginView(TemplateView):
         """
         return render(
             request=request, template_name=self.template_name, context={
-                'auth_form': ForumAuthForm()})
+                'auth_form': ForumAuthForm(is_autofocus=True)})
 
     def post(self, request):
         """
         Try to authenticate the user.
         """
-        auth_form = ForumAuthForm(request=request, data=request.POST)
+        auth_form = ForumAuthForm(
+            request=request, data=request.POST, is_autofocus=True)
         if auth_form.is_valid():
             next_url = request.POST.get('next', settings.LOGIN_REDIRECT_URL)
             login_django(request, auth_form.get_user())

@@ -1,12 +1,12 @@
 {% from 'default/macros/render-form.html' import render_form with context %}
-{% macro login_actions(request, autofocus=False) -%}
+{% macro login_actions(request, is_autofocus=False) -%}
 {%- if request.user.is_anonymous -%}
 <section class="card card-block" aria-label="{{ _('Login') }}">
     <div class="card-text">
     <form method="post" action="{{ url('forum:accounts:login') }}">
         {% csrf_token %}
         <legend>{{ _('Login') }}</legend>
-        {{ render_form(form=forum_auth_form(autofocus)) }}
+        {{ render_form(form=forum_auth_form(is_autofocus=is_autofocus)) }}
         <button type="submit" class="btn btn-primary">
             {{ _('Submit') }}
         </button>

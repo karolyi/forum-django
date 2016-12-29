@@ -52,7 +52,7 @@
         <footer class="row">
             <div class="col-xs-12 col-sm-6">
                 {% if request.path != url('forum:accounts:login') %}
-                {{ login_actions(request, autofocus=False) }}
+                {{ login_actions(request, is_autofocus=False) }}
                 {% endif %}
             </div>
         </footer>
