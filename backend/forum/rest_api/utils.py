@@ -2,7 +2,7 @@ from .exceptions import NotProduceable
 from django.utils.translation import ugettext_lazy as _
 
 
-def cast_to_set_of_int(str_input, delimiter='-'):
+def cast_to_set_of_int(str_input, delimiter='-') -> set(int):
     """
     Convert a string with the given delimiters into a `set` of `int`.
 
@@ -16,7 +16,7 @@ def cast_to_set_of_int(str_input, delimiter='-'):
     return set_result
 
 
-def cast_to_set_of_slug(str_input, delimiter=','):
+def cast_to_set_of_slug(str_input: str, delimiter=',') -> set(str):
     """
     Convert a delimited list of slugs to a `set` of slugs.
     """
@@ -26,3 +26,8 @@ def cast_to_set_of_slug(str_input, delimiter=','):
         raise NotProduceable(_('Invalid input: {message}').format(
             message=exc.args[0]))
     return set_result
+
+
+def tesy(**kwargs: str):
+    z = cast_to_set_of_slug(5)
+    print(z / 5)
