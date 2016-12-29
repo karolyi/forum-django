@@ -33,7 +33,6 @@ def get_next_url(request: WSGIRequest) -> str:
 
     Return the URL to redirect to.
     """
-
     post_next = request.POST.get('next')
     if post_next is not None:
         return post_next
