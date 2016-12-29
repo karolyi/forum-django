@@ -1,0 +1,39 @@
+{% macro render_form(form) -%}
+<div class="forum-form-horizontal-wrapper">
+    {%- if form.errors.__all__ %}
+    <div class="global-error alert alert-danger" role="alert">
+    {% for error in form.errors.__all__ %}
+        <p>{{ error|escape }}</p>
+    {% endfor %}
+    </div>
+    {% endif -%}
+    {% for widget in form -%}
+        {% set widget_name = widget.field.widget.__class__.__name__ -%}
+        <fieldset class="widget-wrapper {% spaceless %}
+                {% if widget_name in ['TextInput', 'PasswordInput'] %}
+                    form-group
+                {% elif widget_name == 'CheckboxInput' %}
+                    form-check
+                {% endif %}
+        {% endspaceless %} {% spaceless %}
+            {% if widget.errors %}
+                has-danger
+            {% endif %}
+        {% endspaceless %}">
+        {%- if widget.errors %}
+            <div class="text-danger widget-error col-form-label-sm" role="alert">
+                {{ widget.errors.as_text()|escape|linebreaks }}
+            </div>
+        {% endif -%}
+        {%- if widget_name == 'CheckboxInput' %}
+            <label class="form-check-label">
+                {{ widget }}
+                {{ widget.label }}
+            </label>
+        {% else %}
+            {{ widget -}}
+        {% endif %}
+        </fieldset>
+    {%- endfor %}
+</div>
+{%- endmacro %}

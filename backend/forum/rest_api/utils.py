@@ -1,8 +1,9 @@
 from .exceptions import NotProduceable
 from django.utils.translation import ugettext_lazy as _
+from typing import Set
 
 
-def cast_to_set_of_int(str_input, delimiter='-') -> set(int):
+def cast_to_set_of_int(str_input, delimiter='-') -> Set[int]:
     """
     Convert a string with the given delimiters into a `set` of `int`.
 
@@ -16,7 +17,7 @@ def cast_to_set_of_int(str_input, delimiter='-') -> set(int):
     return set_result
 
 
-def cast_to_set_of_slug(str_input: str, delimiter=',') -> set(str):
+def cast_to_set_of_slug(str_input: str, delimiter=',') -> Set[str]:
     """
     Convert a delimited list of slugs to a `set` of slugs.
     """

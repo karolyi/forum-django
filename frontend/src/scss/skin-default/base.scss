@@ -134,4 +134,13 @@
       }
     }
   }
+
+  .forum-form-horizontal-wrapper {
+    .widget-error,
+    .global-error {
+      p {
+        margin-bottom: 0;
+      }
+    }
+  }
 }
