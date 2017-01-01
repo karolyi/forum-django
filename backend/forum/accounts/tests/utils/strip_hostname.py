@@ -11,10 +11,10 @@ class StripHostnameTestCase(TestCase):
     Testing the `strip_hostname` function.
     """
 
-    @patch(settings.ALLOWED_HOSTS, [''])
-    def raises_valueerror(self):
+    @patch.object(settings, 'ALLOWED_HOSTS', ['localhost'])
+    def test_raises_valueerror(self):
         """
         Should raise `ValueError` when the hostname is not allowed.
         """
         with self.assertRaises(ValueError):
-            strip_hostname('stuff')
+            strip_hostname(referrer='stuff')

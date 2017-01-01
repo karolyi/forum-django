@@ -14,8 +14,11 @@ def strip_hostname(referrer: str) -> str:
     path & query part when it's one of the allowed hostnames.
     """
     parsed_url = urlparse(url=referrer)
+    hostname = parsed_url.hostname
+    if parsed_url.hostname is None:
+        hostname = ''
     is_allowed = validate_host(
-        host=parsed_url.hostname, allowed_hosts=settings.ALLOWED_HOSTS)
+        host=hostname, allowed_hosts=settings.ALLOWED_HOSTS)
     if not is_allowed:
         raise ValueError()
     return urlunparse(
