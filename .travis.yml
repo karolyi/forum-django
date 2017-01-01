@@ -1,4 +1,7 @@
 language: python
+cache:
+  - venv
+  - /var/lib/mysql
 python:
   - "3.5"
   - "3.6"
@@ -8,6 +11,6 @@ install:
   - pip install coveralls
 # command to run tests
 script:
-  pytest
+  tools/run-tests-with-coverage.sh
 after_success:
   coveralls
