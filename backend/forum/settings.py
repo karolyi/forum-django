@@ -17,7 +17,7 @@ from django_jinja.builtins import DEFAULT_EXTENSIONS
 
 # Keep this at the beginning, after module imports
 try:
-    from forum.settings_production import *
+    from forum.settings_production import *  # NOQA
 except ImportError as e:
     pass
 
@@ -31,7 +31,7 @@ SECRET_KEY = os.environ.get(
 
 # SECURITY WARNING: don't run with debug turned on in production!
 try:
-    DEBUG
+    DEBUG  # NOQA
 except NameError:
     DEBUG = True
 
@@ -252,6 +252,6 @@ LOGIN_REDIRECT_URL = '/'
 
 # Keep this at the end
 try:
-    from forum.settings_production import *
+    from forum.settings_production import *  # NOQA
 except ImportError as e:
     pass

@@ -19,7 +19,7 @@ if [[ $EXITCODE_ISORT -ne 0 ]]; then
     exit $EXITCODE_ISORT
 fi
 
-pycodestyle --exclude='*/migrations/*' backend/
+flake8 --exclude='*/migrations/*' backend/
 EXITCODE_LINTER=$?
 if [[ $EXITCODE_LINTER -ne 0 ]]; then
     # Linter failed
