@@ -21,7 +21,7 @@ class GetNextUrlTestCase(TestCase):
         """
         Should return the URL in the `next` parameter, when passed.
         """
-        request = self.factory.post('/whatever/', {'next': '/bla/?a='})
+        request = self.factory.post('/whatever/', {'next': '/bla/?a=b'})
         next_url = get_next_url(request)
         self.assertEqual(next_url, '/bla/?a=b')
 
