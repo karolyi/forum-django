@@ -7,13 +7,13 @@ cache:
   pip: true
   directories:
     - node_modules
-node_js: 6
 python:
   - 3.5
   - 3.6
 # command to install dependencies
 install:
   - pip install -r backend/requirements.txt
+  - nvm install node
   - npm i
   - gulp build
   - pip install coveralls
