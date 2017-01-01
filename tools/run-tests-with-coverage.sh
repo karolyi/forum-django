@@ -16,4 +16,8 @@ rm -rf htmlcov
 
 coverage run --source 'backend/' backend/manage.py test forum --keepdb -v 2
 coverage html  --omit='*/migrations/*'
-python3 -m http.server
+
+# Start the http server inly when we're not on travis
+if [[ -z "$TRAVIS" ]]; then
+    python3 -m http.server
+fi
