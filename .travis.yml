@@ -11,6 +11,8 @@ cache:
 python:
   - 3.5
   - 3.6
+before_script:
+  - echo "USE mysql;\nUPDATE user SET password=PASSWORD('') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root
 # command to install dependencies
 install:
   - pip install -r backend/requirements.txt

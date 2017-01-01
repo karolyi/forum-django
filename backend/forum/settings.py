@@ -250,7 +250,7 @@ PAGINATOR_MAX_PAGES_TOPICLIST = 10
 
 LOGIN_REDIRECT_URL = '/'
 
-# Keep this at the end
+# Keep this at the very bottom of settings.py
 try:
     from forum.settings_production import *  # NOQA
 except ImportError as e:
