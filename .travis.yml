@@ -1,7 +1,10 @@
 language: python
+addons:
+  mariadb: 10.0
 cache:
-  - venv
-  - /var/lib/mysql
+  pip: true
+  directories:
+    - /var/lib/mysql
 python:
   - "3.5"
   - "3.6"
