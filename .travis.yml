@@ -15,6 +15,7 @@ install:
   - pip install coveralls
 # command to run tests
 script:
-  tools/run-tests-with-coverage.sh
+  - tools/run-linter-and-isort.sh
+  - tools/run-tests-with-coverage.sh
 after_success:
   coveralls
