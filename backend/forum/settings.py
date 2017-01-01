@@ -8,10 +8,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
+import mimetypes
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
-import mimetypes
 from django.utils.translation import ugettext_lazy as _
 from django_jinja.builtins import DEFAULT_EXTENSIONS
 

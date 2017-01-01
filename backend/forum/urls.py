@@ -2,6 +2,7 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.i18n import JavaScriptCatalog
+
 from forum.accounts import urls as urls_accounts
 from forum.base import urls as urls_base
 from forum.rest_api import urls as urls_api

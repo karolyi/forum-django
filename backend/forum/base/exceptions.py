@@ -2,6 +2,7 @@ from django.http.response import \
     HttpResponsePermanentRedirect as redirect_permanent
 from django.http.response import HttpResponseRedirect as redirect
 from django.utils.translation import ugettext_lazy as _
+
 from forum.exceptions import ForumExceptionBase
 
 

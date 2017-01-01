@@ -1,6 +1,8 @@
-from .exceptions import NotProduceable
-from django.utils.translation import ugettext_lazy as _
 from typing import Set
+
+from django.utils.translation import ugettext_lazy as _
+
+from .exceptions import NotProduceable
 
 
 def cast_to_set_of_int(str_input, delimiter='-') -> Set[int]:

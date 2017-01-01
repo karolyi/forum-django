@@ -32,6 +32,7 @@ class Image(models.Model):
     def __str__(self):
         return self.cdn_path
 
+
 pre_delete.connect(cdn_delete_file, sender=Image)
 
 

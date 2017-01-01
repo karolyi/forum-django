@@ -1,6 +1,6 @@
 from django.http.response import HttpResponse, JsonResponse
-from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_text
+from django.utils.translation import ugettext_lazy as _
 
 
 class ForumExceptionBase(Exception):

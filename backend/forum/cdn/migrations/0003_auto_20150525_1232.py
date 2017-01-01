@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations, transaction
 from django.conf import settings
+from django.db import migrations, models, transaction
 
 
 def migrate_forward(apps, schema_editor):
