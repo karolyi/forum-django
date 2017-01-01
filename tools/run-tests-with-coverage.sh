@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
 MY_DIR=$(cd $(dirname ${BASH_SOURCE[0]})/..;pwd)
-
 cd $MY_DIR
-
 
 if [[ -e $MY_DIR/venv/bin/activate && -z $VIRTUAL_ENV ]]; then
     # Only activate virtualenv if it exists and not activated yet
