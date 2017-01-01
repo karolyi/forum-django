@@ -27,7 +27,6 @@ frontend/webpack/stats.json
 *.sublime*
 logs/
 venv/
-tools/
 static/
 # Don't ignore static files under backend/, those have to be collected
 !backend/*static
