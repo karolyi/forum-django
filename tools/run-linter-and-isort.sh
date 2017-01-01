@@ -14,7 +14,7 @@ EXITCODE_ISORT=$?
 if [[ $EXITCODE_ISORT -ne 0 ]]; then
     # Isort failed
     if [[ -z "$TRAVIS" ]]; then
-        echo ISORT FAILED
+        echo ISORT FAILED: $EXITCODE_ISORT
     fi
     exit $EXITCODE_ISORT
 fi
@@ -24,8 +24,8 @@ EXITCODE_LINTER=$?
 if [[ $EXITCODE_LINTER -ne 0 ]]; then
     # Linter failed
     if [[ -z "$TRAVIS" ]]; then
-        echo LINTER FAILED
+        echo LINTER FAILED: $EXITCODE_LINTER
     fi
-    exit $EXITCODE_ISORT
+    exit $EXITCODE_LINTER
 fi
 

@@ -7,7 +7,7 @@ tools/run-linter-and-isort.sh
 EXITCODE_LINTING=$?
 if [[ $EXITCODE_LINTING -ne 0 ]]; then
     # Isort failed
-    echo ISORT FAILED
+    echo LINTER OR ISORT FAILED: $EXITCODE_LINTING
     exit $EXITCODE_LINTING
 fi
 
