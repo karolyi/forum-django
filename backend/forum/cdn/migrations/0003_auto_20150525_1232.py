@@ -53,7 +53,7 @@ class Migration(migrations.Migration):
                     serialize=False, primary_key=True,
                     verbose_name='ID', auto_created=True)),
                 ('orig_src', models.URLField(
-                    db_index=True, verbose_name='Original source',
+                    verbose_name='Original source',
                     max_length=512)),
             ],
             options={
