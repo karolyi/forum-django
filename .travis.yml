@@ -2,9 +2,10 @@ language: python
 addons:
   mariadb: 10.0
 cache:
+  bundler: true
   pip: true
   directories:
-    - /var/lib/mysql
+    - frontend/node_modules
 python:
   - "3.5"
   - "3.6"
