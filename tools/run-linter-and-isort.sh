@@ -9,6 +9,17 @@ if [[ -e $MY_DIR/venv/bin/activate && -z $VIRTUAL_ENV ]]; then
     source $MY_DIR/venv/bin/activate
 fi
 
+gulp lint
+EXITCODE_GULP_LINT=$?
+if [[ $EXITCODE_GULP_LINT -ne 0 ]]; then
+    # Isort failed
+    if [[ -z "$TRAVIS" ]]; then
+        echo GULP LINT FAILED: $EXITCODE_GULP_LINT
+    fi
+    exit $EXITCODE_GULP_LINT
+fi
+
+
 isort -c --skip-glob=node_modules --skip-glob=venv
 EXITCODE_ISORT=$?
 if [[ $EXITCODE_ISORT -ne 0 ]]; then

@@ -10,7 +10,8 @@ configBase.plugins = [
   }),
   new BundleTracker({
     path: __dirname,
-    filename: path.join('..', 'dist', 'assets', 'stats.json'),
+    filename: path.join('..', 'webpack', 'stats.json'),
+    // filename: path.join('..', 'dist', 'assets', 'stats.json'),
   }),
   // To split all the CSS files
   new ExtractTextPlugin('[name]-[hash].css'),

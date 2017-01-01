@@ -5,13 +5,15 @@ cache:
   bundler: true
   pip: true
   directories:
-    - frontend/node_modules
+    - node_modules
 python:
   - "3.5"
   - "3.6"
 # command to install dependencies
 install:
   - pip install -r backend/requirements.txt
+  - npm i
+  - gulp build
   - pip install coveralls
 # command to run tests
 script:

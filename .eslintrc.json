@@ -14,6 +14,7 @@
     "quotes": [2, "single"],
     "strict": [2, "never"],
     "max-len": [2, {"code": 80, "tabWidth": 4, "ignoreUrls": true}],
+    "no-restricted-syntax": "off",
     "import/no-extraneous-dependencies": [
       "error",
       {
