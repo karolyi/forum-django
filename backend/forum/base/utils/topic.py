@@ -1,6 +1,8 @@
 from django.conf import settings
+from django.core.handlers.wsgi import WSGIRequest
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from django.http.response import Http404
 from django.urls.base import reverse
 
@@ -8,7 +10,7 @@ from ..exceptions import HttpResponsePermanentRedirect
 from ..models import Comment, Topic
 
 
-def _get_comments_per_page(request):
+def _get_comments_per_page(request: WSGIRequest) -> int:
     """
     Return the shown topics per page for a user.
     """
@@ -20,7 +22,7 @@ def _get_comments_per_page(request):
     return settings.PAGINATOR_MAX_COMMENTS_LISTED
 
 
-def _prefetch_for_comments(qs_comments):
+def _prefetch_for_comments(qs_comments: QuerySet):
     """
     Take a Django :model:`forum_base.Comment` QuerySet and prefetch/select
     all related models for displaying their variables in the templates.
