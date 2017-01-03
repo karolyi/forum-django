@@ -1,7 +1,8 @@
 from unittest import TestCase
 
-from ..utils import slugify
 from django.utils.translation import ugettext_lazy as _
+
+from ..utils import slugify
 
 
 class SlugifyTestCase(TestCase):
