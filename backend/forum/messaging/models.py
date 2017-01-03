@@ -43,7 +43,7 @@ class Mail(models.Model):
     content_html = models.TextField(verbose_name=_('HTML content'))
     content_md = models.TextField(verbose_name=_('Markdown content'))
     images = models.ManyToManyField(
-        'cdn.Image', verbose_name=_('Images in this mail message'))
+        'forum_cdn.Image', verbose_name=_('Images in this mail message'))
 
 
 class GlobalMessage(models.Model):
@@ -69,4 +69,4 @@ class GlobalMessage(models.Model):
     content_html = models.TextField(verbose_name=_('HTML content'))
     content_md = models.TextField(verbose_name=_('Markdown content'))
     images = models.ManyToManyField(
-        'cdn.Image', verbose_name=_('Images in this global message'))
+        'forum_cdn.Image', verbose_name=_('Images in this global message'))

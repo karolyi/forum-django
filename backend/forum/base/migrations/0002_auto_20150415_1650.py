@@ -9,7 +9,7 @@ def remove_fk(apps, schema_editor):
     if not isinstance(schema_editor.connection, DatabaseWrapper):
         return
     cursor = schema_editor.connection.cursor()
-    Edit = apps.get_model('base', 'Edit')
+    Edit = apps.get_model('forum_base', 'Edit')
     table_edit_name = Edit._meta.db_table
     cursor.execute('SELECT DATABASE()')
     db_name = cursor.fetchall()[0][0]
@@ -23,7 +23,7 @@ def remove_fk(apps, schema_editor):
     if not result:
         return
 
-    Comment = apps.get_model('base', 'Comment')
+    Comment = apps.get_model('forum_base', 'Comment')
     table_comment_name = Comment._meta.db_table
     fk_name = result[0][0]
     query = 'ALTER TABLE `%s` DROP FOREIGN KEY `%s`' % (
@@ -36,7 +36,7 @@ def remove_fk(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0001_initial'),
+        ('forum_base', '0001_initial'),
     ]
 
     operations = [
@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
             model_name='edit',
             name='comment',
             field=models.ForeignKey(
-                to='base.Comment', verbose_name='Edited comment', default=None),
+                to='forum_base.Comment', verbose_name='Edited comment', default=None),
             preserve_default=False,
         ),
     ]

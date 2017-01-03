@@ -9,7 +9,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0031_auto_20151020_2228'),
+        ('forum_base', '0031_auto_20151020_2228'),
     ]
 
     operations = [
@@ -20,6 +20,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='comment',
             name='prev_comment',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_DEFAULT, related_name='answer_set', to='base.Comment', verbose_name='Answered comment'),
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_DEFAULT, related_name='answer_set', to='forum_base.Comment', verbose_name='Answered comment'),
         ),
     ]

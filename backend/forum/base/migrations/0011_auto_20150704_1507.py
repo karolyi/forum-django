@@ -10,9 +10,9 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('admin', '0001_initial'),
-        ('cdn', '0009_auto_20150704_1507'),
+        ('forum_cdn', '0009_auto_20150704_1507'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('base', '0010_auto_20150525_2043'),
+        ('forum_base', '0010_auto_20150525_2043'),
     ]
 
     operations = [
@@ -49,8 +49,8 @@ class Migration(migrations.Migration):
                 ('has_chat_enabled', models.BooleanField(default=True, verbose_name='Enable chat')),
                 ('is_approved', models.BooleanField(default=False, verbose_name='Is approved by admins')),
                 ('expand_archived', models.BooleanField(default=False, verbose_name='Expand archived topics')),
-                ('ignored_users', models.ManyToManyField(verbose_name='List of ignored users', to='base.Settings', related_name='ignored_users_rel_+', null=None)),
-                ('inviter', models.ForeignKey(default=None, null=True, to='base.Settings', verbose_name='Invited by')),
+                ('ignored_users', models.ManyToManyField(verbose_name='List of ignored users', to='forum_base.Settings', related_name='ignored_users_rel_+', null=None)),
+                ('inviter', models.ForeignKey(default=None, null=True, to='forum_base.Settings', verbose_name='Invited by')),
             ],
         ),
         migrations.RemoveField(

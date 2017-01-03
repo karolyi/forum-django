@@ -9,17 +9,18 @@ if [[ -e $MY_DIR/venv/bin/activate && -z $VIRTUAL_ENV ]]; then
     source $MY_DIR/venv/bin/activate
 fi
 
+echo GULP:
 gulp lint
 EXITCODE_GULP_LINT=$?
 if [[ $EXITCODE_GULP_LINT -ne 0 ]]; then
-    # Isort failed
+    # Gulp linting (eslint) failed
     if [[ -z "$TRAVIS" ]]; then
         echo GULP LINT FAILED: $EXITCODE_GULP_LINT
     fi
     exit $EXITCODE_GULP_LINT
 fi
 
-
+echo ISORT:
 isort -c --skip-glob=node_modules --skip-glob=venv
 EXITCODE_ISORT=$?
 if [[ $EXITCODE_ISORT -ne 0 ]]; then
@@ -30,6 +31,7 @@ if [[ $EXITCODE_ISORT -ne 0 ]]; then
     exit $EXITCODE_ISORT
 fi
 
+echo FLAKE8:
 flake8 --exclude='*/migrations/*' backend/
 EXITCODE_LINTER=$?
 if [[ $EXITCODE_LINTER -ne 0 ]]; then
@@ -40,3 +42,4 @@ if [[ $EXITCODE_LINTER -ne 0 ]]; then
     exit $EXITCODE_LINTER
 fi
 
+echo LINTING SUCCESS

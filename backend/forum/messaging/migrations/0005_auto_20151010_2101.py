@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('messaging', '0004_globalmessage'),
+        ('forum_messaging', '0004_globalmessage'),
     ]
 
     operations = [

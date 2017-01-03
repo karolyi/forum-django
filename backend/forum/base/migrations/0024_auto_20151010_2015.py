@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0023_settings_friended_users'),
+        ('forum_base', '0023_settings_friended_users'),
     ]
 
     operations = [

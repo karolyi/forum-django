@@ -50,7 +50,7 @@ class ImageUrl(models.Model):
         return self.orig_src
 
     image = models.ForeignKey(
-        'cdn.Image', verbose_name=_('The CDN file'))
+        'forum_cdn.Image', verbose_name=_('The CDN file'))
     orig_src = models.URLField(
         verbose_name=_('Original source'), max_length=512)
     src_hash = models.CharField(

@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('event', '0003_response_last_modified'),
+        ('forum_event', '0003_response_last_modified'),
     ]
 
     operations = [

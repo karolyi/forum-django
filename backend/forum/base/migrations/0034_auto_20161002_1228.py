@@ -9,13 +9,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0033_auto_20160918_1634'),
+        ('forum_base', '0033_auto_20160918_1634'),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='comment',
             name='prev_comment',
-            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_DEFAULT, related_name='reply_set', to='base.Comment', verbose_name='Replied comment'),
+            field=models.ForeignKey(default=None, null=True, on_delete=django.db.models.deletion.SET_DEFAULT, related_name='reply_set', to='forum_base.Comment', verbose_name='Replied comment'),
         ),
     ]

@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0001_initial'),
+        ('forum_base', '0001_initial'),
     ]
 
     operations = [
@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('file_hash', models.CharField(
                     max_length=200, verbose_name='File hash')),
                 ('comment', models.ManyToManyField(
-                    default=1, null=False, to='base.Comment',
+                    default=1, null=False, to='forum_base.Comment',
                     verbose_name='Found in comment')),
             ],
         ),

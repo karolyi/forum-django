@@ -9,8 +9,8 @@ def migrate_forward(apps, schema_editor):
     """
     Migrates the orig_src field from Image to ImageUrl table
     """
-    Image = apps.get_model('cdn', 'Image')
-    ImageUrl = apps.get_model('cdn', 'ImageUrl')
+    Image = apps.get_model('forum_cdn', 'Image')
+    ImageUrl = apps.get_model('forum_cdn', 'ImageUrl')
     bulk_list = []
     counter = 0
     for image in Image.objects.all():
@@ -30,8 +30,8 @@ def migrate_backward(apps, schema_editor):
     """
     Migrates the orig_src field from ImageUrl to Image table
     """
-    ImageUrl = apps.get_model('cdn', 'ImageUrl')
-    Image = apps.get_model('cdn', 'Image')
+    ImageUrl = apps.get_model('forum_cdn', 'ImageUrl')
+    Image = apps.get_model('forum_cdn', 'Image')
     with transaction.atomic():
         for image_url in ImageUrl.objects.all().order_by('id'):
             images = Image.objects.filter(id=image_url.image_id)
@@ -42,7 +42,7 @@ def migrate_backward(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cdn', '0002_auto_20150403_2024'),
+        ('forum_cdn', '0002_auto_20150403_2024'),
     ]
 
     operations = [
@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
             model_name='imageurl',
             name='image',
             field=models.ForeignKey(
-                verbose_name='The CDN file', to='cdn.Image')),
+                verbose_name='The CDN file', to='forum_cdn.Image')),
         migrations.RunPython(
             migrate_forward, reverse_code=migrate_backward),
         migrations.RemoveField(

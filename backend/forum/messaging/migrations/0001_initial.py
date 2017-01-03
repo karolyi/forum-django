@@ -10,7 +10,7 @@ def migrate_forward(apps, schema_editor):
     Change the thread_id collation to BINARY.
     """
     cursor = connection.cursor()
-    Mail = apps.get_model('messaging', 'Mail')
+    Mail = apps.get_model('forum_messaging', 'Mail')
     # Mail.object.raw
     cursor.execute(
         'ALTER TABLE `%s` MODIFY `%s` varchar(%s) CHARACTER SET utf8 '

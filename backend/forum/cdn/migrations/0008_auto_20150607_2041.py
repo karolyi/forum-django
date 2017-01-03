@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cdn', '0007_image_user'),
+        ('forum_cdn', '0007_image_user'),
     ]
 
     operations = [

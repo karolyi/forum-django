@@ -10,7 +10,12 @@ fi
 
 rm -rf htmlcov
 
-coverage run  --omit='*/migrations/*' --source 'backend/' backend/manage.py test forum --keepdb -v 2
+if [[ -z "$1" ]]; then
+    # No test parameter was provided
+    coverage run  --omit='*/migrations/*' --source 'backend/' backend/manage.py test forum --keepdb -v 2
+else
+    coverage run  --omit='*/migrations/*' --source 'backend/' backend/manage.py test $1 --keepdb -v 2
+fi
 EXITCODE_TESTS=$?
 
 coverage html

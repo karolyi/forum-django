@@ -14,7 +14,8 @@ class CommentVote(models.Model):
         return _('{value} on comment {comment}').format(
             value=self.value, comment=self.comment)
 
-    comment = models.ForeignKey('base.Comment', verbose_name=_('Comment'))
+    comment = models.ForeignKey(
+        'forum_base.Comment', verbose_name=_('Comment'))
     user = models.ForeignKey(User, verbose_name=_('User'))
     value = models.SmallIntegerField(verbose_name=_('Value'))
 

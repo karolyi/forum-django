@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('base', '0027_auto_20151011_1447'),
+        ('forum_base', '0027_auto_20151011_1447'),
     ]
 
     operations = [
@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, verbose_name='ID', serialize=False, primary_key=True)),
                 ('value', models.SmallIntegerField(verbose_name='Value')),
-                ('comment', models.ForeignKey(to='base.Comment', verbose_name='Comment')),
+                ('comment', models.ForeignKey(to='forum_base.Comment', verbose_name='Comment')),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, verbose_name='User')),
             ],
             options={

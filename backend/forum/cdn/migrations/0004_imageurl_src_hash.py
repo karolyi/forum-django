@@ -10,7 +10,7 @@ def migrate_forward(apps, schema_editor):
     """
     Migrates the orig_src field from Image to ImageUrl table
     """
-    ImageUrl = apps.get_model('cdn', 'ImageUrl')
+    ImageUrl = apps.get_model('forum_cdn', 'ImageUrl')
     for image_url in ImageUrl.objects.all():
         src_hash = hashlib.sha512(
             bytearray(image_url.orig_src, 'utf-8')).hexdigest()
@@ -21,7 +21,7 @@ def migrate_forward(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cdn', '0003_auto_20150525_1232'),
+        ('forum_cdn', '0003_auto_20150525_1232'),
     ]
 
     operations = [

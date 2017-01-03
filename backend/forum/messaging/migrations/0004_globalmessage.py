@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('messaging', '0003_mail_sender_deleted'),
+        ('forum_messaging', '0003_mail_sender_deleted'),
     ]
 
     operations = [

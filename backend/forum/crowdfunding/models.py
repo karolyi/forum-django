@@ -38,7 +38,8 @@ class Project(models.Model):
     content_html = models.TextField(verbose_name=_('HTML content'))
     content_md = models.TextField(verbose_name=_('Markdown content'))
     images = models.ManyToManyField(
-        'cdn.Image', verbose_name=_('Images in this project description'))
+        'forum_cdn.Image',
+        verbose_name=_('Images in this project description'))
 
 
 class ProjectBacker(models.Model):
@@ -62,4 +63,4 @@ class ProjectBacker(models.Model):
     content_html = models.TextField(verbose_name=_('HTML content'))
     content_md = models.TextField(verbose_name=_('Markdown content'))
     images = models.ManyToManyField(
-        'cdn.Image', verbose_name=_('Images in this backer\'s message'))
+        'forum_cdn.Image', verbose_name=_('Images in this backer\'s message'))

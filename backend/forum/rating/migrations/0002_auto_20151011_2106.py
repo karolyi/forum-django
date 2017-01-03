@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('rating', '0001_initial'),
+        ('forum_rating', '0001_initial'),
     ]
 
     operations = [

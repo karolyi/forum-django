@@ -58,7 +58,7 @@ class Comment(models.Model):
         default=0,
         max_length=20, unique=True)
     images = models.ManyToManyField(
-        'cdn.Image', verbose_name=_('Images in this comment'))
+        'forum_cdn.Image', verbose_name=_('Images in this comment'))
 
 
 class Edit(models.Model):
@@ -79,7 +79,7 @@ class Edit(models.Model):
     diff = models.TextField(
         verbose_name=_('Diff of the previous version'), null=False)
     images = models.ManyToManyField(
-        'cdn.Image', verbose_name=_('Images in this edit'))
+        'forum_cdn.Image', verbose_name=_('Images in this edit'))
 
 
 class Topic(models.Model):
@@ -121,7 +121,7 @@ class Topic(models.Model):
         related_name='last_comment', on_delete=models.SET_NULL)
     description = models.TextField(verbose_name=_('Description'))
     images = models.ManyToManyField(
-        'cdn.Image', verbose_name=_('Images in this topic description'))
+        'forum_cdn.Image', verbose_name=_('Images in this topic description'))
 
 
 class Settings(models.Model):
@@ -217,7 +217,8 @@ class Settings(models.Model):
     friended_users = models.ManyToManyField(
         User, verbose_name=_('Friended users'), related_name='friended_him')
     images = models.ManyToManyField(
-        'cdn.Image', verbose_name=_('Images in this user\'s descriptions'))
+        'forum_cdn.Image',
+        verbose_name=_('Images in this user\'s descriptions'))
 
 
 class CommentBookmark(models.Model):

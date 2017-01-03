@@ -10,12 +10,7 @@ class GetNextUrlTestCase(TestCase):
     """
     Testing `get_next_url`.
     """
-
-    def setUp(self):
-        """
-        Setting up defaults for the tests.
-        """
-        self.factory = RequestFactory()
+    factory = RequestFactory()
 
     def test_returns_next(self):
         """

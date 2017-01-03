@@ -9,7 +9,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0004_auto_20150507_1506'),
+        ('forum_base', '0004_auto_20150507_1506'),
     ]
 
     operations = [
@@ -31,12 +31,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='topic',
             name='last_comment',
-            field=models.ForeignKey(to='base.Comment', null=True, on_delete=django.db.models.deletion.SET_NULL, verbose_name='Last comment reference', related_name='last_comment'),
+            field=models.ForeignKey(to='forum_base.Comment', null=True, on_delete=django.db.models.deletion.SET_NULL, verbose_name='Last comment reference', related_name='last_comment'),
         ),
         migrations.AlterField(
             model_name='topic',
             name='reply_to',
-            field=models.ForeignKey(to='base.Topic', null=True, on_delete=django.db.models.deletion.SET_NULL, default=None, verbose_name='Reply to topic goes to'),
+            field=models.ForeignKey(to='forum_base.Topic', null=True, on_delete=django.db.models.deletion.SET_NULL, default=None, verbose_name='Reply to topic goes to'),
         ),
         migrations.AlterField(
             model_name='topic',

@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('auth', '0006_require_contenttypes_0002'),
-        ('base', '0002_auto_20150415_1650'),
+        ('forum_base', '0002_auto_20150415_1650'),
     ]
 
     operations = [

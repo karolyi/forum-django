@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0029_auto_20151011_2017'),
+        ('forum_base', '0029_auto_20151011_2017'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, verbose_name='ID', primary_key=True, serialize=False)),
                 ('value', models.SmallIntegerField(verbose_name='Value')),
-                ('comment', models.ForeignKey(verbose_name='Comment', to='base.Comment')),
+                ('comment', models.ForeignKey(verbose_name='Comment', to='forum_base.Comment')),
                 ('user', models.ForeignKey(verbose_name='User', to=settings.AUTH_USER_MODEL)),
             ],
             options={

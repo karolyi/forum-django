@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('base', '0026_auto_20151011_1043'),
+        ('forum_base', '0026_auto_20151011_1043'),
     ]
 
     operations = [
@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('content_html', models.TextField(verbose_name='HTML content')),
                 ('content_md', models.TextField(verbose_name='Markdown content')),
                 ('owner', models.ForeignKey(to=settings.AUTH_USER_MODEL, verbose_name='Owner')),
-                ('related_topic', models.ForeignKey(default=None, null=True, verbose_name='Related topic', to='base.Topic')),
+                ('related_topic', models.ForeignKey(default=None, null=True, verbose_name='Related topic', to='forum_base.Topic')),
             ],
             options={
                 'verbose_name_plural': 'Projects',
@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                 ('last_updated_at', models.DateTimeField(auto_now=True, verbose_name='Last updated at')),
                 ('content_html', models.TextField(verbose_name='HTML content')),
                 ('content_md', models.TextField(verbose_name='Markdown content')),
-                ('project', models.ForeignKey(to='crowdfunding.Project', verbose_name='Project')),
+                ('project', models.ForeignKey(to='forum_crowdfunding.Project', verbose_name='Project')),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, verbose_name='Backer')),
             ],
             options={
