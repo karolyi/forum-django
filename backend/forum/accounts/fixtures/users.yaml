@@ -1,8 +1,7 @@
 - model: auth.user
   pk: 1
   fields:
-    # ValidPassword
-    password: pbkdf2_sha256$30000$UlieG1fOWH4y$qW7PzhzZzGUP7ZzB+0xQ0zGXqj60TR0jfNQjJ9cSndY=
+    password: pbkdf2_sha256$30000$wRknOYiX7col$wmX0d8F6mC5HfGfnPSToDuqZZDce5c/OoB+oPpkgmb8=
     last_login: null
     is_superuser: false
     username: ValidUser
@@ -11,6 +10,101 @@
     email: ''
     is_staff: false
     is_active: true
-    date_joined: '2017-01-03 14:44:27.471836+00:00'
+    date_joined: '2017-01-03 17:06:49.522160+00:00'
     groups: []
     user_permissions: []
+- model: auth.user
+  pk: 2
+  fields:
+    password: pbkdf2_sha256$30000$wRknOYiX7col$wmX0d8F6mC5HfGfnPSToDuqZZDce5c/OoB+oPpkgmb8=
+    last_login: null
+    is_superuser: false
+    username: InactiveUser
+    first_name: ''
+    last_name: ''
+    email: ''
+    is_staff: false
+    is_active: false
+    date_joined: '2017-01-03 17:06:49.522160+00:00'
+    groups: []
+    user_permissions: []
+- model: forum_base.settings
+  pk: 1
+  fields:
+    user: 1
+    slug: validuser
+    last_global_read: 0
+    received_comment_vote_sum: 0
+    received_comment_vote_count: 0
+    comment_vote_hide_limit: -5
+    quote: ''
+    max_comments_per_day: 0
+    comment_count: 0
+    invitations_today: 0
+    invited_by: null
+    invitations_success: 0
+    pw_reminders_today: 0
+    used_skin: ''
+    introduction_md_all: ''
+    introduction_md_reg: ''
+    introduction_md_friends: ''
+    introduction_html_all: ''
+    introduction_html_reg: ''
+    introduction_html_friends: ''
+    picture_emails: ''
+    uses_auto_bookmarks: false
+    mails_own_topic_comments: false
+    mails_replies_topic: true
+    mails_moderation_topic: true
+    mails_messages: true
+    show_replies_comment: true
+    show_relations: true
+    is_banned: false
+    separate_bookmarked_topics: true
+    show_outsiders: true
+    has_chat_enabled: true
+    is_approved: false
+    expand_archived: false
+    ignored_users: []
+    friended_users: []
+    images: []
+- model: forum_base.settings
+  pk: 2
+  fields:
+    user: 2
+    slug: inactiveuser
+    last_global_read: 0
+    received_comment_vote_sum: 0
+    received_comment_vote_count: 0
+    comment_vote_hide_limit: -5
+    quote: ''
+    max_comments_per_day: 0
+    comment_count: 0
+    invitations_today: 0
+    invited_by: null
+    invitations_success: 0
+    pw_reminders_today: 0
+    used_skin: ''
+    introduction_md_all: ''
+    introduction_md_reg: ''
+    introduction_md_friends: ''
+    introduction_html_all: ''
+    introduction_html_reg: ''
+    introduction_html_friends: ''
+    picture_emails: ''
+    uses_auto_bookmarks: false
+    mails_own_topic_comments: false
+    mails_replies_topic: true
+    mails_moderation_topic: true
+    mails_messages: true
+    show_replies_comment: true
+    show_relations: true
+    is_banned: false
+    separate_bookmarked_topics: true
+    show_outsiders: true
+    has_chat_enabled: true
+    is_approved: false
+    expand_archived: false
+    ignored_users: []
+    friended_users: []
+    images: []

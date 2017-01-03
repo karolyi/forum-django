@@ -2,7 +2,7 @@
 {% from 'default/macros/render-form.html' import render_form with context %}
 
 {% block main_content %}
-<form method="post" action="{{ url('forum:accounts:login') }}">
+<form method="post" action="{{ url('forum:accounts:login') }}" class="login-form">
     {% csrf_token %}
     <legend>{{ _('Login') }}</legend>
     {{ render_form(form=auth_form) }}

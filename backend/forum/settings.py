@@ -181,6 +181,9 @@ DATABASES = {
     }
 }
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.AllowAllUsersModelBackend',)
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
