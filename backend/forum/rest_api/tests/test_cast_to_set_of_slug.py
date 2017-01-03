@@ -16,7 +16,7 @@ class CastToSetOfSlugTestCase(TestCase):
         result = cast_to_set_of_slug(str_input='xxx-a,xxx-b')
         self.assertSetEqual(result, {'xxx-a', 'xxx-b'})
 
-    def test_raises_notreproduceable_when_passed_none(self):
+    def test_raises_notproduceable_when_passed_none(self):
         """
         Should raise `NotProduceable` exception when passed `None`.
         """

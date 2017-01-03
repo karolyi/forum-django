@@ -16,7 +16,7 @@ class CastToSetOfIntTestCase(TestCase):
         result = cast_to_set_of_int('1-2-3')
         self.assertSetEqual(result, {1, 2, 3})
 
-    def test_raises_notreproduceable_when_passed_none(self):
+    def test_raises_notproduceable_when_passed_none(self):
         """
         Should raise `NotProduceable` exception when passed `None`.
         """
@@ -27,7 +27,7 @@ class CastToSetOfIntTestCase(TestCase):
                 expected_regex=expected_regex):
             cast_to_set_of_int(None)
 
-    def test_raises_notreproduceable_when_passed_garbage(self):
+    def test_raises_notproduceable_when_passed_garbage(self):
         """
         Should raise `NotProduceable` exception when bumping into
         an error.

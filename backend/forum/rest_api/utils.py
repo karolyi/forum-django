@@ -29,8 +29,3 @@ def cast_to_set_of_slug(str_input: str, delimiter: str =',') -> Set[str]:
         raise NotProduceable(_('Invalid input: {message}').format(
             message=exc.args[0]))
     return set_result
-
-
-def tesy(**kwargs: str):
-    z = cast_to_set_of_slug(5)
-    print(z / 5)
