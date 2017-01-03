@@ -184,6 +184,8 @@ DATABASES = {
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.AllowAllUsersModelBackend',)
 
+TEST_RUNNER = 'forum.utils.DjangoTestRunner'
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 

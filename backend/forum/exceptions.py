@@ -38,3 +38,6 @@ class ForumExceptionBase(Exception):
         response = HttpResponse(self.message, content_type='text/plain')
         response.status_code = self.status_code
         return response
+
+    def __str__(self):
+        return self.message

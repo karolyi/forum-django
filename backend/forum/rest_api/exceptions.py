@@ -4,7 +4,6 @@ from forum.exceptions import ForumExceptionBase
 
 
 class ApiExceptionBase(ForumExceptionBase):
-
     """
     Base class for API related exceptions.
     """
@@ -15,7 +14,6 @@ class ApiExceptionBase(ForumExceptionBase):
 
 
 class NotProduceable(ApiExceptionBase):
-
     """
     Raised when a result is not calculable.
     """

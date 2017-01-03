@@ -1,6 +1,7 @@
 appnope==0.1.0
 beautifulsoup4==4.5.1
 blessings==1.6
+colour-runner==0.0.5
 coverage==4.3.1
 decorator==4.0.10
 Django==1.10.4
