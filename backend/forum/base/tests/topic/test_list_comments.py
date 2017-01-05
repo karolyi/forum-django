@@ -1,9 +1,9 @@
 from unittest import TestCase
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
-from django.core.paginator import Paginator
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
+from django.core.paginator import Paginator
 from django.db.models.query import QuerySet
 from django.http.response import Http404
 from django.test import RequestFactory
