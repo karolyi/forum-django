@@ -24,7 +24,7 @@ def _get_comments_per_page(request: WSGIRequest) -> int:
     return settings.PAGINATOR_MAX_COMMENTS_LISTED
 
 
-def _prefetch_for_comments(qs_comments: QuerySet) -> None:
+def _prefetch_for_comments(qs_comments: QuerySet) -> QuerySet:
     """
     Take a Django :model:`forum_base.Comment` QuerySet and prefetch/select
     all related models for displaying their variables in the templates.
@@ -113,16 +113,18 @@ def list_comments(
     }
     qs_comments = Comment.objects.filter(
         **search_kwargs_comment).order_by('-time')
-    comments_per_page = _get_comments_per_page(request)
+    comments_per_page = _get_comments_per_page(request=request)
     page_id = 1
     if comment_id is not None:
         page_id = _get_comment_pageid(
-            qs_comments, int(comment_id), comments_per_page)
-    qs_comments = _prefetch_for_comments(qs_comments)
-    paginator = Paginator(qs_comments, comments_per_page)
+            qs_comments=qs_comments, comment_id=comment_id,
+            comments_per_page=comments_per_page)
+    qs_comments = _prefetch_for_comments(qs_comments=qs_comments)
     if not qs_comments.exists():
         raise Http404
-    return model_topic, paginator.page(page_id)
+    paginator = Paginator(
+        object_list=qs_comments, per_page=comments_per_page)
+    return model_topic, paginator.page(number=page_id)
 
 
 def replies_up_recursive(
