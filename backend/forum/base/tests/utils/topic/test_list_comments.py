@@ -9,7 +9,7 @@ from django.http.response import Http404
 from django.test import RequestFactory
 from forum.base.models import Comment, Topic
 
-from ...utils.topic import list_comments
+from ....utils.topic import list_comments
 
 
 class ListCommentsTestCase(TestCase):

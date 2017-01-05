@@ -3,7 +3,7 @@ from unittest import TestCase
 from django.conf import settings
 from django.test.client import RequestFactory
 
-from ...utils.topic import _get_comments_per_page
+from ....utils.topic import _get_comments_per_page
 
 MAX_COMMENTS = settings.PAGINATOR_MAX_COMMENTS_LISTED
 

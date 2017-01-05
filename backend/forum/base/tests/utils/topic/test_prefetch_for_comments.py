@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 from django.db.models.query import QuerySet
 
-from ...utils.topic import _prefetch_for_comments
+from ....utils.topic import _prefetch_for_comments
 
 
 class PrefetchForCommentsTestCase(TestCase):

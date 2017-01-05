@@ -7,7 +7,7 @@ from django.http.response import Http404
 from django.test import RequestFactory
 from forum.base.models import Comment
 
-from ...utils.topic import _expansion_sanitize
+from ....utils.topic import _expansion_sanitize
 
 
 class ExpansionSanitizeTestCase(TestCase):

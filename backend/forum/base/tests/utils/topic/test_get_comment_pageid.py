@@ -5,7 +5,7 @@ from django.db.models.query import QuerySet
 from django.http.response import Http404
 from forum.base.models import Comment
 
-from ...utils.topic import _get_comment_pageid
+from ....utils.topic import _get_comment_pageid
 
 
 class GetCommentPageIdTestCase(TestCase):
