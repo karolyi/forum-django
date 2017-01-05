@@ -1,6 +1,8 @@
+from typing import Dict, Tuple
+
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
-from django.core.paginator import Paginator
+from django.core.paginator import Page, Paginator
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.http.response import Http404
@@ -22,7 +24,7 @@ def _get_comments_per_page(request: WSGIRequest) -> int:
     return settings.PAGINATOR_MAX_COMMENTS_LISTED
 
 
-def _prefetch_for_comments(qs_comments: QuerySet):
+def _prefetch_for_comments(qs_comments: QuerySet) -> None:
     """
     Take a Django :model:`forum_base.Comment` QuerySet and prefetch/select
     all related models for displaying their variables in the templates.
@@ -41,7 +43,8 @@ def _prefetch_for_comments(qs_comments: QuerySet):
         'reply_set__user__settings')
 
 
-def _expansion_sanitize(request, topic_slug, comment_id):
+def _expansion_sanitize(
+        request: WSGIRequest, comment_id: int) -> Tuple[Comment, Dict]:
     """
     Sanitize the expansion parameters and check if a requested topic
     is available to the requesting user.
@@ -53,11 +56,11 @@ def _expansion_sanitize(request, topic_slug, comment_id):
     comments that are in a topic not visible to the user).
     """
     # Get the requested comment (cast to int before)
-    comment_id = int(comment_id)
     search_kwargs_comment = {
         'id': comment_id
     }
     if not request.user.is_staff and not request.user.is_superuser:
+        # Filter for only non-staff topics
         search_kwargs_comment['topic__is_staff_only'] = False
     try:
         model_comment = Comment.objects.select_related(
@@ -68,7 +71,9 @@ def _expansion_sanitize(request, topic_slug, comment_id):
     return model_comment, search_kwargs_comment
 
 
-def _get_comment_pageid(qs_comments, comment_id, comments_per_page):
+def _get_comment_pageid(
+        qs_comments: QuerySet, comment_id: int,
+        comments_per_page: int) -> int:
     """
     Get a page number for a given comment ID, so that we can display it
     on the right page.
@@ -85,7 +90,9 @@ def _get_comment_pageid(qs_comments, comment_id, comments_per_page):
     return page_id
 
 
-def list_comments(request, topic_slug, comment_id=None):
+def list_comments(
+        request: WSGIRequest, topic_slug: str,
+        comment_id: int=None) -> Tuple[Topic, Page]:
     """
     List a topic page with comments.
 
@@ -118,7 +125,9 @@ def list_comments(request, topic_slug, comment_id=None):
     return model_topic, paginator.page(page_id)
 
 
-def replies_up_recursive(request, topic_slug, comment_id):
+def replies_up_recursive(
+        request: WSGIRequest, topic_slug: str,
+        comment_id: int) -> Tuple[Topic, QuerySet]:
     """
     Expand comments in a thread upwards from a given comment ID
     recursively.
@@ -131,7 +140,7 @@ def replies_up_recursive(request, topic_slug, comment_id):
     """
     # Get the requested comment
     model_comment, search_kwargs_comment = _expansion_sanitize(
-        request=request, topic_slug=topic_slug, comment_id=comment_id)
+        request=request, comment_id=comment_id)
     if model_comment.topic.slug != topic_slug:
         url = reverse(
             'forum:base:comments-up-recursive',
@@ -156,7 +165,9 @@ def replies_up_recursive(request, topic_slug, comment_id):
     return model_comment.topic, qs_comments
 
 
-def replies_up(request, topic_slug, comment_id):
+def replies_up(
+        request: WSGIRequest, topic_slug: str,
+        comment_id: int) -> Tuple[Topic, QuerySet]:
     """
     Expand comments in a thread upwards from a given comment ID.
 
@@ -168,7 +179,7 @@ def replies_up(request, topic_slug, comment_id):
     """
     # Get the requested comment
     model_comment, search_kwargs_comment = _expansion_sanitize(
-        request=request, topic_slug=topic_slug, comment_id=comment_id)
+        request=request, comment_id=comment_id)
     if model_comment.topic.slug != topic_slug:
         url = reverse(
             'forum:base:comments-up',
@@ -184,7 +195,9 @@ def replies_up(request, topic_slug, comment_id):
     return model_comment.topic, qs_comments
 
 
-def prev_comments_down(request, topic_slug, comment_id):
+def prev_comments_down(
+        request: WSGIRequest, topic_slug: str,
+        comment_id: int) -> Tuple[Topic, QuerySet]:
     """
     Expand the previous comments in the thread along with the requested
     comment ID.
@@ -197,7 +210,7 @@ def prev_comments_down(request, topic_slug, comment_id):
     """
     # Get the requested comment
     model_comment, search_kwargs_comment = _expansion_sanitize(
-        request=request, topic_slug=topic_slug, comment_id=comment_id)
+        request=request, comment_id=comment_id)
     if model_comment.topic.slug != topic_slug:
         url = reverse(
             'forum:base:comments-up-recursive',
