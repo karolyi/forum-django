@@ -13,13 +13,14 @@ class GetCommentPageIdTestCase(TestCase):
     Testing `_get_comment_pageid`.
     """
 
+    mock_comment = Comment(time=555)
+
     def setUp(self):
         """
         Patching and starting mocks.
         """
         self.mock_qs_comments = Mock(spec=QuerySet)
-        mock_comment = Comment(time=555)
-        self.mock_qs_comments.get.return_value = mock_comment
+        self.mock_qs_comments.get.return_value = self.mock_comment
         self.comment_id = 765
 
     def check_queryset_parameterized_properly(self):
