@@ -129,7 +129,7 @@ def list_comments(
 
 def replies_up_recursive(
         request: WSGIRequest, topic_slug: str,
-        comment_id: int) -> Tuple[Topic, QuerySet]:
+        comment_id: int, scroll_to_id: int) -> Tuple[Topic, QuerySet]:
     """
     Expand comments in a thread upwards from a given comment ID
     recursively.
@@ -149,7 +149,7 @@ def replies_up_recursive(
             kwargs={
                 'topic_slug': model_comment.topic.slug,
                 'comment_id': model_comment.id,
-                'scroll_to_id': model_comment.id})
+                'scroll_to_id': scroll_to_id})
         raise HttpResponsePermanentRedirect(url=url)
     set_comment_ids = set([model_comment.id])
     set_iteration_ids = set([model_comment.id])

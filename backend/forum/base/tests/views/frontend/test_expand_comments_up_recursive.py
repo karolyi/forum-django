@@ -24,6 +24,44 @@ class ExpandCommentsUpRecursiveTestCase(TestCase):
                 'scroll_to_id': 1}))
         self.assertEqual(response.status_code, 404)
 
+    def test_disallow_staff_topic_for_anon_instead_redirect(self):
+        """
+        Comment 1 in topic 1 cannot be expanded for non-staff users.
+
+        When the user would except a redirect (thus finding out the)
+        topic slug assigned a given comment, don't allow that and assert
+        a redirect.
+        """
+        client = Client()
+        response = client.get(reverse(
+            viewname='forum:base:comments-up-recursive', kwargs={
+                'topic_slug': 'staff-only-topiccccccc',
+                'comment_id': 1,
+                'scroll_to_id': 1}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_redirect_staff_topic_with_wrong_slug_valid_id(self):
+        """
+        Comment 1 in topic 1 cannot be expanded for non-staff users.
+
+        If the user is able to see the requested topic but passes the
+        wrong slug, redirect him to the correct slug.
+        """
+        client = Client()
+        client.login(username='staffuser', password='ValidPassword')
+        response = client.get(reverse(
+            viewname='forum:base:comments-up-recursive', kwargs={
+                'topic_slug': 'staff-only-topiccccccc',
+                'comment_id': 1,
+                'scroll_to_id': 2}))
+        # Assert a permanent redirect
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response.get('Location'), reverse(
+            viewname='forum:base:comments-up-recursive', kwargs={
+                'topic_slug': 'staff-only-topic',
+                'comment_id': 1,
+                'scroll_to_id': 2}))
+
     def test_http404_for_nonexistent_staff_comment_requested(self):
         """
         Comment 1 in topic 1 cannot be expanded for non-staff users.

@@ -1,3 +1,9 @@
+from typing import Union
+
+from django.core.handlers.wsgi import WSGIRequest
+from django.http.response import \
+    HttpResponseRedirect as DjangoHttpResponsePermanentRedirect
+from django.http.response import HttpResponse
 from django.shortcuts import render
 
 from ..choices import (
@@ -8,7 +14,7 @@ from ..utils.topic import (
     list_comments, prev_comments_down, replies_up, replies_up_recursive)
 
 
-def topic_listing(request):
+def topic_listing(request: WSGIRequest) -> HttpResponse:
     """
     Main entry page, with the topic listings.
     """
@@ -25,7 +31,9 @@ def topic_listing(request):
         context=request_context)
 
 
-def topic_comment_listing(request, topic_slug, comment_id=None):
+def topic_comment_listing(
+        request: WSGIRequest, topic_slug: str,
+        comment_id: int=None) -> HttpResponse:
     """
     List a certain topic.
     """
@@ -42,14 +50,17 @@ def topic_comment_listing(request, topic_slug, comment_id=None):
 
 
 def expand_comments_up_recursive(
-        request, topic_slug, comment_id, scroll_to_id):
+        request: WSGIRequest, topic_slug: str, comment_id: int,
+        scroll_to_id: int
+) -> Union[HttpResponse, DjangoHttpResponsePermanentRedirect]:
     """
     Expand replies to a given comment, by expanding all that is a reply
     to the given comment upwards.
     """
     try:
         model_topic, qs_comments = replies_up_recursive(
-            request=request, topic_slug=topic_slug, comment_id=comment_id)
+            request=request, topic_slug=topic_slug, comment_id=comment_id,
+            scroll_to_id=scroll_to_id)
     except HttpResponsePermanentRedirect as exc:
         return exc.http_response()
     return render(
@@ -63,7 +74,8 @@ def expand_comments_up_recursive(
 
 
 def expand_comments_up(
-        request, topic_slug, comment_id, scroll_to_id):
+    request: WSGIRequest, topic_slug: str, comment_id: int, scroll_to_id: int
+) -> Union[HttpResponse, DjangoHttpResponsePermanentRedirect]:
     """
     Expand replies to a given comment in a non-recursive way. That is,
     only expand the replies to the passed comment ID.
@@ -85,7 +97,9 @@ def expand_comments_up(
 
 
 def expand_comments_down(
-        request, topic_slug, comment_id, scroll_to_id):
+    request: WSGIRequest, topic_slug: str, comment_id: int,
+    scroll_to_id: int
+) -> Union[HttpResponse, DjangoHttpResponsePermanentRedirect]:
     """
     Expand previous replies to a given comment in a recursive way. That
     is, expand all the previous replies until the passed comment ID.
