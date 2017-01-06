@@ -47,20 +47,3 @@
     ip: 127.0.0.1
     unique_id: '1-3'
     images: []
-- model: forum_base.comment
-  pk: 4
-  fields:
-    user: 2
-    topic: 2 # Normal topic
-    moved_from: 1 # Staff topic
-    time: '2017-01-05 20:57:38.540040+00:00'
-    number: 1
-    voting_value: 0
-    prev_comment: null
-    content_md: moved from staff md content id 3, a non-reply
-    content_html: moved from staff html content id 3, a non-reply
-    host: ''
-    ip: 127.0.0.1
-    unique_id: '2-4'
-    images: []
-

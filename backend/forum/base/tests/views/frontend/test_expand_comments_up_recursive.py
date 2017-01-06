@@ -8,7 +8,9 @@ class ExpandCommentsUpRecursiveTestCase(TestCase):
     Testing `expand_comments_up_recursive`.
     """
 
-    fixtures = ['topic-tests-user', 'topic-tests-topic', 'topic-tests-comment']
+    fixtures = [
+        'topic-tests-user', 'topic-tests-topic',
+        'topic-tests-comments-staffonly', 'topic-tests-comments-normal']
 
     def test_disallow_staff_topic_for_anon(self):
         """
