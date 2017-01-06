@@ -26,8 +26,8 @@ class Comment(models.Model):
 
     def __str__(self):
         return str(_(
-            '#{number} of \'{topic}\''.format(
-                number=self.number, topic=self.topic)))
+            '#{number} of \'{topic}\' (ID {id})'.format(
+                number=self.number, topic=self.topic, id=self.id)))
 
     user = models.ForeignKey(User, verbose_name=_('The commenter user'))
     topic = models.ForeignKey('Topic', verbose_name=_('Commented in topic'))

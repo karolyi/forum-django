@@ -1,0 +1,34 @@
+- model: forum_base.topic
+  pk: 1
+  fields:
+    creator: 1
+    name_html: Staff only topic html name
+    name_text: Staff only topic
+    is_enabled: false
+    is_staff_only: true
+    is_voting_enabled: true
+    type: normal
+    truncate_at: null
+    reply_to: null
+    slug: staff-only-topic
+    comment_count: 0
+    last_comment: null
+    description: ''
+    images: []
+- model: forum_base.topic
+  pk: 2
+  fields:
+    creator: 1
+    name_html: Normal topic html name
+    name_text: Normal topic
+    is_enabled: false
+    is_staff_only: false
+    is_voting_enabled: true
+    type: normal
+    truncate_at: null
+    reply_to: null
+    slug: normal-topic
+    comment_count: 0
+    last_comment: null
+    description: ''
+    images: []
