@@ -70,16 +70,6 @@ class CommentsUpRecursiveParser(HtmlResultParserBase):
             container=self.last_cached_comment.find(
                 name='div', class_='comment-content').text)
 
-    def assert_its_content_contains(self, content: str) -> None:
-        """
-        Assert that the lastly used comment wrapper contains the given
-        content.
-        """
-        self.test.assertIn(
-            member=content,
-            container=self.last_cached_comment.find(
-                name='div', class_='comment-content').text)
-
     def assert_no_more_comments(self) -> None:
         """
         Assert that only the previously looked up comments are rendered
@@ -106,7 +96,6 @@ class TopicListingParser(HtmlResultParserBase):
 
     def __init__(self, *args, **kwargs) -> None:
         super(TopicListingParser, self).__init__(*args, **kwargs)
-        self._remove_templates()
         self._fetch_topics()
         self.asserted_topic_slugs = {
             topic_type: set() for topic_type in LIST_TOPIC_TYPE}
@@ -169,9 +158,28 @@ class TopicListingParser(HtmlResultParserBase):
                 found_topics.append(topic)
         return found_topics
 
+    def _assert_preview_contains(
+            self, slug: str, preview_contains: str) -> None:
+        """
+        Assert that a given template with a preview comment exists for
+        the passed `slug`.
+        """
+        if preview_contains is None:
+            # Not looking for anything
+            return
+        tooltip_template = self.soup.find(
+            name='template', class_='forum-topic-tooltip-template',
+            attrs={'data-slug': slug})  # type: Tag
+        tooltip_inner_text = tooltip_template.div.text
+        self.test.assertIn(
+            member=preview_contains, container=tooltip_inner_text, msg=_(
+                'Tooltip for \'{slug}\' does not contain string.').format(
+                slug=slug))
+
     def assert_topic_listed(
             self, topic_type: str, slug: str, name_contains: str=None,
-            username_contains: str=None, total_comments: int=None) -> None:
+            username_contains: str=None, total_comments: int=None,
+            preview_contains: str=None) -> None:
         """
         Assert that a certain topic is listed within a certain category
         and has the passed properties.
@@ -186,6 +194,8 @@ class TopicListingParser(HtmlResultParserBase):
         self._assert_topic_properties(
             topic=topic, name_contains=name_contains,
             username_contains=username_contains, total_comments=total_comments)
+        self._assert_preview_contains(
+            slug=slug, preview_contains=preview_contains)
         self.asserted_topic_slugs[topic_type].add(slug)
 
     def assert_topic_not_listed(self, topic_type: str, slug: str) -> None:
