@@ -96,14 +96,12 @@ class TopicListingParser(HtmlResultParserBase):
 
     def __init__(self, *args, **kwargs) -> None:
         super(TopicListingParser, self).__init__(*args, **kwargs)
-        self._fetch_topics()
-        self.asserted_topic_slugs = {
-            topic_type: set() for topic_type in LIST_TOPIC_TYPE}
 
-    def _fetch_topics(self) -> None:
+    def parse_as_full_page(self):
         """
-        Build the list of topics.
+        Parse the HTML as a full page.
         """
+        self.listed_topic_categories = LIST_TOPIC_TYPE
         self.listed_topics = {
             topic_type: [] for topic_type in LIST_TOPIC_TYPE}
         for topic_type in LIST_TOPIC_TYPE:
@@ -113,6 +111,37 @@ class TopicListingParser(HtmlResultParserBase):
                     class_='topic-type-{topic_type}'.format(
                         topic_type=topic_type)).find_all(
                     name='div', class_='topic-list-item-row')
+        self.asserted_topic_slugs = {
+            topic_type: set() for topic_type in LIST_TOPIC_TYPE}
+
+    def parse_as_one_topic_page(self, topic_type: str) -> None:
+        """
+        Parse the resulted HTML as it's only one served page of a
+        topic list, served through the api on page change.
+        """
+        self.listed_topic_categories = [topic_type]
+        self.listed_topics = {topic_type: self.soup.find_all(
+            name='div', class_='topic-list-item-row')}
+        self.asserted_topic_slugs = {topic_type: set()}
+
+    def parse_as_archived_page_start(self) -> None:
+        """
+        Parse the resulted HTML as it's only one served page of a
+        topic list, served through the api on page change.
+        """
+        self.listed_topic_categories = ['archived']
+        self.listed_topics = {'archived': self.soup.find(
+            name='section', class_='topic-list-wrapper').find_all(
+            name='div', class_='topic-list-item-row')}
+        self.asserted_topic_slugs = {'archived': set()}
+
+    def _fetch_topics(self) -> None:
+        """
+        Build the list of topics.
+        """
+        if self.is_full_page:
+            return
+        # Not a full page render, parse differently
 
     def _assert_topic_properties(
             self, topic: Tag, name_contains: str, username_contains: str,
@@ -123,12 +152,16 @@ class TopicListingParser(HtmlResultParserBase):
         if name_contains is not None:
             # Assert the topic text
             topic_link = topic.find(class_='topic-link')  # type: Tag
-            self.test.assertIn(member=name_contains, container=topic_link.text)
+            self.test.assertIn(
+                member=name_contains, container=topic_link.text, msg=_(
+                    'Listed topic name doesn\'t contain the expected '
+                    'string.'))
         if username_contains is not None:
             # Assert the username text
             user_link = topic.find(class_='forum-username')  # type: Tag
             self.test.assertIn(
-                member=username_contains, container=user_link.text)
+                member=username_contains, container=user_link.text, msg=_(
+                    'Listed user name doesn\'t contain the expected string.'))
         if total_comments is not None:
             # Assert the total comments number
             comment_count_wrapper = topic.find(class_='topic-comment-count')
@@ -173,8 +206,8 @@ class TopicListingParser(HtmlResultParserBase):
         tooltip_inner_text = tooltip_template.div.text
         self.test.assertIn(
             member=preview_contains, container=tooltip_inner_text, msg=_(
-                'Tooltip for \'{slug}\' does not contain string.').format(
-                slug=slug))
+                'Tooltip for \'{slug}\' does not contain expected string.'
+            ).format(slug=slug))
 
     def assert_topic_listed(
             self, topic_type: str, slug: str, name_contains: str=None,
@@ -207,16 +240,15 @@ class TopicListingParser(HtmlResultParserBase):
         found_topics = self._look_for_a_topic(
             topics=topics, topic_type=topic_type, slug=slug)
         self.test.assertEqual(len(found_topics), 0, msg=_(
-            'Expected a topic to not be found but found a topic with a slug '
-            '{slug} in topic_type {topic_type}').format(
-            slug=slug, topic_type=topic_type))
+            'Unexpected topic with slug \'{slug}\' in topic_type '
+            '\'{topic_type}\'.').format(slug=slug, topic_type=topic_type))
 
     def assert_no_more_topics_listed(self):
         """
         Assert that within the test we looked up all the topics that
         are listed in the topic page.
         """
-        for topic_type in LIST_TOPIC_TYPE:
+        for topic_type in self.listed_topic_categories:
             # Get the listed topic slugs
             topics_slugs_remaining = list(map(
                 lambda x: self._get_slug(topic=x),

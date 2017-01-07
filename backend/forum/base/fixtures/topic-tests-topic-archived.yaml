@@ -1,0 +1,68 @@
+- model: forum_base.topic
+  pk: 5
+  fields:
+    creator: 1 # ValidUser
+    name_html: Archived enabled non-staff topic 1 html name
+    name_text: Archived enabled non-staff topic 1 text name
+    is_enabled: true
+    is_staff_only: false
+    is_voting_enabled: true
+    type: archived
+    truncate_at: null
+    reply_to: null
+    slug: archived-enabled-non-staff-topic-1
+    comment_count: 2
+    last_comment: 14
+    description: ''
+    images: []
+- model: forum_base.topic
+  pk: 6
+  fields:
+    creator: 2 # InactiveUser
+    name_html: Archived disabled non-staff topic 1 html name
+    name_text: Archived disabled non-staff topic 1 text name
+    is_enabled: false
+    is_staff_only: false
+    is_voting_enabled: true
+    type: archived
+    truncate_at: null
+    reply_to: null
+    slug: archived-disabled-non-staff-topic-1
+    comment_count: 1
+    last_comment: 11
+    description: ''
+    images: []
+- model: forum_base.topic
+  pk: 7
+  fields:
+    creator: 3 # StaffUser
+    name_html: Archived enabled staff topic 1 html name
+    name_text: Archived enabled staff topic 1 text name
+    is_enabled: true
+    is_staff_only: true
+    is_voting_enabled: true
+    type: archived
+    truncate_at: null
+    reply_to: null
+    slug: archived-enabled-staff-topic-1
+    comment_count: 1
+    last_comment: 12
+    description: ''
+    images: []
+- model: forum_base.topic
+  pk: 8
+  fields:
+    creator: 4 # SuperUser
+    name_html: Archived disabled staff topic 1 html name
+    name_text: Archived disabled staff topic 1 text name
+    is_enabled: false
+    is_staff_only: true
+    is_voting_enabled: true
+    type: archived
+    truncate_at: null
+    reply_to: null
+    slug: archived-disabled-staff-topic-1
+    comment_count: 1
+    last_comment: 13
+    description: ''
+    images: []

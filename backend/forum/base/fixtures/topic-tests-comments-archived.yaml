@@ -1,0 +1,80 @@
+- model: forum_base.comment
+  pk: 10
+  fields:
+    user: 1 # ValidUser
+    topic: 5 # Archived enabled non-staff topic
+    moved_from: null
+    time: '2017-01-05 20:02:38.540040+00:00'
+    number: 1
+    voting_value: 0
+    prev_comment: null
+    content_md: Archived enabled non-staff first comment MD
+    content_html: Archived enabled non-staff first comment HTML
+    host: ''
+    ip: 127.0.0.1
+    unique_id: '5-10'
+    images: []
+- model: forum_base.comment
+  pk: 14
+  fields:
+    user: 5 # SuperStaffUser
+    topic: 5 # Archived enabled non-staff topic
+    moved_from: null
+    time: '2017-01-05 20:03:38.540040+00:00'
+    number: 1
+    voting_value: 0
+    prev_comment: null
+    content_md: Archived enabled non-staff second comment MD
+    content_html: Archived enabled non-staff second comment HTML
+    host: ''
+    ip: 127.0.0.1
+    unique_id: '5-14'
+    images: []
+- model: forum_base.comment
+  pk: 11
+  fields:
+    user: 2 # InactiveUser
+    topic: 6 # Archived disabled non-staff topic
+    moved_from: null
+    time: '2017-01-05 20:04:38.540040+00:00'
+    number: 1
+    voting_value: 0
+    prev_comment: null
+    content_md: Archived disabled non-staff first comment MD
+    content_html: Archived disabled non-staff first comment HTML
+    host: ''
+    ip: 127.0.0.1
+    unique_id: '6-11'
+    images: []
+- model: forum_base.comment
+  pk: 12
+  fields:
+    user: 3 # StaffUser
+    topic: 7 # Archived enabled staff topic
+    moved_from: null
+    time: '2017-01-05 20:06:38.540040+00:00'
+    number: 1
+    voting_value: 0
+    prev_comment: null
+    content_md: Archived enabled staff first comment MD
+    content_html: Archived enabled staff first comment HTML
+    host: ''
+    ip: 127.0.0.1
+    unique_id: '7-12'
+    images: []
+- model: forum_base.comment
+  pk: 13
+  fields:
+    user: 4 # SuperUser
+    topic: 8 # Archived disabled staff topic
+    moved_from: null
+    time: '2017-01-05 20:07:38.540040+00:00'
+    number: 1
+    voting_value: 0
+    prev_comment: null
+    content_md: Archived disabled staff first comment MD
+    content_html: Archived disabled staff first comment HTML
+    host: ''
+    ip: 127.0.0.1
+    unique_id: '8-13'
+    images: []
