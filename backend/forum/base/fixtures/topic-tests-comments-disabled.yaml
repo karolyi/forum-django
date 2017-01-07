@@ -1,0 +1,16 @@
+- model: forum_base.comment
+  pk: 8
+  fields:
+    user: 2
+    topic: 4 # Disabled topic
+    moved_from: null
+    time: '2017-01-05 20:00:38.540040+00:00'
+    number: 1
+    voting_value: 0
+    prev_comment: null
+    content_md: Disabled topic first comment MD
+    content_html: Disabled topic first comment HTML
+    host: ''
+    ip: 127.0.0.1
+    unique_id: '4-8'
+    images: []

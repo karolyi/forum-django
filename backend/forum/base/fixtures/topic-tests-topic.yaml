@@ -2,33 +2,67 @@
   pk: 1
   fields:
     creator: 1
-    name_html: Staff only topic html name
-    name_text: Staff only topic
-    is_enabled: false
+    name_html: Staff only topic 1 html name
+    name_text: Staff only topic 1
+    is_enabled: true
     is_staff_only: true
     is_voting_enabled: true
     type: normal
     truncate_at: null
     reply_to: null
-    slug: staff-only-topic
-    comment_count: 0
-    last_comment: null
+    slug: staff-only-topic-1
+    comment_count: 4
+    last_comment: 9
     description: ''
     images: []
 - model: forum_base.topic
   pk: 2
   fields:
     creator: 1
-    name_html: Normal topic html name
-    name_text: Normal topic
-    is_enabled: false
+    name_html: Normal topic 1 html name
+    name_text: Normal topic 1
+    is_enabled: true
     is_staff_only: false
     is_voting_enabled: true
     type: normal
     truncate_at: null
     reply_to: null
-    slug: normal-topic
-    comment_count: 0
-    last_comment: null
+    slug: normal-topic-1
+    comment_count: 1
+    last_comment: 4
+    description: ''
+    images: []
+- model: forum_base.topic
+  pk: 3
+  fields:
+    creator: 3
+    name_html: Highlighted topic 1 html name
+    name_text: Highlighted topic 1
+    is_enabled: true
+    is_staff_only: false
+    is_voting_enabled: true
+    type: highlighted
+    truncate_at: null
+    reply_to: null
+    slug: highlighted-topic-1
+    comment_count: 3
+    last_comment: 7
+    description: ''
+    images: []
+- model: forum_base.topic
+  pk: 4
+  fields:
+    creator: 4
+    name_html: Disabled normal topic 1 html name
+    name_text: Disabled normal topic 1
+    is_enabled: false
+    is_staff_only: false
+    is_voting_enabled: true
+    type: highlighted
+    truncate_at: null
+    reply_to: null
+    slug: disabled-normal-topic-1
+    comment_count: 1
+    last_comment: 8
     description: ''
     images: []

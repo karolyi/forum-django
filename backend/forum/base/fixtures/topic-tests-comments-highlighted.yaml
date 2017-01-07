@@ -1,0 +1,50 @@
+# Comments should be ordered by date so the PKs are randomized for
+# testing purpose here
+- model: forum_base.comment
+  pk: 6
+  fields:
+    user: 4
+    topic: 3 # Highlighted topic
+    moved_from: null
+    time: '2017-01-05 21:32:01.540040+00:00'
+    number: 1
+    voting_value: 0
+    prev_comment: null
+    content_md: Highlighted topic md content id 6, a non-reply
+    content_html: Highlighted topic html content id 6, a non-reply
+    host: ''
+    ip: 127.0.0.1
+    unique_id: '3-6'
+    images: []
+- model: forum_base.comment
+  pk: 5
+  fields:
+    user: 2
+    topic: 3 # Highlighted topic
+    moved_from: null
+    time: '2017-01-05 21:32:02.540040+00:00'
+    number: 2
+    voting_value: 0
+    prev_comment: null
+    content_md: Highlighted topic md content id 5, a non-reply
+    content_html: Highlighted topic html content id 5, a non-reply
+    host: ''
+    ip: 127.0.0.1
+    unique_id: '3-5'
+    images: []
+- model: forum_base.comment
+  pk: 7
+  fields:
+    user: 3
+    topic: 3 # Highlighted topic
+    moved_from: null
+    time: '2017-01-05 21:32:03.540040+00:00'
+    number: 3
+    voting_value: 0
+    prev_comment: 5
+    content_md: Highlighted topic md content id 7, a reply to 5
+    content_html: Highlighted topic html content id 7, a reply to 5
+    host: ''
+    ip: 127.0.0.1
+    unique_id: '3-7'
+    images: []

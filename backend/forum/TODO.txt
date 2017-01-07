@@ -1,0 +1,4 @@
+TODO:
+
+- check if an expanded reply hides disabled topics for anonymous and non-admin
+- check if an expanded reply hides staff topics for anonymous and non-admin

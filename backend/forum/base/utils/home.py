@@ -1,13 +1,15 @@
+from typing import Union
+
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.core.paginator import Paginator
-
+from django.core.handlers.wsgi import WSGIRequest
+from django.core.paginator import Page, Paginator
 from forum.base.models import Topic
 
 from ..choices import TOPIC_TYPE_ARCHIVED
 
 
-def _get_topics_per_page(request):
+def _get_topics_per_page(request: WSGIRequest) -> int:
     """
     Return the shown topics per page for a user.
     """
@@ -18,7 +20,9 @@ def _get_topics_per_page(request):
     return settings.PAGINATOR_MAX_PAGES_TOPICLIST
 
 
-def collect_topic_page(request, topic_type, page_id=1, force=False):
+def collect_topic_page(
+        request: WSGIRequest, topic_type: str, page_id: int=1,
+        force: bool=False) -> Union[bool, Page]:
     """
     Collect topic list for the home view.
 
@@ -35,9 +39,11 @@ def collect_topic_page(request, topic_type, page_id=1, force=False):
             return False
 
     search_kwargs = {
-        'is_enabled': True,
-        'is_staff_only': request.user.is_staff,
+        'is_enabled': True
     }
+    if not request.user.is_staff and not request.user.is_superuser:
+        # Only list topics that are visible to the user
+        search_kwargs['is_staff_only'] = False
     search_kwargs['type'] = topic_type
     qs_topics = Topic.objects.filter(**search_kwargs).select_related(
         'last_comment', 'last_comment__user', 'last_comment__user__settings'

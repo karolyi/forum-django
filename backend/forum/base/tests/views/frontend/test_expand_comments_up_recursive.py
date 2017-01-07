@@ -10,7 +10,8 @@ class ExpandCommentsUpRecursiveTestCase(TestCase):
 
     fixtures = [
         'topic-tests-user', 'topic-tests-topic',
-        'topic-tests-comments-staffonly', 'topic-tests-comments-normal']
+        'topic-tests-comments-staffonly', 'topic-tests-comments-normal',
+        'topic-tests-comments-highlighted', 'topic-tests-comments-disabled']
 
     def test_disallow_staff_topic_for_anon(self):
         """
@@ -19,7 +20,7 @@ class ExpandCommentsUpRecursiveTestCase(TestCase):
         client = Client()
         response = client.get(reverse(
             viewname='forum:base:comments-up-recursive', kwargs={
-                'topic_slug': 'staff-only-topic',
+                'topic_slug': 'staff-only-topic-1',
                 'comment_id': 1,
                 'scroll_to_id': 1}))
         self.assertEqual(response.status_code, 404)
@@ -35,7 +36,7 @@ class ExpandCommentsUpRecursiveTestCase(TestCase):
         client = Client()
         response = client.get(reverse(
             viewname='forum:base:comments-up-recursive', kwargs={
-                'topic_slug': 'staff-only-topiccccccc',
+                'topic_slug': 'staff-only-topic-1cccccc',
                 'comment_id': 1,
                 'scroll_to_id': 1}))
         self.assertEqual(response.status_code, 404)
@@ -51,14 +52,14 @@ class ExpandCommentsUpRecursiveTestCase(TestCase):
         client.login(username='staffuser', password='ValidPassword')
         response = client.get(reverse(
             viewname='forum:base:comments-up-recursive', kwargs={
-                'topic_slug': 'staff-only-topiccccccc',
+                'topic_slug': 'staff-only-topic-1cccccc',
                 'comment_id': 1,
                 'scroll_to_id': 2}))
         # Assert a permanent redirect
         self.assertEqual(response.status_code, 301)
         self.assertEqual(response.get('Location'), reverse(
             viewname='forum:base:comments-up-recursive', kwargs={
-                'topic_slug': 'staff-only-topic',
+                'topic_slug': 'staff-only-topic-1',
                 'comment_id': 1,
                 'scroll_to_id': 2}))
 
@@ -69,7 +70,7 @@ class ExpandCommentsUpRecursiveTestCase(TestCase):
         client = Client()
         response = client.get(reverse(
             viewname='forum:base:comments-up-recursive', kwargs={
-                'topic_slug': 'staff-only-topic',
+                'topic_slug': 'staff-only-topic-1',
                 'comment_id': 999,
                 'scroll_to_id': 789}))
         self.assertEqual(response.status_code, 404)
@@ -94,7 +95,7 @@ class ExpandCommentsUpRecursiveTestCase(TestCase):
         client.login(username='staffuser', password='ValidPassword')
         response = client.get(reverse(
             viewname='forum:base:comments-up-recursive', kwargs={
-                'topic_slug': 'staff-only-topic',
+                'topic_slug': 'staff-only-topic-1',
                 'comment_id': 1,
                 'scroll_to_id': 1}))
         parser = CommentsUpRecursiveParser(test=self, response=response)
@@ -111,7 +112,7 @@ class ExpandCommentsUpRecursiveTestCase(TestCase):
         client.login(username='SuperUser', password='ValidPassword')
         response = client.get(reverse(
             viewname='forum:base:comments-up-recursive', kwargs={
-                'topic_slug': 'staff-only-topic',
+                'topic_slug': 'staff-only-topic-1',
                 'comment_id': 1,
                 'scroll_to_id': 1}))
         parser = CommentsUpRecursiveParser(test=self, response=response)
@@ -128,7 +129,7 @@ class ExpandCommentsUpRecursiveTestCase(TestCase):
         client = Client()
         response = client.get(reverse(
             viewname='forum:base:comments-up-recursive', kwargs={
-                'topic_slug': 'normal-topic',
+                'topic_slug': 'normal-topic-1',
                 'comment_id': 4,
                 'scroll_to_id': 4}))
         parser = CommentsUpRecursiveParser(test=self, response=response)
