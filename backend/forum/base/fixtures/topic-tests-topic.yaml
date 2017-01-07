@@ -3,7 +3,7 @@
   fields:
     creator: 1
     name_html: Staff only topic 1 html name
-    name_text: Staff only topic 1
+    name_text: Staff only topic 1 text name
     is_enabled: true
     is_staff_only: true
     is_voting_enabled: true
@@ -20,7 +20,7 @@
   fields:
     creator: 1
     name_html: Normal topic 1 html name
-    name_text: Normal topic 1
+    name_text: Normal topic 1 text name
     is_enabled: true
     is_staff_only: false
     is_voting_enabled: true
@@ -37,7 +37,7 @@
   fields:
     creator: 3
     name_html: Highlighted topic 1 html name
-    name_text: Highlighted topic 1
+    name_text: Highlighted topic 1 text name
     is_enabled: true
     is_staff_only: false
     is_voting_enabled: true
@@ -54,7 +54,7 @@
   fields:
     creator: 4
     name_html: Disabled normal topic 1 html name
-    name_text: Disabled normal topic 1
+    name_text: Disabled normal topic 1 text name
     is_enabled: false
     is_staff_only: false
     is_voting_enabled: true

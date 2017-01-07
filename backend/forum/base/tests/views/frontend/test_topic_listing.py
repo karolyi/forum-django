@@ -17,15 +17,26 @@ class TopicListingTestCase(TestCase):
         Certain topics will be listed for everyone, assert them here.
         """
         parser.assert_topic_listed(
-            topic_type='highlighted', name_contains='Highlighted topic 1',
+            topic_type='highlighted',
+            name_contains='Highlighted topic 1 html name',
             slug='highlighted-topic-1', username_contains='StaffUser',
             total_comments=3)
         parser.assert_topic_listed(
-            topic_type='normal', name_contains='Normal topic 1',
+            topic_type='normal', name_contains='Normal topic 1 html name',
             slug='normal-topic-1', username_contains='InactiveUser',
             total_comments=1)
         parser.assert_topic_not_listed(topic_type='highlighted', slug='foo')
         parser.assert_no_more_topics_listed()
+
+    def assert_topics_for_staff(self, parser: TopicListingParser):
+        """
+        Assert that the rendered topics contain the ones only visible
+        for staff.
+        """
+        parser.assert_topic_listed(
+            topic_type='normal', name_contains='Staff only topic 1 html name',
+            slug='staff-only-topic-1', username_contains='SuperUser',
+            total_comments=4)
 
     def test_renders_topics_properly_for_anonymous(self):
         """
@@ -68,10 +79,7 @@ class TopicListingTestCase(TestCase):
         client.login(username='SuperUser', password='ValidPassword')
         response = client.get(reverse(viewname='forum:base:topic-listing'))
         parser = TopicListingParser(test=self, response=response)
-        parser.assert_topic_listed(
-            topic_type='normal', name_contains='Staff only topic 1',
-            slug='staff-only-topic-1', username_contains='SuperUser',
-            total_comments=4)
+        self.assert_topics_for_staff(parser=parser)
         self.assert_topics_for_everyone(parser=parser)
 
     def test_renders_topics_properly_for_superstaffuser(self):
@@ -82,8 +90,5 @@ class TopicListingTestCase(TestCase):
         client.login(username='SuperStaffUser', password='ValidPassword')
         response = client.get(reverse(viewname='forum:base:topic-listing'))
         parser = TopicListingParser(test=self, response=response)
-        parser.assert_topic_listed(
-            topic_type='normal', name_contains='Staff only topic 1',
-            slug='staff-only-topic-1', username_contains='SuperUser',
-            total_comments=4)
+        self.assert_topics_for_staff(parser=parser)
         self.assert_topics_for_everyone(parser=parser)
