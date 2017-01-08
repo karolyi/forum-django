@@ -142,14 +142,6 @@ class TopicListingParser(HtmlResultParserBase):
             name='div', class_='topic-list-item-row')}
         self.asserted_topic_slugs = {'archived': set()}
 
-    def _fetch_topics(self) -> None:
-        """
-        Build the list of topics.
-        """
-        if self.is_full_page:
-            return
-        # Not a full page render, parse differently
-
     def _assert_topic_properties(
             self, topic: Tag, name_contains: str, username_contains: str,
             total_comments: int) -> None:
