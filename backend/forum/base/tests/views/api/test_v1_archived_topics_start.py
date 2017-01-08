@@ -4,7 +4,7 @@ from django.test import Client, TestCase
 from forum.testutils.html_result_parser import TopicListingParser
 
 
-class V1TopicListPageTestCase(TestCase):
+class V1ArchivedTopicStartTestCase(TestCase):
     """
     Testing `v1_topic_list_page`.
     """

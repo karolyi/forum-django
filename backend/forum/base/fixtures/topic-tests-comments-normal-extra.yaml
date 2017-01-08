@@ -1,0 +1,64 @@
+- model: forum_base.comment
+  pk: 15
+  fields:
+    user: 1 # ValidUser
+    topic: 9 # normal-topic-2
+    moved_from: null
+    time: '2017-01-07 20:02:38.540040+00:00'
+    number: 1
+    voting_value: 0
+    prev_comment: null
+    content_md: Normal topic 2 first comment MD
+    content_html: <b>Normal topic 2 first comment HTML</b>
+    host: ''
+    ip: 127.0.0.1
+    unique_id: 15-9
+    images: []
+- model: forum_base.comment
+  pk: 16
+  fields:
+    user: 2 # InactiveUser
+    topic: 10 # normal-topic-3
+    moved_from: null
+    time: '2017-01-07 20:03:38.540040+00:00'
+    number: 1
+    voting_value: 0
+    prev_comment: null
+    content_md: Normal topic 3 first comment MD
+    content_html: Normal topic 3 first comment HTML
+    host: ''
+    ip: 127.0.0.1
+    unique_id: 16-10
+    images: []
+- model: forum_base.comment
+  pk: 17
+  fields:
+    user: 3 # StaffUser
+    topic: 11 # normal-topic-4
+    moved_from: null
+    time: '2017-01-07 20:04:38.540040+00:00'
+    number: 1
+    voting_value: 0
+    prev_comment: null
+    content_md: Normal topic 4 first comment MD
+    content_html: Normal topic 4 first comment HTML
+    host: ''
+    ip: 127.0.0.1
+    unique_id: 17-11
+    images: []
+- model: forum_base.comment
+  pk: 18
+  fields:
+    user: 4 # SuperUser
+    topic: 12 # normal-topic-5
+    moved_from: null
+    time: '2017-01-07 20:05:38.540040+00:00'
+    number: 1
+    voting_value: 0
+    prev_comment: null
+    content_md: Normal topic 5 first comment MD
+    content_html: Normal topic 5 first comment HTML
+    host: ''
+    ip: 127.0.0.1
+    unique_id: 18-12
+    images: []
