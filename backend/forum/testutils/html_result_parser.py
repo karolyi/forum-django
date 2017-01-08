@@ -22,6 +22,13 @@ class HtmlResultParserBase(object):
         self._assert_statuscode_200()
         self._parse_result()
 
+    def _get_inner_html(self, tag: Tag):
+        """
+        Return the `innerHTML` of a given passed content list (from a
+        `Tag`).
+        """
+        return ''.join(map(str, tag.contents))
+
     def _assert_statuscode_200(self) -> None:
         self.test.assertEqual(self.response.status_code, 200)
 
@@ -65,10 +72,10 @@ class CommentsUpRecursiveParser(HtmlResultParserBase):
         self.test.assertIsNotNone(comment_wrapper)
         self.rendered_comments[comment_id] = comment_wrapper
         self.last_cached_comment = comment_wrapper
-        self.test.assertIn(
-            member=content,
-            container=self.last_cached_comment.find(
-                name='div', class_='comment-content').text)
+        inner_html = self._get_inner_html(
+            tag=self.last_cached_comment.find(
+                name='div', class_='comment-content'))
+        self.test.assertIn(member=content, container=inner_html)
 
     def assert_no_more_comments(self) -> None:
         """
@@ -152,21 +159,24 @@ class TopicListingParser(HtmlResultParserBase):
         if name_contains is not None:
             # Assert the topic text
             topic_link = topic.find(class_='topic-link')  # type: Tag
+            inner_html = self._get_inner_html(tag=topic_link)
             self.test.assertIn(
-                member=name_contains, container=topic_link.text, msg=_(
+                member=name_contains, container=inner_html, msg=_(
                     'Listed topic name doesn\'t contain the expected '
                     'string.'))
         if username_contains is not None:
             # Assert the username text
             user_link = topic.find(class_='forum-username')  # type: Tag
+            inner_html = self._get_inner_html(tag=user_link)
             self.test.assertIn(
-                member=username_contains, container=user_link.text, msg=_(
+                member=username_contains, container=inner_html, msg=_(
                     'Listed user name doesn\'t contain the expected string.'))
         if total_comments is not None:
             # Assert the total comments number
             comment_count_wrapper = topic.find(class_='topic-comment-count')
+            inner_html = self._get_inner_html(tag=comment_count_wrapper)
             self.test.assertEqual(
-                int(comment_count_wrapper.text), total_comments,
+                int(inner_html), total_comments,
                 msg=_('Wrong number of comments found.'))
 
     def _get_slug(self, topic: Tag):
@@ -203,9 +213,9 @@ class TopicListingParser(HtmlResultParserBase):
         tooltip_template = self.soup.find(
             name='template', class_='forum-topic-tooltip-template',
             attrs={'data-slug': slug})  # type: Tag
-        tooltip_inner_text = tooltip_template.div.text
+        tooltip_inner_html = self._get_inner_html(tag=tooltip_template.div)
         self.test.assertIn(
-            member=preview_contains, container=tooltip_inner_text, msg=_(
+            member=preview_contains, container=tooltip_inner_html, msg=_(
                 'Tooltip for \'{slug}\' does not contain expected string.'
             ).format(slug=slug))
 
