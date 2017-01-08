@@ -1,10 +1,10 @@
 from decimal import Decimal
 
+from django.core.handlers.wsgi import WSGIRequest
 from django.core.paginator import InvalidPage
 from django.db.models.aggregates import Avg, Count
-from django.http.response import Http404, JsonResponse
+from django.http.response import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render
-
 from forum.base.utils.home import collect_topic_page
 from forum.rating.models import UserRating
 from forum.rest_api.exceptions import NotProduceable
@@ -14,7 +14,7 @@ from ..choices import LIST_TOPIC_TYPE, TOPIC_TYPE_ARCHIVED
 from ..models import Settings
 
 
-def v1_user_short(request, slug_list):
+def v1_user_short(request: WSGIRequest, slug_list: str) -> JsonResponse:
     """
     Serve some short information about the requested user IDs such as
     quotes, and staff/superuser status and received ratings.
@@ -55,7 +55,7 @@ def v1_user_short(request, slug_list):
     return JsonResponse(dict_result)
 
 
-def v1_topic_list_page(request):
+def v1_topic_list_page(request: WSGIRequest) -> HttpResponse:
     """
     Render a HTML for a topic page, requested by the paginating script.
     """
@@ -81,7 +81,7 @@ def v1_topic_list_page(request):
         })
 
 
-def v1_archived_topics_start(request):
+def v1_archived_topics_start(request: WSGIRequest) -> HttpResponse:
     """
     Render the starter HTML for the archived topics, including the
     first page of the topic listing section, and the paginator wrapper.
