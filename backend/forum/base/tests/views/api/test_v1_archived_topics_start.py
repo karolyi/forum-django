@@ -23,12 +23,6 @@ class V1TopicListPageTestCase(TestCase):
         parser.parse_as_archived_page_start()
         return parser
 
-    def assert_topics_for_everyone(self, response: HttpResponse):
-        """
-        Assert that topics that should be visible for everyone, are
-        visible.
-        """
-
     def test_lists_topics_for_anonymous(self):
         """
         Should lists topics for `AnonymousUser`.
@@ -54,7 +48,7 @@ class V1TopicListPageTestCase(TestCase):
 
     def test_lists_topics_for_valid_user(self):
         """
-        Should lists topics for `AnonymousUser`.
+        Should lists topics for `ValidUser`.
         """
         client = Client()
         client.login(username='ValidUser', password='ValidPassword')
@@ -107,7 +101,7 @@ class V1TopicListPageTestCase(TestCase):
 
     def test_lists_topics_for_superuser(self):
         """
-        Should lists topics for `StaffUser`.
+        Should lists topics for `SuperUser`.
         """
         client = Client()
         client.login(username='SuperUser', password='ValidPassword')
