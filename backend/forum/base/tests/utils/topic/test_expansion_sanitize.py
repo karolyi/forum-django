@@ -50,11 +50,11 @@ class ExpansionSanitizeTestCase(TestCase):
         comment, search_kwargs_comment = _expansion_sanitize(
             request=request, comment_id=123)
         self.assertDictEqual(search_kwargs_comment, {
-            'topic__is_staff_only': False})
+            'topic__is_staff_only': False, 'topic__is_enabled': True})
         self.is_queryset_properly_parameterized()
         self.mock_comment.objects.select_related.return_value\
             .only.return_value.get.assert_called_once_with(
-                id=123, topic__is_staff_only=False)
+                id=123, topic__is_staff_only=False, topic__is_enabled=True)
 
     def check_filters_in_staff_topic(self, user: User):
         """
@@ -64,11 +64,12 @@ class ExpansionSanitizeTestCase(TestCase):
         request.user = user
         comment, search_kwargs_comment = _expansion_sanitize(
             request=request, comment_id=123)
-        self.assertDictEqual(search_kwargs_comment, {})
+        self.assertDictEqual(
+            search_kwargs_comment, {'topic__is_enabled': True})
         self.is_queryset_properly_parameterized()
         self.mock_comment.objects.select_related.return_value\
             .only.return_value.get.assert_called_once_with(
-                id=123)
+                id=123, topic__is_enabled=True)
 
     def test_filters_out_staff_topic_when_non_staff(self):
         """

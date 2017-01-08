@@ -2,7 +2,7 @@
 {% from 'default/macros/forum-time.html' import forum_time %}
 {% from 'default/base/macros/topic-comment-onereply.html' import topic_comment_onereply %}
 
-{% macro topic_comment_template(model_comment=None, is_template=False) -%}
+{% macro topic_comment_template(model_comment=None, is_template=False, show_invisible=False) -%}
 <section class="card topic-comment-wrapper" data-comment-id="{{ model_comment.id if not is_template else ''}}" data-topic-slug="{{ model_comment.topic.slug if not is_template else '' }}">
     <div class="card-header">
         <div class="row">
@@ -24,13 +24,16 @@
                 {{ forum_time(time=model_comment.time, is_template=is_template) }}
             </div>
             <div class="col-xs-4 col-sm-2 comment-previous">
-            {% if not is_template and model_comment.prev_comment %}
-                <a href="{{ url('forum:base:topic-comment-listing', topic_slug=model_comment.prev_comment.topic.slug, comment_id=model_comment.prev_comment_id) }}" data-link-to="{{ model_comment.prev_comment_id }}">
-                    {{ _('re:&nbsp;#') }}{{ model_comment.prev_comment.number }} ({{ model_comment.prev_comment.user.username }})
-                </a>
-            {% else %}
+            {% if not is_template and model_comment.prev_comment -%}
+                {% set is_prev_comment_visible = is_topic_comment_visible(comment=model_comment.prev_comment, show_invisible=show_invisible, request=request, cache_key='topic-comment-listing') -%}
+                {% if is_prev_comment_visible -%}
+                    <a href="{{ url('forum:base:topic-comment-listing', topic_slug=model_comment.prev_comment.topic.slug, comment_id=model_comment.prev_comment_id) }}" data-link-to="{{ model_comment.prev_comment_id }}">
+                        {{ _('re:&nbsp;#') }}{{ model_comment.prev_comment.number }} ({{ model_comment.prev_comment.user.username }})
+                    </a>
+                {%- endif %}
+            {%- else -%}
                 &nbsp;
-            {% endif %}
+            {%- endif %}
             </div>
             <div class="clearfix visible-xs-block"></div>
             <div class="col-xs-2 col-sm-1 voting-value-wrapper">
@@ -58,13 +61,16 @@
     <div class="card-block">
         <div class="card-text comment-content">
             {{ (model_comment.content_html if not is_template else '')|safe }}
-        {% if is_template %}
+        {% if is_template -%}
             {{ topic_comment_onereply(is_template=is_template) }}
-        {% elif model_comment.reply_set.all() %}
-            {% for model_comment in model_comment.reply_set.all() %}
-            {{ topic_comment_onereply(model_comment=model_comment, is_template=is_template) }}
-            {% endfor %}
-        {% endif %}
+        {%- elif model_comment.reply_set.all() -%}
+            {% for model_comment in model_comment.reply_set.all() -%}
+            {% set is_onereply_visible = is_topic_comment_visible(comment=model_comment, show_invisible=show_invisible, request=request, cache_key='topic-comment-listing') %}
+            {% if is_onereply_visible -%}
+                {{ topic_comment_onereply(model_comment=model_comment, is_template=is_template) }}
+            {%- endif %}
+            {%- endfor %}
+        {%- endif %}
         </div>
     </div>
 </section>

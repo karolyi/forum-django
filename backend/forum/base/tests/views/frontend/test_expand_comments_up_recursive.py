@@ -3,9 +3,9 @@ from django.test import Client, TestCase
 from forum.testutils.html_result_parser import CommentsUpRecursiveParser
 
 
-class ExpandCommentsUpRecursiveTestCase(TestCase):
+class BasicTestCase(TestCase):
     """
-    Testing `expand_comments_up_recursive`.
+    Testing `expand_comments_up_recursive` with basic tests.
     """
 
     fixtures = [
@@ -29,9 +29,9 @@ class ExpandCommentsUpRecursiveTestCase(TestCase):
         """
         Comment 1 in topic 1 cannot be expanded for non-staff users.
 
-        When the user would except a redirect (thus finding out the)
-        topic slug assigned a given comment, don't allow that and assert
-        a redirect.
+        When the user would except a redirect (thus finding out the
+        topic slug assigned a given comment), don't allow that and
+        assert a redirect.
         """
         client = Client()
         response = client.get(reverse(
@@ -137,3 +137,30 @@ class ExpandCommentsUpRecursiveTestCase(TestCase):
             comment_id=4,
             content='moved from staff html content id 3, a non-reply')
         parser.assert_no_more_comments()
+
+
+class Scenario1TestCase(TestCase):
+    """
+    Testing `expand_comments_up_recursive` with test scenario 1.
+    """
+
+    fixtures = [
+        'topic-tests-user',
+        'comment-tests-topics-scenario-1',
+        'comment-tests-comments-scenario-1']
+
+    def test_shows_expansion_to_anon_properly(self):
+        """
+        Should list the appropriate comment thread for `AnonymousUser`.
+        """
+        client = Client()
+        response = client.get(reverse(
+            viewname='forum:base:comments-up-recursive', kwargs={
+                'topic_slug': 'scenario-1-enabled-non-staff-topic-100',
+                'comment_id': 100,
+                'scroll_to_id': 100}))
+        parser = CommentsUpRecursiveParser(test=self, response=response)
+        parser.assert_commentid_contains_content(
+            comment_id=100,
+            content='comment ID 100 HTML content')
+        # parser.assert_no_more_comments()

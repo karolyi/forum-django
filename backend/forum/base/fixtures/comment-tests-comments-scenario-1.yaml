@@ -1,0 +1,151 @@
+# In this scenario (with only non-staff topics):
+
+# - The first comment comment starts in a topic that's visible for
+#   AnonymousUser
+- model: forum_base.comment
+  pk: 100
+  fields:
+    user: 1 # ValidUser
+    topic: 100 # scenario-1-enabled-non-staff-topic-100
+    moved_from: null
+    time: '2017-01-05 20:01:38.540040+00:00'
+    number: 1
+    voting_value: 0
+    prev_comment: null
+    content_md: comment ID 100 MD content
+    content_html: comment ID 100 HTML content
+    host: ''
+    ip: 127.0.0.1
+    unique_id: 100
+    images: []
+
+# - The second comment is a reply in the same topic
+- model: forum_base.comment
+  pk: 101
+  fields:
+    user: 2 # InactiveUser
+    topic: 100 # scenario-1-enabled-non-staff-topic-100
+    moved_from: null
+    time: '2017-01-05 20:02:38.540040+00:00'
+    number: 2
+    voting_value: 0
+    prev_comment: 100
+    content_md: comment ID 101 MD content
+    content_html: comment ID 101 HTML content
+    host: ''
+    ip: 127.0.0.1
+    unique_id: 101
+    images: []
+
+# - The third comment is a reply in a topic that's disabled
+- model: forum_base.comment
+  pk: 102
+  fields:
+    user: 3 # StaffUser
+    topic: 102 # scenario-1-disabled-non-staff-topic-102
+    moved_from: null
+    time: '2017-01-05 20:03:38.540040+00:00'
+    number: 3
+    voting_value: 0
+    prev_comment: 100
+    content_md: INVISIBLE comment ID 102 MD content
+    content_html: INVISIBLE comment ID 102 HTML content
+    host: ''
+    ip: 127.0.0.1
+    unique_id: 102
+    images: []
+
+# - The fourth comment is a reply to the third comment in another,
+#   visible, non-staff topic (topic 101)
+- model: forum_base.comment
+  pk: 103
+  fields:
+    user: 4 # SuperUser
+    topic: 101 # scenario-1-enabled-non-staff-topic-101
+    moved_from: null
+    time: '2017-01-05 20:04:38.540040+00:00'
+    number: 4
+    voting_value: 0
+    prev_comment: 102
+    content_md: comment ID 103 MD content
+    content_html: comment ID 103 HTML content
+    host: ''
+    ip: 127.0.0.1
+    unique_id: 103
+    images: []
+
+# - The fifth comment is a reply to the third comment in the original
+#   visible topic
+- model: forum_base.comment
+  pk: 104
+  fields:
+    user: 5 # SuperStaffUser
+    topic: 100 # scenario-1-enabled-non-staff-topic-100
+    moved_from: null
+    time: '2017-01-05 20:05:38.540040+00:00'
+    number: 5
+    voting_value: 0
+    prev_comment: 102
+    content_md: comment ID 104 MD content
+    content_html: comment ID 104 HTML content
+    host: ''
+    ip: 127.0.0.1
+    unique_id: 104
+    images: []
+
+# - The sixth comment is a reply to the fifth comment, but moved from
+#   a disabled topic
+- model: forum_base.comment
+  pk: 105
+  fields:
+    user: 6 # BannedUSer
+    topic: 100 # scenario-1-enabled-non-staff-topic-100
+    moved_from: 102
+    time: '2017-01-05 20:06:38.540040+00:00'
+    number: 6
+    voting_value: 1
+    prev_comment: 104
+    content_md: comment ID 105 MD content
+    content_html: comment ID 105 HTML content
+    host: ''
+    ip: 127.0.0.1
+    unique_id: 105
+    images: []
+
+# - The seventh comment is a reply in a disabled topic, moved from an
+#   enabled one, a reply to the fifth comment
+- model: forum_base.comment
+  pk: 106
+  fields:
+    user: 1 # ValidUser
+    topic: 102 # scenario-1-disabled-non-staff-topic-102
+    moved_from: 100
+    time: '2017-01-05 20:07:38.540040+00:00'
+    number: 7
+    voting_value: 1
+    prev_comment: 104
+    content_md: comment ID 106 MD content
+    content_html: comment ID 106 HTML content
+    host: ''
+    ip: 127.0.0.1
+    unique_id: 106
+    images: []
+
+# - The eighth comment is a reply in another visible topic to the fifth comment
+#   moved from the original visible topic
+- model: forum_base.comment
+  pk: 107
+  fields:
+    user: 2 # InactiveUser
+    topic: 101 # scenario-1-enabled-non-staff-topic-101
+    moved_from: 100
+    time: '2017-01-05 20:08:38.540040+00:00'
+    number: 8
+    voting_value: 1
+    prev_comment: 104
+    content_md: comment ID 107 MD content
+    content_html: comment ID 107 HTML content
+    host: ''
+    ip: 127.0.0.1
+    unique_id: 107
+    images: []

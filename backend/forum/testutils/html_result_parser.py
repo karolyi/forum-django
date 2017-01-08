@@ -51,31 +51,50 @@ class HtmlResultParserBase(object):
             template = self.soup.template
 
 
-class CommentsUpRecursiveParser(HtmlResultParserBase):
+class CommentParser(HtmlResultParserBase):
+    """
+    A base class for parsing rendered comments.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(CommentParser, self).__init__(*args, **kwargs)
+
+    def _assert_comment_attrs(self, comment_wrapper: Tag, attrs: dict):
+        """
+        Check a rendered comment's attributes.
+        """
+        if attrs.get('number') is not None:
+            pass
+
+
+class CommentsUpRecursiveParser(CommentParser):
     """
     Parsing the result of `comments_up_recursive` view.
     """
 
     def __init__(self, *args, **kwargs) -> None:
-        super(CommentsUpRecursiveParser, self).__init__(*args, **kwargs)
+        super(CommentParser, self).__init__(*args, **kwargs)
         self.rendered_comments = {}
         self.last_cached_comment = None
 
     def assert_commentid_contains_content(
-            self, comment_id: int, content: str) -> None:
+            self, comment_id: int, content: str, attrs: dict=None) -> None:
         """
         Assert that a given rendered comment's content contains a given
         passed text snippet.
         """
         comment_wrapper = self.soup.main.article.find(
             name='section', attrs={'data-comment-id': comment_id})
-        self.test.assertIsNotNone(comment_wrapper)
+        self.test.assertIs(type(comment_wrapper), Tag)
         self.rendered_comments[comment_id] = comment_wrapper
         self.last_cached_comment = comment_wrapper
         inner_html = self._get_inner_html(
             tag=self.last_cached_comment.find(
                 name='div', class_='comment-content'))
         self.test.assertIn(member=content, container=inner_html)
+        if attrs is not None:
+            self._assert_comment_attrs(
+                comment_wrapper=comment_wrapper, attrs=attrs)
 
     def assert_no_more_comments(self) -> None:
         """

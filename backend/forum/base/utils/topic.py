@@ -57,7 +57,8 @@ def _expansion_sanitize(
     """
     # Get the requested comment (cast to int before)
     search_kwargs_comment = {
-        'id': comment_id
+        'id': comment_id,
+        'topic__is_enabled': True,
     }
     if not request.user.is_staff and not request.user.is_superuser:
         # Filter for only non-staff topics
@@ -99,18 +100,17 @@ def list_comments(
     Return the topic model and the requested page containing the
     `comment_id`.
     """
+    # from IPython import embed
+    # embed()
     search_kwargs_topic = {
-        'slug': topic_slug,
-    }
+        'slug': topic_slug, 'is_enabled': True}
     if not request.user.is_staff and not request.user.is_superuser:
         search_kwargs_topic['is_staff_only'] = False
     try:
         model_topic = Topic.objects.get(**search_kwargs_topic)
     except Topic.DoesNotExist:
         raise Http404
-    search_kwargs_comment = {
-        'topic': model_topic
-    }
+    search_kwargs_comment = {'topic': model_topic}
     qs_comments = Comment.objects.filter(
         **search_kwargs_comment).order_by('-time')
     comments_per_page = _get_comments_per_page(request=request)
@@ -139,6 +139,8 @@ def replies_up_recursive(
 
     Raise `HttpResponsePermanentRedirect` when the comment exists but
     is in another topic, `Http404` when not found.
+
+    As the code flows, invisible comment won't get filtered in.
     """
     # Get the requested comment
     model_comment, search_kwargs_comment = _expansion_sanitize(
@@ -151,18 +153,18 @@ def replies_up_recursive(
                 'comment_id': model_comment.id,
                 'scroll_to_id': scroll_to_id})
         raise HttpResponsePermanentRedirect(url=url)
-    set_comment_ids = set([model_comment.id])
-    set_iteration_ids = set([model_comment.id])
+    comment_ids = {model_comment.id}
+    iteration_ids = {model_comment.id}
     while True:
-        search_kwargs_comment['prev_comment__in'] = set_iteration_ids
+        search_kwargs_comment['prev_comment__in'] = iteration_ids
         qs_comments = Comment.objects.filter(
             **search_kwargs_comment).only('id').order_by()
-        set_iteration_ids = set((x.id for x in qs_comments))
-        if len(set_iteration_ids) == 0:
+        iteration_ids = {x.id for x in qs_comments}
+        if len(iteration_ids) == 0:
             # No more comments fetchable
             break
-        set_comment_ids.update(set_iteration_ids)
-    qs_comments = Comment.objects.filter(id__in=set_comment_ids)
+        comment_ids.update(iteration_ids)
+    qs_comments = Comment.objects.filter(id__in=comment_ids)
     qs_comments = _prefetch_for_comments(qs_comments)
     return model_comment.topic, qs_comments
 

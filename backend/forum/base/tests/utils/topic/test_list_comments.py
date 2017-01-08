@@ -120,7 +120,7 @@ class ListCommentsTestCase(TestCase):
         with self.assertRaises(expected_exception=Http404):
             list_comments(request=self.request, topic_slug='foo')
         self.mock_topic.objects.get.assert_called_once_with(
-            slug='foo', is_staff_only=False)
+            slug='foo', is_staff_only=False, is_enabled=True)
 
     def test_raises_http404_if_comment_nonexistent(self):
         """
@@ -131,7 +131,7 @@ class ListCommentsTestCase(TestCase):
         with self.assertRaises(expected_exception=Http404):
             list_comments(request=self.request, topic_slug='foo')
         self.mock_topic.objects.get.assert_called_once_with(
-            slug='foo', is_staff_only=False)
+            slug='foo', is_staff_only=False, is_enabled=True)
         self.mock_comment.objects.filter.assert_called_once_with(
             topic='topic-get-return-value')
         self.mock_comment.objects.filter.return_value.order_by\
@@ -152,7 +152,7 @@ class ListCommentsTestCase(TestCase):
         topic, page = \
             list_comments(request=self.request, topic_slug='foo')
         self.mock_topic.objects.get.assert_called_once_with(
-            slug='foo', is_staff_only=False)
+            slug='foo', is_staff_only=False, is_enabled=True)
         self.assert_normal_flow_without_commentid()
         self.mock_paginator.return_value.page.assert_called_once_with(number=1)
         self.assertIs(topic, self.mock_topic.objects.get.return_value)
@@ -165,7 +165,7 @@ class ListCommentsTestCase(TestCase):
         topic, page = list_comments(
             request=self.request, topic_slug='foo', comment_id=123)
         self.mock_topic.objects.get.assert_called_once_with(
-            slug='foo', is_staff_only=False)
+            slug='foo', is_staff_only=False, is_enabled=True)
         self.assert_commentid_passed_and_successful_execution(
             topic=topic, page=page)
 
@@ -177,7 +177,7 @@ class ListCommentsTestCase(TestCase):
         topic, page = list_comments(
             request=self.request, topic_slug='fooo', comment_id=123)
         self.mock_topic.objects.get.assert_called_once_with(
-            slug='fooo')
+            slug='fooo', is_enabled=True)
         self.assert_commentid_passed_and_successful_execution(
             topic=topic, page=page)
 
@@ -189,7 +189,7 @@ class ListCommentsTestCase(TestCase):
         topic, page = list_comments(
             request=self.request, topic_slug='fooo', comment_id=123)
         self.mock_topic.objects.get.assert_called_once_with(
-            slug='fooo')
+            slug='fooo', is_enabled=True)
         self.assert_commentid_passed_and_successful_execution(
             topic=topic, page=page)
 
@@ -201,6 +201,6 @@ class ListCommentsTestCase(TestCase):
         topic, page = list_comments(
             request=self.request, topic_slug='fooo', comment_id=123)
         self.mock_topic.objects.get.assert_called_once_with(
-            slug='fooo')
+            slug='fooo', is_enabled=True)
         self.assert_commentid_passed_and_successful_execution(
             topic=topic, page=page)

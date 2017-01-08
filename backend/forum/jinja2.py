@@ -1,6 +1,9 @@
+from functools import lru_cache
+
 from debug_toolbar.panels.templates import TemplatesPanel as BaseTemplatesPanel
 from django.conf import settings
 from django.contrib.humanize.templatetags.humanize import naturaltime
+from django.core.handlers.wsgi import WSGIRequest
 from django.core.paginator import Page
 from django.utils.html import strip_spaces_between_tags
 from django.utils.translation import (
@@ -168,6 +171,27 @@ def forum_auth_form():
     return ForumAuthForm
 
 
+@lru_cache(maxsize=100)
+def is_topic_comment_visible(
+        comment, show_invisible: bool, request: WSGIRequest,
+        cache_key: str='topic-comment-listing') -> bool:
+    """
+    Tell the templating engine if a given comment should or shouldn't be
+    visible in a given user context.
+
+    Return `True` if yes, `False` when no.
+    """
+    if show_invisible:
+        return True
+    if not comment.topic.is_enabled:
+        return False
+    is_admin = request.user.is_staff or request.user.is_superuser
+    if comment.topic.is_staff_only and not is_admin:
+        # Staff only topic, but the user is non-staff:
+        return False
+    return True
+
+
 class ForumToolsExtension(Extension):
     """
     Puts the settings variable and other utilities into the global
@@ -178,6 +202,8 @@ class ForumToolsExtension(Extension):
         super(ForumToolsExtension, self).__init__(environment)
         environment.globals['django_settings'] = settings
         environment.globals['forum_auth_form'] = forum_auth_form()
+        environment.globals['is_topic_comment_visible'] = \
+            is_topic_comment_visible
         environment.globals['paginator_generic_get_list'] = \
             paginator_generic_get_list
         environment.filters['naturaltime'] = naturaltime
