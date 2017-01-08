@@ -8,7 +8,20 @@ from django.utils.translation import ugettext_lazy as _
 from forum.base.choices import LIST_TOPIC_TYPE
 
 
-class HtmlResultParserBase(object):
+class HTMLParserMixin(object):
+    """
+    Tools for generic HTML parsing.
+    """
+
+    def _get_inner_html(self, tag: Tag):
+        """
+        Return the `innerHTML` of a given passed content list (from a
+        `Tag`).
+        """
+        return ''.join(map(str, tag.contents))
+
+
+class HtmlResultParserBase(HTMLParserMixin):
     """
     Tool for parsing the rendered HTML content with end-to-end testing.
     """
@@ -21,13 +34,6 @@ class HtmlResultParserBase(object):
         self.response = response
         self._assert_statuscode_200()
         self._parse_result()
-
-    def _get_inner_html(self, tag: Tag):
-        """
-        Return the `innerHTML` of a given passed content list (from a
-        `Tag`).
-        """
-        return ''.join(map(str, tag.contents))
 
     def _assert_statuscode_200(self) -> None:
         self.test.assertEqual(self.response.status_code, 200)
@@ -51,50 +57,55 @@ class HtmlResultParserBase(object):
             template = self.soup.template
 
 
-class CommentParser(HtmlResultParserBase):
+class OneTopicCommentParser(HTMLParserMixin):
+    """
+    Functionality for testing out one rendered topic comment structure.
+    """
+
+    def __init__(self, comment: Tag, test: TestCase):
+        self.comment = comment
+        self.test = test
+
+    def assert_contains_content(self, content: str):
+        """
+        Assert that the comment contains the given content.
+        """
+        inner_html = self._get_inner_html(
+            tag=self.comment.find(name='div', class_='comment-content'))
+        self.test.assertIn(member=content, container=inner_html)
+
+
+class CommentsPageParser(HtmlResultParserBase):
     """
     A base class for parsing rendered comments.
     """
 
     def __init__(self, *args, **kwargs):
-        super(CommentParser, self).__init__(*args, **kwargs)
-
-    def _assert_comment_attrs(self, comment_wrapper: Tag, attrs: dict):
-        """
-        Check a rendered comment's attributes.
-        """
-        if attrs.get('number') is not None:
-            pass
+        super(CommentsPageParser, self).__init__(*args, **kwargs)
 
 
-class CommentsUpRecursiveParser(CommentParser):
+class CommentsUpRecursiveParser(CommentsPageParser):
     """
     Parsing the result of `comments_up_recursive` view.
     """
 
     def __init__(self, *args, **kwargs) -> None:
-        super(CommentParser, self).__init__(*args, **kwargs)
+        super(CommentsPageParser, self).__init__(*args, **kwargs)
         self.rendered_comments = {}
         self.last_cached_comment = None
 
-    def assert_commentid_contains_content(
-            self, comment_id: int, content: str, attrs: dict=None) -> None:
+    def assert_and_return_commentid(self, comment_id: int):
         """
-        Assert that a given rendered comment's content contains a given
-        passed text snippet.
+        Assert that a given comment ID exists and return an initialized
+        `OneTopicCommentParser` for it, for further parsing.
         """
         comment_wrapper = self.soup.main.article.find(
             name='section', attrs={'data-comment-id': comment_id})
         self.test.assertIs(type(comment_wrapper), Tag)
         self.rendered_comments[comment_id] = comment_wrapper
         self.last_cached_comment = comment_wrapper
-        inner_html = self._get_inner_html(
-            tag=self.last_cached_comment.find(
-                name='div', class_='comment-content'))
-        self.test.assertIn(member=content, container=inner_html)
-        if attrs is not None:
-            self._assert_comment_attrs(
-                comment_wrapper=comment_wrapper, attrs=attrs)
+        return OneTopicCommentParser(
+            comment=comment_wrapper, test=self.test)
 
     def assert_no_more_comments(self) -> None:
         """

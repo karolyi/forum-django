@@ -99,8 +99,8 @@ class BasicTestCase(TestCase):
                 'comment_id': 1,
                 'scroll_to_id': 1}))
         parser = CommentsUpRecursiveParser(test=self, response=response)
-        parser.assert_commentid_contains_content(
-            comment_id=1,
+        comment = parser.assert_and_return_commentid(comment_id=1)
+        comment.assert_contains_content(
             content='second staff html content id 1, a non-reply')
         parser.assert_no_more_comments()
 
@@ -116,8 +116,8 @@ class BasicTestCase(TestCase):
                 'comment_id': 1,
                 'scroll_to_id': 1}))
         parser = CommentsUpRecursiveParser(test=self, response=response)
-        parser.assert_commentid_contains_content(
-            comment_id=1,
+        comment = parser.assert_and_return_commentid(comment_id=1)
+        comment.assert_contains_content(
             content='second staff html content id 1, a non-reply')
         parser.assert_no_more_comments()
 
@@ -133,8 +133,8 @@ class BasicTestCase(TestCase):
                 'comment_id': 4,
                 'scroll_to_id': 4}))
         parser = CommentsUpRecursiveParser(test=self, response=response)
-        parser.assert_commentid_contains_content(
-            comment_id=4,
+        comment = parser.assert_and_return_commentid(comment_id=4)
+        comment.assert_contains_content(
             content='moved from staff html content id 3, a non-reply')
         parser.assert_no_more_comments()
 
@@ -160,7 +160,6 @@ class Scenario1TestCase(TestCase):
                 'comment_id': 100,
                 'scroll_to_id': 100}))
         parser = CommentsUpRecursiveParser(test=self, response=response)
-        parser.assert_commentid_contains_content(
-            comment_id=100,
-            content='comment ID 100 HTML content')
+        comment = parser.assert_and_return_commentid(comment_id=100)
+        comment.assert_contains_content(content='comment ID 100 HTML content')
         # parser.assert_no_more_comments()
