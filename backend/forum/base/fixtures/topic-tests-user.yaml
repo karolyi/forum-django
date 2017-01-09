@@ -297,7 +297,7 @@
     received_comment_vote_sum: 0
     received_comment_vote_count: 0
     comment_vote_hide_limit: -5
-    quote: 'BannedUser quote'
+    quote: 'Banned>User quote'
     max_comments_per_day: 0
     comment_count: 0
     invitations_today: 0
