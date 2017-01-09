@@ -171,7 +171,8 @@ class Scenario1TestCase(TestCase):
         comment = parser.assert_and_return_commentid(comment_id=101)
         comment.assert_contains_content(content='comment ID 101 HTML content')
         comment.assert_time(value='2017-01-05T20:02:38.540040+00:00')
-        comment.assert_previous(comment_id=100, user_slug='validuser', username='ValidUser')
+        comment.assert_previous(
+            comment_id=100, user_slug='validuser', username='ValidUser')
         comment.assert_no_replies()
         comment.assert_replies_order()
         parser.assert_no_more_comments()
