@@ -26,7 +26,7 @@ class BasicTestCase(TestCase):
                 'scroll_to_id': 1}))
         self.assertEqual(response.status_code, 404)
 
-    def test_disallow_staff_topic_for_anon_instead_redirect(self):
+    def test_disallow_staff_topic_for_anon_instead_redirecting(self):
         """
         Comment 1 in topic 1 cannot be expanded for non-staff users.
 
@@ -139,10 +139,51 @@ class BasicTestCase(TestCase):
             content='moved from staff html content id 3, a non-reply')
         parser.assert_no_more_comments_and_order()
 
+    def assert_disabled_topic_returns_404_for_client(self, client: Client):
+        """
+        Assert that requesting a disallowed topic returns a HTTP 404.
+        """
+        response = client.get(reverse(
+            viewname='forum:base:comments-up-recursive', kwargs={
+                'topic_slug': 'disabled-normal-topic-1',
+                'comment_id': 8,
+                'scroll_to_id': 8}))
+        self.assertEqual(response.status_code, 404)
+
+    def assert_disabled_topic_returns_404_without_redirect(
+            self, client: Client):
+        """
+        A comment in a disabled topic as a start comment should result
+        in a HTTP 404 for `AnonymousUser`, and not a HTTP redirect, so
+        the user would NOT be able to find out the disabled topic slug.
+        """
+        response = client.get(reverse(
+            viewname='forum:base:comments-up-recursive', kwargs={
+                'topic_slug': 'foo-topic',
+                'comment_id': 8,
+                'scroll_to_id': 8}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_disallow_disabled_topic_for_all_usertype(self):
+        """
+        A comment in a disabled topic as a start comment should result
+        in a HTTP 404 for `AnonymousUser`.
+        """
+        usertypes = [
+            '', 'ValidUser', 'StaffUser', 'SuperUser', 'SuperStaffUser']
+        for username in usertypes:
+            client = Client()
+            if username != '':
+                client.login(username=username, password='ValidPassword')
+            self.assert_disabled_topic_returns_404_for_client(client=client)
+            self.assert_disabled_topic_returns_404_without_redirect(
+                client=client)
+
 
 class Scenario1Test1TestCase(TestCase):
     """
-    Testing `expand_comments_up_recursive` with test scenario 1.
+    Testing `expand_comments_up_recursive` with test scenario 1,
+    testing expansion from comment 100.
     """
 
     fixtures = [
