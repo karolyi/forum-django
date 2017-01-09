@@ -169,7 +169,7 @@ def replies_up_recursive(
 
 def replies_up(
         request: WSGIRequest, topic_slug: str,
-        comment_id: int) -> Tuple[Topic, QuerySet]:
+        comment_id: int, scroll_to_id: int) -> Tuple[Topic, QuerySet]:
     """
     Expand comments in a thread upwards from a given comment ID.
 
@@ -188,7 +188,7 @@ def replies_up(
             kwargs={
                 'topic_slug': model_comment.topic.slug,
                 'comment_id': model_comment.id,
-                'scroll_to_id': model_comment.id})
+                'scroll_to_id': scroll_to_id})
         raise HttpResponsePermanentRedirect(url=url)
     qs_comments = Comment.objects.filter(
         Q(id=model_comment.id) | Q(prev_comment_id=model_comment.id),

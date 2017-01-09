@@ -37,7 +37,7 @@
 {% jsmin %}
 <script type="text/javascript">
 Forum.topicCommentListing.init({
-    {{ js_config_topic_comment(listing_mode='commentListing', root='.topic-comment-listing-wrapper', comment_id=comment_id, scroll_to_id=comment_id, model_topic=model_topic) }}
+    {{ js_config_topic_comment(listing_mode='commentListing', root='.topic-comment-listing-wrapper', comment_id=comment_id, scroll_to_id=scroll_to_id, model_topic=model_topic) }}
 })
 </script>
 {% endjsmin %}
