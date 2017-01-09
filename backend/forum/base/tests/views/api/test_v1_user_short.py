@@ -92,7 +92,7 @@ class V1UserShortTestCase(TestCase):
                 'isBanned': True,
                 'isStaff': False,
                 'isSuperuser': False,
-                'quote': 'BannedUser quote',
+                'quote': 'Banned>User quote',
                 'rating': {'avg': 0, 'count': 0}}})
 
     def test_returns_two_users(self):
