@@ -79,7 +79,7 @@
     password: pbkdf2_sha256$30000$wRknOYiX7col$wmX0d8F6mC5HfGfnPSToDuqZZDce5c/OoB+oPpkgmb8=
     last_login: null
     is_superuser: false
-    username: BannedUser
+    username: Banned>User
     first_name: ''
     last_name: ''
     email: ''

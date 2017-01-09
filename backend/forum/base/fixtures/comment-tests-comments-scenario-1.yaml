@@ -5,7 +5,7 @@
 - model: forum_base.comment
   pk: 100
   fields:
-    user: 1 # ValidUser
+    user: 6 # Banned>User
     topic: 100 # scenario-1-enabled-non-staff-topic-100
     moved_from: null
     time: '2017-01-05T20:01:38.540040+00:00'

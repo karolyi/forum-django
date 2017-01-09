@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from typing import List
 
 from bs4 import BeautifulSoup
@@ -210,6 +211,18 @@ class OneTopicCommentParser(HTMLParserMixin):
             self._reply_ids, self._asserted_replies, msg=_(
                 'Asserted the second order, got the first'))
 
+    def assert_vote_value(self, value: int):
+        """
+        Assert the votes value on the renderes comment.
+        """
+        value_wrapper = self.comment.find(
+            name='div', class_='voting-value-wrapper')
+        self.test.assertIsInstance(value_wrapper, Tag)
+        value_html = value_wrapper.find(
+            name='span', class_='voting-value').decode_contents()
+        value_int = int(value_html)
+        self.test.assertEqual(value_int, value)
+
     def assert_time(self, value: str):
         """
         Assert that the comment has the passed time identifier.
@@ -236,7 +249,7 @@ class CommentsUpRecursiveParser(CommentsPageParser):
 
     def __init__(self, *args, **kwargs) -> None:
         super(CommentsPageParser, self).__init__(*args, **kwargs)
-        self.rendered_comments = {}
+        self.rendered_comments = OrderedDict()
         self.last_cached_comment = None
 
     def assert_and_return_commentid(self, comment_id: int):
@@ -252,7 +265,7 @@ class CommentsUpRecursiveParser(CommentsPageParser):
         return OneTopicCommentParser(
             comment=comment_wrapper, test=self.test)
 
-    def assert_no_more_comments(self) -> None:
+    def assert_no_more_comments_and_order(self) -> None:
         """
         Assert that only the previously looked up comments are rendered
         in the HTML response.
@@ -263,12 +276,16 @@ class CommentsUpRecursiveParser(CommentsPageParser):
         id_list = []
         for comment in rendered_comments:
             id_list.append(int(comment['data-comment-id']))
+        id_list_extra_ids = id_list.copy()
         for comment_id in self.rendered_comments.keys():
-            id_list.remove(comment_id)
-        if id_list:
+            id_list_extra_ids.remove(comment_id)
+        if id_list_extra_ids:
             self.test.fail(msg=_(
-                'There are more comments with IDs {ids}').format(
-                ids=', '.join(map(str, id_list))))
+                'There are extra unasserted comments with IDs {ids}').format(
+                ids=', '.join(map(str, id_list_extra_ids))))
+        self.test.assertListEqual(
+            id_list, list(self.rendered_comments.keys()), msg=_(
+                'Expected the order of IDs to be the first, got the second'))
 
 
 class TopicListingParser(HtmlResultParserBase):
