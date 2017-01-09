@@ -160,6 +160,18 @@ class Scenario1TestCase(TestCase):
                 'comment_id': 100,
                 'scroll_to_id': 100}))
         parser = CommentsUpRecursiveParser(test=self, response=response)
+        # Check comment ID 100
         comment = parser.assert_and_return_commentid(comment_id=100)
         comment.assert_contains_content(content='comment ID 100 HTML content')
-        # parser.assert_no_more_comments()
+        comment.assert_time(value='2017-01-05T20:01:38.540040+00:00')
+        comment.assert_no_previous()
+        comment.assert_reply(user_slug='inactiveuser', comment_id=101)
+        comment.assert_replies_order()
+        # Check comment ID 101
+        comment = parser.assert_and_return_commentid(comment_id=101)
+        comment.assert_contains_content(content='comment ID 101 HTML content')
+        comment.assert_time(value='2017-01-05T20:02:38.540040+00:00')
+        comment.assert_previous(comment_id=100, user_slug='validuser', username='ValidUser')
+        comment.assert_no_replies()
+        comment.assert_replies_order()
+        parser.assert_no_more_comments()

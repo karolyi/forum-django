@@ -97,13 +97,13 @@ class V1TopicListPageTestCase(TestCase):
         parser = self._get_parser(response=response)
         parser.assert_topic_listed(
             topic_type='normal', slug='normal-topic-5',
-            name_contains='Normal topic 5 html name',
-            username_contains='SuperUser', total_comments=1,
+            topic_name='Normal topic 5 html name', username='SuperUser',
+            total_comments=1,
             preview_contains='Normal topic 5 first comment HTML')
         parser.assert_topic_listed(
             topic_type='normal', slug='normal-topic-4',
-            name_contains='Normal topic 4 html name',
-            username_contains='StaffUser', total_comments=1,
+            topic_name='Normal topic 4 html name', username='StaffUser',
+            total_comments=1,
             preview_contains='Normal topic 4 first comment HTML')
         parser.assert_topic_not_listed(
             topic_type='normal', slug='normal-topic-3')
@@ -138,13 +138,13 @@ class V1TopicListPageTestCase(TestCase):
             topic_type='normal', slug='normal-topic-4')
         parser.assert_topic_listed(
             topic_type='normal', slug='normal-topic-3',
-            name_contains='<b>Normal topic 3 html name</b>',
-            username_contains='InactiveUser', total_comments=1,
+            topic_name='<b>Normal topic 3 html name</b>',
+            username='InactiveUser', total_comments=1,
             preview_contains='Normal topic 3 first comment HTML')
         parser.assert_topic_listed(
             topic_type='normal', slug='normal-topic-2',
-            name_contains='Normal topic 2 html name',
-            username_contains='ValidUser', total_comments=1,
+            topic_name='Normal topic 2 html name',
+            username='ValidUser', total_comments=1,
             preview_contains='<b>Normal topic 2 first comment HTML</b>')
         parser.assert_topic_not_listed(
             topic_type='normal', slug='normal-topic-1')
@@ -179,8 +179,8 @@ class V1TopicListPageTestCase(TestCase):
             topic_type='normal', slug='normal-topic-2')
         parser.assert_topic_listed(
             topic_type='normal', slug='normal-topic-1',
-            name_contains='Normal topic 1 html name',
-            username_contains='InactiveUser', total_comments=1,
+            topic_name='Normal topic 1 html name',
+            username='InactiveUser', total_comments=1,
             preview_contains='moved from staff html content id 3, a non-reply')
         parser.assert_no_more_topics_listed()
 

@@ -28,8 +28,10 @@
                 {% set is_prev_comment_visible = is_topic_comment_visible(comment=model_comment.prev_comment, show_invisible=show_invisible, request=request, cache_key='topic-comment-listing') -%}
                 {% if is_prev_comment_visible -%}
                     <a href="{{ url('forum:base:topic-comment-listing', topic_slug=model_comment.prev_comment.topic.slug, comment_id=model_comment.prev_comment_id) }}" data-link-to="{{ model_comment.prev_comment_id }}">
-                        {{ _('re:&nbsp;#') }}{{ model_comment.prev_comment.number }} ({{ model_comment.prev_comment.user.username }})
+                        {{- _('re:&nbsp;#') -}}
+                        {{- model_comment.prev_comment.number -}}
                     </a>
+                    ({{- forum_username(model_user=model_comment.prev_comment.user|default(None), is_template=is_template) -}})
                 {%- endif %}
             {%- else -%}
                 &nbsp;

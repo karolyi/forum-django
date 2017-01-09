@@ -100,8 +100,6 @@ def list_comments(
     Return the topic model and the requested page containing the
     `comment_id`.
     """
-    # from IPython import embed
-    # embed()
     search_kwargs_topic = {
         'slug': topic_slug, 'is_enabled': True}
     if not request.user.is_staff and not request.user.is_superuser:

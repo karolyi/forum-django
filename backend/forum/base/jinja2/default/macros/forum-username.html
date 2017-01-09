@@ -1,14 +1,14 @@
 {% macro forum_username(model_user, is_template=False) -%}
-{% if not is_template %}
+{% if not is_template -%}
 <a href="/{{ model_user.settings.slug }}" class="forum-username {% spaceless %}
     {% if model_user.is_superuser or model_user.is_staff %}
         is-admin
     {% endif %}
 {% endspaceless %}" data-slug="{{ model_user.settings.slug }}" data-toggle="username">
-    {{ model_user.username|escape }}
+    {{- model_user.username|escape -}}
 </a>
-{% else %}
+{%- else -%}
 <a href="" class="forum-username" data-slug="" data-toggle="username">
 </a>
-{% endif %}
+{%- endif %}
 {%- endmacro %}

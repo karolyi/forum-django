@@ -29,14 +29,14 @@ class TopicListingTestCase(TestCase):
         parser = self._get_parser(response=response)
         parser.assert_topic_listed(
             topic_type='highlighted',
-            name_contains='Highlighted topic 1 html name',
-            slug='highlighted-topic-1', username_contains='StaffUser',
+            topic_name='Highlighted topic 1 html name',
+            slug='highlighted-topic-1', username='StaffUser',
             total_comments=3,
             preview_contains='Highlighted topic html content id 7, a reply '
             'to 5')
         parser.assert_topic_listed(
-            topic_type='normal', name_contains='Normal topic 1 html name',
-            slug='normal-topic-1', username_contains='InactiveUser',
+            topic_type='normal', topic_name='Normal topic 1 html name',
+            slug='normal-topic-1', username='InactiveUser',
             total_comments=1,
             preview_contains='moved from staff html content id 3, a non-reply')
         parser.assert_topic_not_listed(topic_type='highlighted', slug='foo')
@@ -49,20 +49,20 @@ class TopicListingTestCase(TestCase):
         """
         parser = self._get_parser(response=response)
         parser.assert_topic_listed(
-            topic_type='normal', name_contains='Staff only topic 1 html name',
-            slug='staff-only-topic-1', username_contains='SuperUser',
+            topic_type='normal', topic_name='Staff only topic 1 html name',
+            slug='staff-only-topic-1', username='SuperUser',
             total_comments=4,
             preview_contains='fourth staff html content id 9, a reply to 2')
         parser.assert_topic_listed(
             topic_type='highlighted',
-            name_contains='Highlighted topic 1 html name',
-            slug='highlighted-topic-1', username_contains='StaffUser',
+            topic_name='Highlighted topic 1 html name',
+            slug='highlighted-topic-1', username='StaffUser',
             total_comments=3,
             preview_contains='Highlighted topic html content id 7, a reply '
             'to 5')
         parser.assert_topic_listed(
-            topic_type='normal', name_contains='Normal topic 1 html name',
-            slug='normal-topic-1', username_contains='InactiveUser',
+            topic_type='normal', topic_name='Normal topic 1 html name',
+            slug='normal-topic-1', username='InactiveUser',
             total_comments=1,
             preview_contains='moved from staff html content id 3, a non-reply')
         parser.assert_topic_not_listed(topic_type='highlighted', slug='foo')

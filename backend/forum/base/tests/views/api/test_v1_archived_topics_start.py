@@ -33,10 +33,9 @@ class V1ArchivedTopicStartTestCase(TestCase):
         parser = self._get_parser(response=response)
         parser.assert_topic_listed(
             topic_type='archived',
-            name_contains='Archived enabled non-staff topic 1 html name',
+            topic_name='Archived enabled non-staff topic 1 html name',
             slug='archived-enabled-non-staff-topic-1',
-            username_contains='SuperStaffUser',
-            total_comments=2,
+            username='SuperStaffUser', total_comments=2,
             preview_contains='Archived enabled non-staff second comment HTML')
         parser.assert_topic_not_listed(
             topic_type='archived', slug='archived-disabled-non-staff-topic-1')
@@ -57,10 +56,9 @@ class V1ArchivedTopicStartTestCase(TestCase):
         parser = self._get_parser(response=response)
         parser.assert_topic_listed(
             topic_type='archived',
-            name_contains='Archived enabled non-staff topic 1 html name',
+            topic_name='Archived enabled non-staff topic 1 html name',
             slug='archived-enabled-non-staff-topic-1',
-            username_contains='SuperStaffUser',
-            total_comments=2,
+            username='SuperStaffUser', total_comments=2,
             preview_contains='Archived enabled non-staff second comment HTML')
         parser.assert_topic_not_listed(
             topic_type='archived', slug='archived-disabled-non-staff-topic-1')
@@ -81,17 +79,15 @@ class V1ArchivedTopicStartTestCase(TestCase):
         parser = self._get_parser(response=response)
         parser.assert_topic_listed(
             topic_type='archived',
-            name_contains='Archived enabled non-staff topic 1 html name',
+            topic_name='Archived enabled non-staff topic 1 html name',
             slug='archived-enabled-non-staff-topic-1',
-            username_contains='SuperStaffUser',
-            total_comments=2,
+            username='SuperStaffUser', total_comments=2,
             preview_contains='Archived enabled non-staff second comment HTML')
         parser.assert_topic_listed(
             topic_type='archived',
-            name_contains='Archived enabled staff topic 1 html name',
+            topic_name='Archived enabled staff topic 1 html name',
             slug='archived-enabled-staff-topic-1',
-            username_contains='StaffUser',
-            total_comments=1,
+            username='StaffUser', total_comments=1,
             preview_contains='Archived enabled staff first comment HTML')
         parser.assert_topic_not_listed(
             topic_type='archived', slug='archived-disabled-non-staff-topic-1')
@@ -110,17 +106,15 @@ class V1ArchivedTopicStartTestCase(TestCase):
         parser = self._get_parser(response=response)
         parser.assert_topic_listed(
             topic_type='archived',
-            name_contains='Archived enabled non-staff topic 1 html name',
+            topic_name='Archived enabled non-staff topic 1 html name',
             slug='archived-enabled-non-staff-topic-1',
-            username_contains='SuperStaffUser',
-            total_comments=2,
+            username='SuperStaffUser', total_comments=2,
             preview_contains='Archived enabled non-staff second comment HTML')
         parser.assert_topic_listed(
             topic_type='archived',
-            name_contains='Archived enabled staff topic 1 html name',
+            topic_name='Archived enabled staff topic 1 html name',
             slug='archived-enabled-staff-topic-1',
-            username_contains='StaffUser',
-            total_comments=1,
+            username='StaffUser', total_comments=1,
             preview_contains='Archived enabled staff first comment HTML')
         parser.assert_topic_not_listed(
             topic_type='archived', slug='archived-disabled-non-staff-topic-1')

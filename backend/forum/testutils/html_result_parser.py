@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from bs4.element import Tag
 from django.http.response import HttpResponse
 from django.test import TestCase
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from forum.base.choices import LIST_TOPIC_TYPE
 
@@ -12,13 +13,6 @@ class HTMLParserMixin(object):
     """
     Tools for generic HTML parsing.
     """
-
-    def _get_inner_html(self, tag: Tag):
-        """
-        Return the `innerHTML` of a given passed content list (from a
-        `Tag`).
-        """
-        return ''.join(map(str, tag.contents))
 
 
 class HtmlResultParserBase(HTMLParserMixin):
@@ -57,6 +51,49 @@ class HtmlResultParserBase(HTMLParserMixin):
             template = self.soup.template
 
 
+class TimeParser(object):
+    """
+    Tester for a generated `time` tag.
+    """
+
+    def __init__(self, tag: Tag, test: TestCase):
+        self.tag = tag
+        self.test = test
+        self.test.assertIsInstance(obj=tag, cls=Tag)
+
+    def assert_value(self, value: str):
+        """
+        Assert that the `datetime` attribute has the passed value.
+        """
+        self.test.assertEqual(self.tag['datetime'], value, msg=_(
+            'Date element\'s datetime attribute has the wrong value'))
+
+
+class UserNameParser(object):
+    """
+    Tester for a generated forum username tag.
+    """
+
+    def __init__(self, tag: Tag, test: TestCase):
+        self.tag = tag
+        self.test = test
+        self.test.assertIsInstance(obj=tag, cls=Tag)
+
+    def assert_slug(self, value: str):
+        """
+        Assert that the slug in the username tag is the expected one.
+        """
+        self.test.assertEqual(self.tag['data-slug'], value, msg=_(
+            'Username has the wrong slug'))
+
+    def assert_text(self, value: str):
+        """
+        Assert that the username contains the expected value.
+        """
+        self.test.assertEqual(self.tag.decode_contents(), value, msg=_(
+            'Username has the wrong text'))
+
+
 class OneTopicCommentParser(HTMLParserMixin):
     """
     Functionality for testing out one rendered topic comment structure.
@@ -65,14 +102,122 @@ class OneTopicCommentParser(HTMLParserMixin):
     def __init__(self, comment: Tag, test: TestCase):
         self.comment = comment
         self.test = test
+        self._asserted_replies = []
+
+    @cached_property
+    def _comment_content(self) -> Tag:
+        """
+        Return the comment content tag.
+        """
+        comment_content = \
+            self.comment.find(name='div', class_='comment-content')
+        self.test.assertIsInstance(obj=comment_content, cls=Tag)
+        return comment_content
+
+    @cached_property
+    def _replies(self):
+        """
+        Return the replies to this comment in an array.
+        """
+        return self._comment_content.find_all(
+            name='div', class_='topic-comment-onereply', recursive=False)
+
+    @cached_property
+    def _reply_ids(self):
+        reply_ids = []
+        for reply in self._replies:  # type: Tag
+            link_to = int(reply.find(
+                name='a', class_='to-reply-comment')['data-link-to'])
+            reply_ids.append(link_to)
+        return reply_ids
 
     def assert_contains_content(self, content: str):
         """
         Assert that the comment contains the given content.
         """
-        inner_html = self._get_inner_html(
-            tag=self.comment.find(name='div', class_='comment-content'))
-        self.test.assertIn(member=content, container=inner_html)
+        self.test.assertIn(
+            member=content, container=self._comment_content.decode_contents())
+
+    def assert_no_previous(self):
+        """
+        Assert that a comment is not a reply to another one.
+        """
+
+        previous_wrapper = self.comment.find(
+            name='div', class_='comment-previous')
+        for item in previous_wrapper.children:
+            self.test.assertNotIsInstance(obj=item, cls=Tag, msg=_(
+                'HTML Tag found where none expected.'))
+
+    def assert_previous(
+            self, comment_id: int, user_slug: str=None, username: str=None):
+        """
+        Assert that a comment is not a reply to another one.
+        """
+
+        previous_wrapper = self.comment.find(
+            name='div', class_='comment-previous')  # type: Tag
+        previous_link = previous_wrapper.a  # type: Tag
+        self.test.assertIsInstance(obj=previous_link, cls=Tag)
+        self.test.assertEqual(int(previous_link['data-link-to']), comment_id)
+        user_parser = UserNameParser(
+            tag=previous_wrapper.find(name='a', class_='forum-username'),
+            test=self.test)
+        if user_slug is not None:
+            user_parser.assert_slug(value=user_slug)
+        if username is not None:
+            user_parser.assert_text(value=username)
+
+    def assert_reply(
+            self, comment_id: int, user_slug: str=None, username: str=None):
+        """
+        Assert that the comment has a reply by a given user slug and a
+        given comment id.
+        """
+        self.test.assertGreater(len(self._replies), 0, msg=_(
+            'Asserted a reply where there is none'))
+        for reply in self._replies:  # type: Tag
+            username_link = reply.find(name='a', class_='forum-username')
+            comment_link = reply.find(name='a', class_='to-reply-comment')
+            link_to = int(comment_link['data-link-to'])
+            if link_to == comment_id:
+                break
+        else:
+            self.fail(_(
+                'Reply with comment ID {comment_id} not found.').format(
+                comment_id=comment_id))
+        user_parser = UserNameParser(tag=username_link, test=self.test)
+        if user_slug is not None:
+            user_parser.assert_slug(value=user_slug)
+        if username is not None:
+            user_parser.assert_text(value=username)
+        self._asserted_replies.append(link_to)
+
+    def assert_no_replies(self):
+        """
+        Assert that there are no replies to this comment.
+        """
+        self.test.assertEqual(len(self._replies), 0, msg=_(
+            'Replies with ID {ids} found where none expected').format(
+            ids=','.join(map(str, self._reply_ids))))
+
+    def assert_replies_order(self):
+        """
+        Assert that the previously checked replies are in their check
+        order.
+        """
+        self.test.assertListEqual(
+            self._reply_ids, self._asserted_replies, msg=_(
+                'Asserted the second order, got the first'))
+
+    def assert_time(self, value: str):
+        """
+        Assert that the comment has the passed time identifier.
+        """
+        comment_time = self.comment.find(name='div', class_='comment-time')
+        time_parser = TimeParser(
+            tag=comment_time.time, test=self.test)
+        time_parser.assert_value(value=value)
 
 
 class CommentsPageParser(HtmlResultParserBase):
@@ -173,30 +318,28 @@ class TopicListingParser(HtmlResultParserBase):
         self.asserted_topic_slugs = {'archived': set()}
 
     def _assert_topic_properties(
-            self, topic: Tag, name_contains: str, username_contains: str,
+            self, topic: Tag, topic_name: str, username: str,
             total_comments: int) -> None:
         """
         Assert the properties of a certain found topic
         """
-        if name_contains is not None:
+        if topic_name is not None:
             # Assert the topic text
             topic_link = topic.find(class_='topic-link')  # type: Tag
-            inner_html = self._get_inner_html(tag=topic_link)
-            self.test.assertIn(
-                member=name_contains, container=inner_html, msg=_(
-                    'Listed topic name doesn\'t contain the expected '
-                    'string.'))
-        if username_contains is not None:
+            inner_html = topic_link.decode_contents()
+            self.test.assertEquals(
+                inner_html, topic_name, msg=_(
+                    'Listed topic name isn\'t the expected string.'))
+        if username is not None:
             # Assert the username text
-            user_link = topic.find(class_='forum-username')  # type: Tag
-            inner_html = self._get_inner_html(tag=user_link)
-            self.test.assertIn(
-                member=username_contains, container=inner_html, msg=_(
-                    'Listed user name doesn\'t contain the expected string.'))
+            user_parser = UserNameParser(
+                tag=topic.find(class_='forum-username'), test=self.test)
+            user_parser.assert_text(value=username)
         if total_comments is not None:
             # Assert the total comments number
-            comment_count_wrapper = topic.find(class_='topic-comment-count')
-            inner_html = self._get_inner_html(tag=comment_count_wrapper)
+            comment_count_wrapper = topic.find(
+                class_='topic-comment-count')  # type: Tag
+            inner_html = comment_count_wrapper.decode_contents()
             self.test.assertEqual(
                 int(inner_html), total_comments,
                 msg=_('Wrong number of comments found.'))
@@ -235,15 +378,15 @@ class TopicListingParser(HtmlResultParserBase):
         tooltip_template = self.soup.find(
             name='template', class_='forum-topic-tooltip-template',
             attrs={'data-slug': slug})  # type: Tag
-        tooltip_inner_html = self._get_inner_html(tag=tooltip_template.div)
+        tooltip_inner_html = tooltip_template.div.decode_contents()
         self.test.assertIn(
             member=preview_contains, container=tooltip_inner_html, msg=_(
                 'Tooltip for \'{slug}\' does not contain expected string.'
             ).format(slug=slug))
 
     def assert_topic_listed(
-            self, topic_type: str, slug: str, name_contains: str=None,
-            username_contains: str=None, total_comments: int=None,
+            self, topic_type: str, slug: str, topic_name: str=None,
+            username: str=None, total_comments: int=None,
             preview_contains: str=None) -> None:
         """
         Assert that a certain topic is listed within a certain category
@@ -257,8 +400,8 @@ class TopicListingParser(HtmlResultParserBase):
         # At this point we have found the topic
         topic = found_topics[0]
         self._assert_topic_properties(
-            topic=topic, name_contains=name_contains,
-            username_contains=username_contains, total_comments=total_comments)
+            topic=topic, topic_name=topic_name, username=username,
+            total_comments=total_comments)
         self._assert_preview_contains(
             slug=slug, preview_contains=preview_contains)
         self.asserted_topic_slugs[topic_type].add(slug)
