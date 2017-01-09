@@ -149,3 +149,21 @@
     ip: 127.0.0.1
     unique_id: 207
     images: []
+
+# - The ninth comment is a reply in another visible topic to the eight comment
+- model: forum_base.comment
+  pk: 208
+  fields:
+    user: 3 # StaffUser
+    topic: 201 # scenario-2-enabled-non-staff-topic-201
+    moved_from: null
+    time: '2017-01-06T20:09:38.540040+00:00'
+    number: 9
+    voting_value: 0
+    prev_comment: 207
+    content_md: comment ID 208 MD content
+    content_html: comment ID 208 HTML content
+    host: ''
+    ip: 127.0.0.1
+    unique_id: 208
+    images: []

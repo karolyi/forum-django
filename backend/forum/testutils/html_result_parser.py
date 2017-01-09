@@ -239,7 +239,7 @@ class OneTopicCommentParser(HTMLParserMixin):
             if link_to == comment_id:
                 break
         else:
-            self.fail(_(
+            self.test.fail(_(
                 'Reply with comment ID {comment_id} not found.').format(
                 comment_id=comment_id))
         if number is not None:
@@ -302,7 +302,7 @@ class CommentsPageParser(HtmlResultParserBase):
         super(CommentsPageParser, self).__init__(*args, **kwargs)
 
 
-class CommentsUpRecursiveParser(CommentsPageParser):
+class ExpandedThreadParser(CommentsPageParser):
     """
     Parsing the result of `comments_up_recursive` view.
     """
@@ -319,7 +319,8 @@ class CommentsUpRecursiveParser(CommentsPageParser):
         """
         comment_wrapper = self.soup.main.article.find(
             name='section', attrs={'data-comment-id': comment_id})
-        self.test.assertIs(type(comment_wrapper), Tag)
+        self.test.assertIs(type(comment_wrapper), Tag, msg=_(
+            'Comment with ID {id} not found').format(id=comment_id))
         self.rendered_comments[comment_id] = comment_wrapper
         self.last_cached_comment = comment_wrapper
         return OneTopicCommentParser(
