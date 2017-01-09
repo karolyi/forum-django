@@ -1,4 +1,5 @@
 from django.core.urlresolvers import reverse
+from django.http.response import HttpResponse
 from django.test import Client, TestCase
 from forum.testutils.html_result_parser import CommentsUpRecursiveParser
 
@@ -139,7 +140,7 @@ class BasicTestCase(TestCase):
         parser.assert_no_more_comments_and_order()
 
 
-class Scenario1TestCase(TestCase):
+class Scenario1Test1TestCase(TestCase):
     """
     Testing `expand_comments_up_recursive` with test scenario 1.
     """
@@ -149,16 +150,12 @@ class Scenario1TestCase(TestCase):
         'comment-tests-topics-scenario-1',
         'comment-tests-comments-scenario-1']
 
-    def test_shows_expansion_to_anon_properly(self):
+    def assert_flow_all_users_from_comment_100(self, response: HttpResponse):
         """
-        Should list the appropriate comment thread for `AnonymousUser`.
+        Assert that this scenario should result the same comments listed
+        for all the users (AnonymousUser, ValidUser, StaffUser,
+        SuperUser, SuperStaffUser).
         """
-        client = Client()
-        response = client.get(reverse(
-            viewname='forum:base:comments-up-recursive', kwargs={
-                'topic_slug': 'scenario-1-enabled-non-staff-topic-100',
-                'comment_id': 100,
-                'scroll_to_id': 100}))
         parser = CommentsUpRecursiveParser(test=self, response=response)
         # Check comment ID 101
         comment = parser.assert_and_return_commentid(comment_id=101)
@@ -180,3 +177,67 @@ class Scenario1TestCase(TestCase):
         comment.assert_replies_order()
 
         parser.assert_no_more_comments_and_order()
+
+    def test_shows_expansion_to_anon_properly(self):
+        """
+        Should list the appropriate comment thread for `AnonymousUser`.
+        """
+        client = Client()
+        response = client.get(reverse(
+            viewname='forum:base:comments-up-recursive', kwargs={
+                'topic_slug': 'scenario-1-enabled-non-staff-topic-100',
+                'comment_id': 100,
+                'scroll_to_id': 100}))
+        self.assert_flow_all_users_from_comment_100(response=response)
+
+    def test_shows_expansion_to_validuser_properly(self):
+        """
+        Should list the appropriate comment thread for `ValidUser`.
+        """
+        client = Client()
+        client.login(username='ValidUser', password='ValidPassword')
+        response = client.get(reverse(
+            viewname='forum:base:comments-up-recursive', kwargs={
+                'topic_slug': 'scenario-1-enabled-non-staff-topic-100',
+                'comment_id': 100,
+                'scroll_to_id': 100}))
+        self.assert_flow_all_users_from_comment_100(response=response)
+
+    def test_shows_expansion_to_staffuser_properly(self):
+        """
+        Should list the appropriate comment thread for `StaffUser`.
+        """
+        client = Client()
+        client.login(username='StaffUser', password='ValidPassword')
+        response = client.get(reverse(
+            viewname='forum:base:comments-up-recursive', kwargs={
+                'topic_slug': 'scenario-1-enabled-non-staff-topic-100',
+                'comment_id': 100,
+                'scroll_to_id': 100}))
+        self.assert_flow_all_users_from_comment_100(response=response)
+
+    def test_shows_expansion_to_superuser_properly(self):
+        """
+        Should list the appropriate comment thread for `SuperUser`.
+        """
+        client = Client()
+        client.login(username='SuperUser', password='ValidPassword')
+        response = client.get(reverse(
+            viewname='forum:base:comments-up-recursive', kwargs={
+                'topic_slug': 'scenario-1-enabled-non-staff-topic-100',
+                'comment_id': 100,
+                'scroll_to_id': 100}))
+        self.assert_flow_all_users_from_comment_100(response=response)
+
+    def test_shows_expansion_to_superstaffuser_properly(self):
+        """
+        Should list the appropriate comment thread for `SuperStaffUser`.
+        """
+        client = Client()
+        client.login(username='SuperStaffUser', password='ValidPassword')
+        response = client.get(reverse(
+            viewname='forum:base:comments-up-recursive', kwargs={
+                'topic_slug': 'scenario-1-enabled-non-staff-topic-100',
+                'comment_id': 100,
+                'scroll_to_id': 100}))
+        self.assert_flow_all_users_from_comment_100(response=response)
