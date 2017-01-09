@@ -443,6 +443,7 @@ class Scenario2Test1TestCase(TestCase):
         parser = CommentsUpRecursiveParser(test=self, response=response)
         # Check comment ID 201
         comment_201 = parser.assert_and_return_commentid(comment_id=201)
+        comment_201.assert_number(number=2)
         comment_201.assert_user(
             user_slug='inactiveuser', username='InactiveUser')
         comment_201.assert_contains_content(
@@ -455,6 +456,7 @@ class Scenario2Test1TestCase(TestCase):
         comment_201.assert_no_replies()
         # Check comment ID 200
         comment_200 = parser.assert_and_return_commentid(comment_id=200)
+        comment_200.assert_number(number=1)
         comment_200.assert_user(
             user_slug='banneduser', username='Banned&gt;User')
         comment_200.assert_contains_content(
@@ -483,6 +485,7 @@ class Scenario2Test1TestCase(TestCase):
         parser = CommentsUpRecursiveParser(test=self, response=response)
         # Check comment ID 207
         comment_207 = parser.assert_and_return_commentid(comment_id=207)
+        comment_207.assert_number(number=8)
         comment_207.assert_user(
             user_slug='inactiveuser', username='InactiveUser')
         comment_207.assert_previous(
@@ -495,6 +498,8 @@ class Scenario2Test1TestCase(TestCase):
         comment_207.assert_no_replies()
         # Check comment ID 206
         comment_206 = parser.assert_and_return_commentid(comment_id=206)
+        comment_206.assert_number(number=7)
+        comment_206.assert_number(number=7)
         comment_206.assert_user(user_slug='validuser', username='ValidUser')
         comment_206.assert_previous(
             comment_id=204, user_slug='superstaffuser',
@@ -506,6 +511,7 @@ class Scenario2Test1TestCase(TestCase):
         comment_206.assert_no_replies()
         # Check comment ID 205
         comment_205 = parser.assert_and_return_commentid(comment_id=205)
+        comment_205.assert_number(number=6)
         comment_205.assert_user(
             user_slug='banneduser', username='Banned&gt;User')
         comment_205.assert_previous(
@@ -518,6 +524,7 @@ class Scenario2Test1TestCase(TestCase):
         comment_205.assert_no_replies()
         # Check comment ID 204
         comment_204 = parser.assert_and_return_commentid(comment_id=204)
+        comment_204.assert_number(number=5)
         comment_204.assert_user(
             user_slug='superstaffuser', username='SuperStaffUser')
         comment_204.assert_previous(
@@ -536,6 +543,7 @@ class Scenario2Test1TestCase(TestCase):
         comment_204.assert_replies_order()
         # Check comment ID 203
         comment_203 = parser.assert_and_return_commentid(comment_id=203)
+        comment_203.assert_number(number=4)
         comment_203.assert_user(user_slug='superuser', username='SuperUser')
         comment_203.assert_previous(
             comment_id=202, user_slug='staffuser',
@@ -547,6 +555,7 @@ class Scenario2Test1TestCase(TestCase):
         comment_203.assert_no_replies()
         # Check comment ID 202
         comment_202 = parser.assert_and_return_commentid(comment_id=202)
+        comment_202.assert_number(number=3)
         comment_202.assert_user(user_slug='staffuser', username='StaffUser')
         comment_202.assert_previous(
             comment_id=200, user_slug='banneduser',
@@ -563,6 +572,7 @@ class Scenario2Test1TestCase(TestCase):
         comment_202.assert_replies_order()
         # Check comment ID 201
         comment_201 = parser.assert_and_return_commentid(comment_id=201)
+        comment_201.assert_number(number=2)
         comment_201.assert_user(
             user_slug='inactiveuser', username='InactiveUser')
         comment_201.assert_contains_content(
@@ -570,11 +580,12 @@ class Scenario2Test1TestCase(TestCase):
         comment_201.assert_time(value='2017-01-06T20:02:38.540040+00:00')
         comment_201.assert_vote_value(value=0)
         comment_201.assert_previous(
-            comment_id=200, user_slug='banneduser',
-            username='Banned&gt;User')
+            comment_id=200, user_slug='banneduser', username='Banned&gt;User',
+            number=1)
         comment_201.assert_no_replies()
         # Check comment ID 200
         comment_200 = parser.assert_and_return_commentid(comment_id=200)
+        comment_200.assert_number(number=1)
         comment_200.assert_user(
             user_slug='banneduser', username='Banned&gt;User')
         comment_200.assert_contains_content(
@@ -585,7 +596,8 @@ class Scenario2Test1TestCase(TestCase):
         comment_200.assert_reply(
             comment_id=202, user_slug='staffuser', username='StaffUser')
         comment_200.assert_reply(
-            comment_id=201, user_slug='inactiveuser', username='InactiveUser')
+            comment_id=201, user_slug='inactiveuser', username='InactiveUser',
+            number=2)
         comment_200.assert_replies_order()
         # Finishing parser assertions
         parser.assert_same_topicgroup_tag(

@@ -148,6 +148,23 @@ class OneTopicCommentParser(HTMLParserMixin):
         return _(
             '<OneTopicCommentParser with comment ID {id}>').format(id=self._id)
 
+    def assert_number(self, number: int):
+        """
+        Assert that the comment ID is the expected one.
+        """
+        comment_number_wrapper = self.comment.find(
+            name='div', class_='comment-number-wrapper')  # type: Tag
+        self.test.assertIsInstance(obj=comment_number_wrapper, cls=Tag, msg=_(
+            'Wrapper for the comment number not found'))
+        comment_link = comment_number_wrapper.a.span  # type: Tag
+        self.test.assertIsInstance(obj=comment_link, cls=Tag, msg=_(
+            'Comment number link not found'))
+        content = comment_link.decode_contents()
+        comment_number = '#{value}'.format(value=number)
+        content = '#{content}'.format(content=content)
+        self.test.assertEqual(content, comment_number, msg=_(
+            'Comment number is not the expected'))
+
     def assert_user(self, user_slug: str, username: str=None):
         """
         Assert that the poster is the expected username.
@@ -180,7 +197,8 @@ class OneTopicCommentParser(HTMLParserMixin):
                 'HTML Tag found where none expected.'))
 
     def assert_previous(
-            self, comment_id: int, user_slug: str=None, username: str=None):
+            self, comment_id: int, user_slug: str=None, username: str=None,
+            number: int=None):
         """
         Assert that a comment is not a reply to another one.
         """
@@ -193,6 +211,12 @@ class OneTopicCommentParser(HTMLParserMixin):
         self.test.assertEqual(
             int(previous_link['data-link-to']), comment_id, msg=_(
                 'Previous comment ID differs from expected'))
+        if number is not None:
+            content = previous_link.decode_contents()
+            prev_number = content[content.rfind('#'):]
+            str_number = '#{number}'.format(number=number)
+            self.test.assertEqual(prev_number, str_number, msg=_(
+                'Previous comment number differs from expected'))
         user_parser = UserNameParser(
             tag=previous_wrapper.find(name='a', class_='forum-username'),
             test=self.test)
@@ -200,7 +224,8 @@ class OneTopicCommentParser(HTMLParserMixin):
         user_parser.assert_text(value=username)
 
     def assert_reply(
-            self, comment_id: int, user_slug: str=None, username: str=None):
+            self, comment_id: int, user_slug: str=None, username: str=None,
+            number: int=None):
         """
         Assert that the comment has a reply by a given user slug and a
         given comment id.
@@ -217,6 +242,12 @@ class OneTopicCommentParser(HTMLParserMixin):
             self.fail(_(
                 'Reply with comment ID {comment_id} not found.').format(
                 comment_id=comment_id))
+        if number is not None:
+            content = comment_link.span.decode_contents()
+            content = '#{content}'.format(content=content)
+            str_number = '#{number}'.format(number=number)
+            self.test.assertEqual(content, str_number, msg=_(
+                'Reply comment number differs from expected'))
         user_parser = UserNameParser(tag=username_link, test=self.test)
         user_parser.assert_slug(value=user_slug)
         user_parser.assert_text(value=username)
