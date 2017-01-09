@@ -80,19 +80,21 @@ class UserNameParser(object):
         self.test = test
         self.test.assertIsInstance(obj=tag, cls=Tag)
 
-    def assert_slug(self, value: str):
+    def assert_slug(self, value: str=None):
         """
         Assert that the slug in the username tag is the expected one.
         """
-        self.test.assertEqual(self.tag['data-slug'], value, msg=_(
-            'Username has the wrong slug'))
+        if value is not None:
+            self.test.assertEqual(self.tag['data-slug'], value, msg=_(
+                'Username has the wrong slug'))
 
-    def assert_text(self, value: str):
+    def assert_text(self, value: str=None):
         """
         Assert that the username contains the expected value.
         """
-        self.test.assertEqual(self.tag.decode_contents(), value, msg=_(
-            'Username has the wrong text'))
+        if value is not None:
+            self.test.assertEqual(self.tag.decode_contents(), value, msg=_(
+                'Username has the wrong text'))
 
 
 class OneTopicCommentParser(HTMLParserMixin):
@@ -132,6 +134,33 @@ class OneTopicCommentParser(HTMLParserMixin):
             reply_ids.append(link_to)
         return reply_ids
 
+    @cached_property
+    def _id(self) -> int:
+        """
+        Return the ID of the rendered comment.
+        """
+        return int(self.comment['data-comment-id'])
+
+    def __str__(self):
+        """
+        Return a readable name.
+        """
+        return _(
+            '<OneTopicCommentParser with comment ID {id}>').format(id=self._id)
+
+    def assert_user(self, user_slug: str, username: str=None):
+        """
+        Assert that the poster is the expected username.
+        """
+        commenter_wrapper = self.comment.find(
+            name='div', class_='commenter-user')  # type: Tag
+        self.test.assertIsInstance(obj=commenter_wrapper, cls=Tag, msg=_(
+            'Commenter wrapper HTML Tag not found.'))
+        username_parser = UserNameParser(
+            tag=commenter_wrapper.a, test=self.test)
+        username_parser.assert_slug(value=user_slug)
+        username_parser.assert_text(value=username)
+
     def assert_contains_content(self, content: str):
         """
         Assert that the comment contains the given content.
@@ -164,10 +193,8 @@ class OneTopicCommentParser(HTMLParserMixin):
         user_parser = UserNameParser(
             tag=previous_wrapper.find(name='a', class_='forum-username'),
             test=self.test)
-        if user_slug is not None:
-            user_parser.assert_slug(value=user_slug)
-        if username is not None:
-            user_parser.assert_text(value=username)
+        user_parser.assert_slug(value=user_slug)
+        user_parser.assert_text(value=username)
 
     def assert_reply(
             self, comment_id: int, user_slug: str=None, username: str=None):
@@ -188,10 +215,8 @@ class OneTopicCommentParser(HTMLParserMixin):
                 'Reply with comment ID {comment_id} not found.').format(
                 comment_id=comment_id))
         user_parser = UserNameParser(tag=username_link, test=self.test)
-        if user_slug is not None:
-            user_parser.assert_slug(value=user_slug)
-        if username is not None:
-            user_parser.assert_text(value=username)
+        user_parser.assert_slug(value=user_slug)
+        user_parser.assert_text(value=username)
         self._asserted_replies.append(link_to)
 
     def assert_no_replies(self):
@@ -287,6 +312,56 @@ class CommentsUpRecursiveParser(CommentsPageParser):
             id_list, list(self.rendered_comments.keys()), msg=_(
                 'Expected the order of IDs to be the first, got the second'))
 
+    def _get_topic_group_wrappers(
+            self, first: OneTopicCommentParser, second: OneTopicCommentParser):
+        """
+        Extract the topic group wrappers from two given comments.
+        """
+        parents = []
+        for item in [first, second]:
+            for parent in item.comment.parents:
+                if 'group-comments-in-topic' in parent.get('class', []):
+                    parents.append(parent)
+                    break
+            else:
+                self.test.fail(msg=_(
+                    'Topic wrapper not found for comment ID {comment_id}'
+                ).format(comment_id=item._id))
+        return parents
+
+    def assert_same_topicgroup(
+            self, first: OneTopicCommentParser, second: OneTopicCommentParser):
+        """
+        Assert that the topic group wrappers are the same `Tag`s for the
+        two passed `OneTopicCommentParser` classes.
+        """
+        parents = self._get_topic_group_wrappers(first=first, second=second)
+        if parents[0] != parents[1]:
+            self.test.fail(msg=_(
+                'Parents for {first} and {second} expected to be the same but '
+                'they aren\'t').format(
+                first=first, second=second))
+
+    def assert_not_same_topicgroup(
+            self, first: OneTopicCommentParser, second: OneTopicCommentParser):
+        """
+        Assert that the passed comments are rendered in different topic
+        group wrappers.
+        """
+        parents = self._get_topic_group_wrappers(first=first, second=second)
+        slug_1 = parents[0]['data-topic-slug']
+        if parents[0] == parents[1]:
+            self.test.fail(msg=_(
+                'Parents for {first} and {second} expected to be different '
+                'but they are the same HTML Tag with slug: {slug}').format(
+                first=first, second=second, slug=slug_1))
+        slug_2 = parents[1]['data-topic-slug']
+        if slug_1 == slug_2:
+            self.test.fail(msg=_(
+                'Parents for {first} and {second} expected to be different '
+                'Tags, they are but group the same topic: {slug}').format(
+                first=first, second=second, slug=slug_1))
+
 
 class TopicListingParser(HtmlResultParserBase):
     """
@@ -304,12 +379,11 @@ class TopicListingParser(HtmlResultParserBase):
         self.listed_topics = {
             topic_type: [] for topic_type in LIST_TOPIC_TYPE}
         for topic_type in LIST_TOPIC_TYPE:
-            self.listed_topics[topic_type] = \
-                self.soup.main.find(
-                    name='div',
-                    class_='topic-type-{topic_type}'.format(
-                        topic_type=topic_type)).find_all(
-                    name='div', class_='topic-list-item-row')
+            self.listed_topics[topic_type] = self.soup.main.find(
+                name='div',
+                class_='topic-type-{topic_type}'.format(
+                    topic_type=topic_type)).find_all(
+                name='div', class_='topic-list-item-row')
         self.asserted_topic_slugs = {
             topic_type: set() for topic_type in LIST_TOPIC_TYPE}
 

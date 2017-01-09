@@ -216,7 +216,7 @@ class Scenario1Test1TestCase(TestCase):
         comment.assert_reply(
             comment_id=101, user_slug='inactiveuser', username='InactiveUser')
         comment.assert_replies_order()
-
+        # Finish parsing
         parser.assert_no_more_comments_and_order()
 
     def test_shows_expansion_to_anon_properly(self):
@@ -282,3 +282,133 @@ class Scenario1Test1TestCase(TestCase):
                 'comment_id': 100,
                 'scroll_to_id': 100}))
         self.assert_flow_all_users_from_comment_100(response=response)
+
+
+class Scenario1Test2TestCase(TestCase):
+    """
+    Testing `expand_comments_up_recursive` with test scenario 2,
+    testing expansion from comment 103.
+    """
+
+    fixtures = [
+        'topic-tests-user',
+        'comment-tests-topics-scenario-1',
+        'comment-tests-comments-scenario-1']
+
+    def assert_only_one_comment_visible(self, client: Client):
+        """
+        Assert what we created this scenario for: only one comment
+        should be rendered for everyone.
+        """
+        response = client.get(reverse(
+            viewname='forum:base:comments-up-recursive', kwargs={
+                'topic_slug': 'scenario-1-enabled-non-staff-topic-101',
+                'comment_id': 103,
+                'scroll_to_id': 103}))
+        parser = CommentsUpRecursiveParser(test=self, response=response)
+        # Check comment ID 101
+        comment = parser.assert_and_return_commentid(comment_id=103)
+        comment.assert_contains_content(content='comment ID 103 HTML content')
+        comment.assert_time(value='2017-01-05T20:04:38.540040+00:00')
+        comment.assert_vote_value(value=2)
+        comment.assert_no_previous()
+        comment.assert_no_replies()
+        comment.assert_replies_order()
+        # Finish parsing
+        parser.assert_no_more_comments_and_order()
+
+    def test_only_one_comment_visible(self):
+        """
+        Should expand only one comment in the thread since there are
+        no more replies.
+        """
+        usertypes = [
+            '', 'ValidUser', 'StaffUser', 'SuperUser', 'SuperStaffUser']
+        for username in usertypes:
+            client = Client()
+            if username != '':
+                client.login(username=username, password='ValidPassword')
+            self.assert_only_one_comment_visible(client=client)
+
+
+class Scenario1Test3TestCase(TestCase):
+    """
+    Testing `expand_comments_up_recursive` with test scenario 3,
+    testing expansion from comment 104.
+    """
+
+    fixtures = [
+        'topic-tests-user',
+        'comment-tests-topics-scenario-1',
+        'comment-tests-comments-scenario-1']
+
+    def assert_same_for_everyone(self, client: Client):
+        """
+        Should render the right amount and the right format of comments
+        for everyone.
+        """
+        client = Client()
+        client.login(username='SuperUser', password='ValidPassword')
+        response = client.get(reverse(
+            viewname='forum:base:comments-up-recursive', kwargs={
+                'topic_slug': 'scenario-1-enabled-non-staff-topic-100',
+                'comment_id': 104,
+                'scroll_to_id': 104}))
+        parser = CommentsUpRecursiveParser(test=self, response=response)
+        # Check comment ID 107
+        comment_107 = parser.assert_and_return_commentid(comment_id=107)
+        comment_107.assert_user(
+            user_slug='inactiveuser', username='InactiveUser')
+        comment_107.assert_contains_content(
+            content='comment ID 107 HTML content')
+        comment_107.assert_time(value='2017-01-05T20:08:38.540040+00:00')
+        comment_107.assert_vote_value(value=1)
+        comment_107.assert_previous(
+            comment_id=104, user_slug='superstaffuser',
+            username='SuperStaffUser')
+        comment_107.assert_no_replies()
+        # Check comment ID 105
+        comment_105 = parser.assert_and_return_commentid(comment_id=105)
+        comment_105.assert_user(
+            user_slug='banneduser', username='Banned&gt;User')
+        comment_105.assert_contains_content(
+            content='comment ID 105 HTML content')
+        comment_105.assert_time(value='2017-01-05T20:06:38.540040+00:00')
+        comment_105.assert_vote_value(value=1)
+        comment_105.assert_previous(
+            comment_id=104, user_slug='superstaffuser',
+            username='SuperStaffUser')
+        comment_105.assert_no_replies()
+        # Check comment ID 104
+        comment_104 = parser.assert_and_return_commentid(comment_id=104)
+        comment_104.assert_user(
+            user_slug='superstaffuser', username='SuperStaffUser')
+        comment_104.assert_contains_content(
+            content='comment ID 104 HTML content')
+        comment_104.assert_time(value='2017-01-05T20:05:38.540040+00:00')
+        comment_104.assert_vote_value(value=0)
+        comment_104.assert_no_previous()
+        comment_104.assert_reply(
+            comment_id=107, user_slug='inactiveuser', username='InactiveUser')
+        comment_104.assert_reply(
+            comment_id=105, user_slug='banneduser', username='Banned&gt;User')
+        comment_104.assert_replies_order()
+        # Check if comments belong to the expected topic group Tag
+        parser.assert_same_topicgroup(first=comment_105, second=comment_104)
+        parser.assert_not_same_topicgroup(
+            first=comment_107, second=comment_104)
+        # Finish parsing
+        parser.assert_no_more_comments_and_order()
+
+    def test_renders_properly_for_everyone(self):
+        """
+        Should render the same thread and the same format of comments
+        for everyone in this scenario.
+        """
+        usertypes = [
+            '', 'ValidUser', 'StaffUser', 'SuperUser', 'SuperStaffUser']
+        for username in usertypes:
+            client = Client()
+            if username != '':
+                client.login(username=username, password='ValidPassword')
+            self.assert_same_for_everyone(client=client)

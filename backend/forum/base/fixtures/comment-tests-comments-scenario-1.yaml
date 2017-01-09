@@ -65,7 +65,7 @@
     moved_from: null
     time: '2017-01-05T20:04:38.540040+00:00'
     number: 4
-    voting_value: 0
+    voting_value: 2
     prev_comment: 102
     content_md: comment ID 103 MD content
     content_html: comment ID 103 HTML content
@@ -98,7 +98,7 @@
 - model: forum_base.comment
   pk: 105
   fields:
-    user: 6 # BannedUSer
+    user: 6 # Banned>User
     topic: 100 # scenario-1-enabled-non-staff-topic-100
     moved_from: 102
     time: '2017-01-05T20:06:38.540040+00:00'

@@ -51,6 +51,7 @@ TEMPLATES = [
                 'webpack_loader.contrib.jinja2ext.WebpackExtension',
                 'jinja2.ext.with_',
                 'jinja2.ext.i18n',
+                'jinja2.ext.do',
                 'forum.jinja2.SpacelessExtension',
                 'forum.jinja2.ForumToolsExtension',
                 'forum.jinja2.JsMinExtension',
