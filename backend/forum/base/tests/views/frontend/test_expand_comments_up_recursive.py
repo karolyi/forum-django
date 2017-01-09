@@ -182,7 +182,7 @@ class BasicTestCase(TestCase):
 
 class Scenario1Test1TestCase(TestCase):
     """
-    Testing `expand_comments_up_recursive` with test scenario 1,
+    Testing `expand_comments_up_recursive` with test scenario 1-1,
     testing expansion from comment 100.
     """
 
@@ -199,24 +199,28 @@ class Scenario1Test1TestCase(TestCase):
         """
         parser = CommentsUpRecursiveParser(test=self, response=response)
         # Check comment ID 101
-        comment = parser.assert_and_return_commentid(comment_id=101)
-        comment.assert_contains_content(content='comment ID 101 HTML content')
-        comment.assert_time(value='2017-01-05T20:02:38.540040+00:00')
-        comment.assert_vote_value(value=0)
-        comment.assert_previous(
+        comment_101 = parser.assert_and_return_commentid(comment_id=101)
+        comment_101.assert_contains_content(
+            content='comment ID 101 HTML content')
+        comment_101.assert_time(value='2017-01-05T20:02:38.540040+00:00')
+        comment_101.assert_vote_value(value=0)
+        comment_101.assert_previous(
             comment_id=100, user_slug='banneduser', username='Banned&gt;User')
-        comment.assert_no_replies()
-        comment.assert_replies_order()
+        comment_101.assert_no_replies()
+        comment_101.assert_replies_order()
         # Check comment ID 100
-        comment = parser.assert_and_return_commentid(comment_id=100)
-        comment.assert_contains_content(content='comment ID 100 HTML content')
-        comment.assert_time(value='2017-01-05T20:01:38.540040+00:00')
-        comment.assert_vote_value(value=0)
-        comment.assert_no_previous()
-        comment.assert_reply(
+        comment_100 = parser.assert_and_return_commentid(comment_id=100)
+        comment_100.assert_contains_content(
+            content='comment ID 100 HTML content')
+        comment_100.assert_time(value='2017-01-05T20:01:38.540040+00:00')
+        comment_100.assert_vote_value(value=0)
+        comment_100.assert_no_previous()
+        comment_100.assert_reply(
             comment_id=101, user_slug='inactiveuser', username='InactiveUser')
-        comment.assert_replies_order()
+        comment_100.assert_replies_order()
         # Finish parsing
+        parser.assert_same_topicgroup_tag(
+            first=comment_101, second=comment_100)
         parser.assert_no_more_comments_and_order()
 
     def test_shows_expansion_to_anon_properly(self):
@@ -286,7 +290,7 @@ class Scenario1Test1TestCase(TestCase):
 
 class Scenario1Test2TestCase(TestCase):
     """
-    Testing `expand_comments_up_recursive` with test scenario 2,
+    Testing `expand_comments_up_recursive` with test scenario 1-2,
     testing expansion from comment 103.
     """
 
@@ -333,7 +337,7 @@ class Scenario1Test2TestCase(TestCase):
 
 class Scenario1Test3TestCase(TestCase):
     """
-    Testing `expand_comments_up_recursive` with test scenario 3,
+    Testing `expand_comments_up_recursive` with test scenario 1-3,
     testing expansion from comment 104.
     """
 
@@ -394,8 +398,9 @@ class Scenario1Test3TestCase(TestCase):
             comment_id=105, user_slug='banneduser', username='Banned&gt;User')
         comment_104.assert_replies_order()
         # Check if comments belong to the expected topic group Tag
-        parser.assert_same_topicgroup(first=comment_105, second=comment_104)
-        parser.assert_not_same_topicgroup(
+        parser.assert_same_topicgroup_tag(
+            first=comment_105, second=comment_104)
+        parser.assert_different_topicgroup(
             first=comment_107, second=comment_104)
         # Finish parsing
         parser.assert_no_more_comments_and_order()
@@ -412,3 +417,211 @@ class Scenario1Test3TestCase(TestCase):
             if username != '':
                 client.login(username=username, password='ValidPassword')
             self.assert_same_for_everyone(client=client)
+
+
+class Scenario2Test1TestCase(TestCase):
+    """
+    Testing `expand_comments_up_recursive` with test scenario 2-1,
+    testing expansion from comment 200.
+    """
+
+    fixtures = [
+        'topic-tests-user',
+        'comment-tests-topics-scenario-2',
+        'comment-tests-comments-scenario-2']
+
+    def assert_visibility_for_non_admin(self, client: Client):
+        """
+        Non-admin (`AnonymousUser`, `ValidUser`) should not see staff
+        topics in thread expansion.
+        """
+        response = client.get(reverse(
+            viewname='forum:base:comments-up-recursive', kwargs={
+                'topic_slug': 'scenario-2-enabled-non-staff-topic-200',
+                'comment_id': 200,
+                'scroll_to_id': 200}))
+        parser = CommentsUpRecursiveParser(test=self, response=response)
+        # Check comment ID 201
+        comment_201 = parser.assert_and_return_commentid(comment_id=201)
+        comment_201.assert_user(
+            user_slug='inactiveuser', username='InactiveUser')
+        comment_201.assert_contains_content(
+            content='comment ID 201 HTML content')
+        comment_201.assert_time(value='2017-01-06T20:02:38.540040+00:00')
+        comment_201.assert_vote_value(value=0)
+        comment_201.assert_previous(
+            comment_id=200, user_slug='banneduser',
+            username='Banned&gt;User')
+        comment_201.assert_no_replies()
+        # Check comment ID 200
+        comment_200 = parser.assert_and_return_commentid(comment_id=200)
+        comment_200.assert_user(
+            user_slug='banneduser', username='Banned&gt;User')
+        comment_200.assert_contains_content(
+            content='comment ID 200 HTML content')
+        comment_200.assert_time(value='2017-01-06T20:01:38.540040+00:00')
+        comment_200.assert_vote_value(value=0)
+        comment_200.assert_no_previous()
+        comment_200.assert_reply(
+            comment_id=201, user_slug='inactiveuser', username='InactiveUser')
+        comment_200.assert_replies_order()
+        # Finishing parser assertions
+        parser.assert_same_topicgroup_tag(
+            first=comment_201, second=comment_200)
+        parser.assert_no_more_comments_and_order()
+
+    def assert_visibility_for_admin(self, client: Client):
+        """
+        Admin (`StaffUser`, `SuperUser`, `SuperStaffUser`) should see
+        staff topics in thread expansion.
+        """
+        response = client.get(reverse(
+            viewname='forum:base:comments-up-recursive', kwargs={
+                'topic_slug': 'scenario-2-enabled-non-staff-topic-200',
+                'comment_id': 200,
+                'scroll_to_id': 200}))
+        parser = CommentsUpRecursiveParser(test=self, response=response)
+        # Check comment ID 207
+        comment_207 = parser.assert_and_return_commentid(comment_id=207)
+        comment_207.assert_user(
+            user_slug='inactiveuser', username='InactiveUser')
+        comment_207.assert_previous(
+            comment_id=204, user_slug='superstaffuser',
+            username='SuperStaffUser')
+        comment_207.assert_time(value='2017-01-06T20:08:38.540040+00:00')
+        comment_207.assert_vote_value(value=1)
+        comment_207.assert_contains_content(
+            content='comment ID 207 HTML content')
+        comment_207.assert_no_replies()
+        # Check comment ID 206
+        comment_206 = parser.assert_and_return_commentid(comment_id=206)
+        comment_206.assert_user(user_slug='validuser', username='ValidUser')
+        comment_206.assert_previous(
+            comment_id=204, user_slug='superstaffuser',
+            username='SuperStaffUser')
+        comment_206.assert_time(value='2017-01-06T20:07:38.540040+00:00')
+        comment_206.assert_vote_value(value=1)
+        comment_206.assert_contains_content(
+            content='comment ID 206 STAFF HTML content')
+        comment_206.assert_no_replies()
+        # Check comment ID 205
+        comment_205 = parser.assert_and_return_commentid(comment_id=205)
+        comment_205.assert_user(
+            user_slug='banneduser', username='Banned&gt;User')
+        comment_205.assert_previous(
+            comment_id=204, user_slug='superstaffuser',
+            username='SuperStaffUser')
+        comment_205.assert_time(value='2017-01-06T20:06:38.540040+00:00')
+        comment_205.assert_vote_value(value=1)
+        comment_205.assert_contains_content(
+            content='comment ID 205 HTML content')
+        comment_205.assert_no_replies()
+        # Check comment ID 204
+        comment_204 = parser.assert_and_return_commentid(comment_id=204)
+        comment_204.assert_user(
+            user_slug='superstaffuser', username='SuperStaffUser')
+        comment_204.assert_previous(
+            comment_id=202, user_slug='staffuser',
+            username='StaffUser')
+        comment_204.assert_time(value='2017-01-06T20:05:38.540040+00:00')
+        comment_204.assert_vote_value(value=0)
+        comment_204.assert_contains_content(
+            content='comment ID 204 HTML content')
+        comment_204.assert_reply(
+            comment_id=207, user_slug='inactiveuser', username='InactiveUser')
+        comment_204.assert_reply(
+            comment_id=206, user_slug='validuser', username='ValidUser')
+        comment_204.assert_reply(
+            comment_id=205, user_slug='banneduser', username='Banned&gt;User')
+        comment_204.assert_replies_order()
+        # Check comment ID 203
+        comment_203 = parser.assert_and_return_commentid(comment_id=203)
+        comment_203.assert_user(user_slug='superuser', username='SuperUser')
+        comment_203.assert_previous(
+            comment_id=202, user_slug='staffuser',
+            username='StaffUser')
+        comment_203.assert_time(value='2017-01-06T20:04:38.540040+00:00')
+        comment_203.assert_vote_value(value=-3)
+        comment_203.assert_contains_content(
+            content='comment ID 203 HTML content')
+        comment_203.assert_no_replies()
+        # Check comment ID 202
+        comment_202 = parser.assert_and_return_commentid(comment_id=202)
+        comment_202.assert_user(user_slug='staffuser', username='StaffUser')
+        comment_202.assert_previous(
+            comment_id=200, user_slug='banneduser',
+            username='Banned&gt;User')
+        comment_202.assert_time(value='2017-01-06T20:03:38.540040+00:00')
+        comment_202.assert_vote_value(value=0)
+        comment_202.assert_contains_content(
+            content='comment ID 202 STAFF HTML content')
+        comment_202.assert_reply(
+            comment_id=204, user_slug='superstaffuser',
+            username='SuperStaffUser')
+        comment_202.assert_reply(
+            comment_id=203, user_slug='superuser', username='SuperUser')
+        comment_202.assert_replies_order()
+        # Check comment ID 201
+        comment_201 = parser.assert_and_return_commentid(comment_id=201)
+        comment_201.assert_user(
+            user_slug='inactiveuser', username='InactiveUser')
+        comment_201.assert_contains_content(
+            content='comment ID 201 HTML content')
+        comment_201.assert_time(value='2017-01-06T20:02:38.540040+00:00')
+        comment_201.assert_vote_value(value=0)
+        comment_201.assert_previous(
+            comment_id=200, user_slug='banneduser',
+            username='Banned&gt;User')
+        comment_201.assert_no_replies()
+        # Check comment ID 200
+        comment_200 = parser.assert_and_return_commentid(comment_id=200)
+        comment_200.assert_user(
+            user_slug='banneduser', username='Banned&gt;User')
+        comment_200.assert_contains_content(
+            content='comment ID 200 HTML content')
+        comment_200.assert_time(value='2017-01-06T20:01:38.540040+00:00')
+        comment_200.assert_vote_value(value=0)
+        comment_200.assert_no_previous()
+        comment_200.assert_reply(
+            comment_id=202, user_slug='staffuser', username='StaffUser')
+        comment_200.assert_reply(
+            comment_id=201, user_slug='inactiveuser', username='InactiveUser')
+        comment_200.assert_replies_order()
+        # Finishing parser assertions
+        parser.assert_same_topicgroup_tag(
+            first=comment_201, second=comment_200)
+        parser.assert_different_topicgroup(
+            first=comment_201, second=comment_202)
+        parser.assert_different_topicgroup(
+            first=comment_202, second=comment_203)
+        parser.assert_different_topicgroup(
+            first=comment_203, second=comment_204)
+        parser.assert_same_topicgroup_tag(
+            first=comment_204, second=comment_205)
+        parser.assert_different_topicgroup(
+            first=comment_205, second=comment_206)
+        parser.assert_different_topicgroup(
+            first=comment_206, second=comment_207)
+        parser.assert_no_more_comments_and_order()
+
+    def test_visibility_for_non_admin(self):
+        """
+        Test the thread visibility for non-admin users.
+        """
+        usertypes = ['', 'ValidUser']
+        for username in usertypes:
+            client = Client()
+            if username != '':
+                client.login(username=username, password='ValidPassword')
+            self.assert_visibility_for_non_admin(client=client)
+
+    def test_visibility_for_admin(self):
+        """
+        Test the thread visibility for non-admin users.
+        """
+        usertypes = ['StaffUser', 'SuperUser', 'SuperStaffUser']
+        for username in usertypes:
+            client = Client()
+            if username != '':
+                client.login(username=username, password='ValidPassword')
+            self.assert_visibility_for_admin(client=client)

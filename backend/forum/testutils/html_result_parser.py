@@ -188,8 +188,11 @@ class OneTopicCommentParser(HTMLParserMixin):
         previous_wrapper = self.comment.find(
             name='div', class_='comment-previous')  # type: Tag
         previous_link = previous_wrapper.a  # type: Tag
-        self.test.assertIsInstance(obj=previous_link, cls=Tag)
-        self.test.assertEqual(int(previous_link['data-link-to']), comment_id)
+        self.test.assertIsInstance(obj=previous_link, cls=Tag, msg=_(
+            'Previous comment expected but not found'))
+        self.test.assertEqual(
+            int(previous_link['data-link-to']), comment_id, msg=_(
+                'Previous comment ID differs from expected'))
         user_parser = UserNameParser(
             tag=previous_wrapper.find(name='a', class_='forum-username'),
             test=self.test)
@@ -225,7 +228,7 @@ class OneTopicCommentParser(HTMLParserMixin):
         """
         self.test.assertEqual(len(self._replies), 0, msg=_(
             'Replies with ID {ids} found where none expected').format(
-            ids=','.join(map(str, self._reply_ids))))
+            ids=', '.join(map(str, self._reply_ids))))
 
     def assert_replies_order(self):
         """
@@ -246,7 +249,8 @@ class OneTopicCommentParser(HTMLParserMixin):
         value_html = value_wrapper.find(
             name='span', class_='voting-value').decode_contents()
         value_int = int(value_html)
-        self.test.assertEqual(value_int, value)
+        self.test.assertEqual(value_int, value, msg=_(
+            'Comment votes value differs from expected'))
 
     def assert_time(self, value: str):
         """
@@ -329,7 +333,7 @@ class CommentsUpRecursiveParser(CommentsPageParser):
                 ).format(comment_id=item._id))
         return parents
 
-    def assert_same_topicgroup(
+    def assert_same_topicgroup_tag(
             self, first: OneTopicCommentParser, second: OneTopicCommentParser):
         """
         Assert that the topic group wrappers are the same `Tag`s for the
@@ -338,11 +342,11 @@ class CommentsUpRecursiveParser(CommentsPageParser):
         parents = self._get_topic_group_wrappers(first=first, second=second)
         if parents[0] != parents[1]:
             self.test.fail(msg=_(
-                'Parents for {first} and {second} expected to be the same but '
-                'they aren\'t').format(
+                'Parent Tags for {first} and {second} expected to be the same '
+                'but they aren\'t').format(
                 first=first, second=second))
 
-    def assert_not_same_topicgroup(
+    def assert_different_topicgroup(
             self, first: OneTopicCommentParser, second: OneTopicCommentParser):
         """
         Assert that the passed comments are rendered in different topic

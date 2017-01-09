@@ -1,0 +1,55 @@
+# Topics for testing comments expansion through more topic (staff and
+# non-staff too). For complete description, see
+# `comment-tests-comments-scenario-2.yaml`
+
+- model: forum_base.topic
+  pk: 200
+  fields:
+    creator: 2 # InactiveUser
+    name_html: Scenario-2 enabled non-staff 200 html name
+    name_text: Scenario-2 enabled non-staff 200 text name
+    is_enabled: true
+    is_staff_only: false
+    is_voting_enabled: true
+    type: normal
+    truncate_at: null
+    reply_to: null
+    slug: scenario-2-enabled-non-staff-topic-200
+    comment_count: 4
+    last_comment: 205
+    description: ''
+    images: []
+- model: forum_base.topic
+  pk: 201
+  fields:
+    creator: 3 # StaffUser
+    name_html: <b>Scenario-2 enabled non-staff 201 html name</b>
+    name_text: Scenario-2 enabled non-staff 201 text name
+    is_enabled: true
+    is_staff_only: false
+    is_voting_enabled: true
+    type: normal
+    truncate_at: null
+    reply_to: null
+    slug: scenario-2-enabled-non-staff-topic-201
+    comment_count: 2
+    last_comment: 207
+    description: ''
+    images: []
+- model: forum_base.topic
+  pk: 202
+  fields:
+    creator: 4 # SuperUser
+    name_html: <b>Scenario-2 enabled staff 202 html name</b>
+    name_text: Scenario-2 enabled staff 202 text name
+    is_enabled: true
+    is_staff_only: true
+    is_voting_enabled: true
+    type: normal
+    truncate_at: null
+    reply_to: null
+    slug: scenario-2-enabled-staff-topic-202
+    comment_count: 2
+    last_comment: 206
+    description: ''
+    images: []
