@@ -45,6 +45,8 @@
   }
 
   .topic-group-wrapper {
+    margin-bottom: $grid-gutter-width-base / 2;
+
     .card-header {
       .card-title {
         margin-bottom: 0;
@@ -99,6 +101,8 @@
     }
 
     .topic-comment-wrapper {
+      margin-bottom: $grid-gutter-width-base / 2;
+
       &.is-highlighted {
         .card-header,
         .card-block {

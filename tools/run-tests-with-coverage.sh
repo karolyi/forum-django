@@ -12,9 +12,9 @@ rm -rf htmlcov
 
 if [[ -z "$1" ]]; then
     # No test parameter was provided
-    coverage run --branch --omit='*/migrations/*,*/forum/settings_test.py' --source 'backend/' backend/manage.py test forum --keepdb -v 2
+    coverage run --branch --omit='*/migrations/*,*/forum/settings_test*.py' --source 'backend/' backend/manage.py test forum --keepdb -v 2
 else
-    coverage run --branch --omit='*/migrations/*,*/forum/settings_test.py' --source 'backend/' backend/manage.py test $1 --keepdb -v 2
+    coverage run --branch --omit='*/migrations/*,*/forum/settings_test*.py' --source 'backend/' backend/manage.py test $1 --keepdb -v 2
 fi
 EXITCODE_TESTS=$?
 
