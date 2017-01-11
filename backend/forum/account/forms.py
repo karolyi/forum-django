@@ -1,7 +1,9 @@
 from django.contrib.auth.forms import AuthenticationForm, UsernameField
+from django.forms import ModelForm
 from django.forms.fields import CharField
 from django.forms.widgets import PasswordInput, TextInput
 from django.utils.translation import ugettext_lazy as _
+from forum.base.models import Settings
 
 
 class ForumAuthForm(AuthenticationForm):
@@ -28,3 +30,15 @@ class ForumAuthForm(AuthenticationForm):
             # Remove the autofocus for the main page
             self.fields['username'].widget.attrs['autofocus'] = ''
         return init_val
+
+
+class SettingsForm(ModelForm):
+    class Meta:
+        model = Settings
+        fields = (
+            'quote', 'comment_vote_hide_limit', 'introduction_md_all',
+            'introduction_md_reg', 'introduction_md_friends',
+            'uses_auto_bookmarks', 'mails_own_topic_comments',
+            'mails_replies_topic', 'mails_moderation_topic', 'mails_messages',
+            'separate_bookmarked_topics', 'show_outsiders', 'has_chat_enabled',
+            'expand_archived')

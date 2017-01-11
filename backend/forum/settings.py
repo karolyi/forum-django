@@ -255,6 +255,7 @@ PAGINATOR_MAX_COMMENTS_LISTED = 50
 PAGINATOR_MAX_PAGES_TOPICLIST = 10
 
 LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = 'forum:account:login'
 
 # Keep this at the very bottom of settings.py
 try:

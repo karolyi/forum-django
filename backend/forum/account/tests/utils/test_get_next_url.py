@@ -12,11 +12,21 @@ class GetNextUrlTestCase(TestCase):
     """
     factory = RequestFactory()
 
-    def test_returns_next(self):
+    def test_returns_next_from_post(self):
         """
-        Should return the URL in the `next` parameter, when passed.
+        Should return the URL in the `next` parameter, when passed from
+        HTTP `POST`.
         """
         request = self.factory.post('/whatever/', {'next': '/bla/?a=b'})
+        next_url = get_next_url(request)
+        self.assertEqual(next_url, '/bla/?a=b')
+
+    def test_returns_next_from_get(self):
+        """
+        Should return the URL in the `next` parameter, when passed from
+        HTTP `GET`.
+        """
+        request = self.factory.get('/whatever/', {'next': '/bla/?a=b'})
         next_url = get_next_url(request)
         self.assertEqual(next_url, '/bla/?a=b')
 
