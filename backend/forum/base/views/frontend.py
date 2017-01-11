@@ -107,7 +107,8 @@ def expand_comments_down(
     """
     try:
         model_topic, qs_comments = prev_comments_down(
-            request=request, topic_slug=topic_slug, comment_id=comment_id)
+            request=request, topic_slug=topic_slug, comment_id=comment_id,
+            scroll_to_id=scroll_to_id)
     except HttpResponsePermanentRedirect as exc:
         return exc.http_response()
     return render(

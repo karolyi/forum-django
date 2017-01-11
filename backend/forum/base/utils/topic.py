@@ -199,7 +199,7 @@ def replies_up(
 
 def prev_comments_down(
         request: WSGIRequest, topic_slug: str,
-        comment_id: int) -> Tuple[Topic, QuerySet]:
+        comment_id: int, scroll_to_id: int) -> Tuple[Topic, QuerySet]:
     """
     Expand the previous comments in the thread along with the requested
     comment ID.
@@ -211,31 +211,30 @@ def prev_comments_down(
     is in another topic, `Http404` when not found.
     """
     # Get the requested comment
-    model_comment, search_kwargs_comment = _expansion_sanitize(
+    comment, search_kwargs_comment = _expansion_sanitize(
         request=request, comment_id=comment_id)
-    if model_comment.topic.slug != topic_slug:
+    if comment.topic.slug != topic_slug:
         url = reverse(
-            'forum:base:comments-up-recursive',
+            'forum:base:comments-down',
             kwargs={
-                'topic_slug': model_comment.topic.slug,
-                'comment_id': model_comment.id,
-                'scroll_to_id': model_comment.id})
+                'topic_slug': comment.topic.slug,
+                'comment_id': comment.id,
+                'scroll_to_id': scroll_to_id})
         raise HttpResponsePermanentRedirect(url=url)
-    set_comment_ids = set()
-    last_id = model_comment.id
+    comment_original = comment
+    set_comment_ids = {comment.id}
     while True:
-        search_kwargs_comment['id'] = last_id
-        set_comment_ids.add(last_id)
+        if comment.prev_comment_id is None:
+            # This comment is the root comment, not a previous comment
+            break
+        search_kwargs_comment['id'] = comment.prev_comment_id
         try:
-            model_comment_iter = Comment.objects.only(
+            comment = Comment.objects.only(
                 'id', 'prev_comment_id').get(**search_kwargs_comment)
         except Comment.DoesNotExist:
             # No such comment (or in a topic that's not visible)
             break
-        if model_comment_iter.prev_comment_id is None:
-            # This comment is the root comment, not a reply
-            break
-        last_id = model_comment_iter.prev_comment_id
+        set_comment_ids.add(comment.id)
     qs_comments = Comment.objects.filter(id__in=set_comment_ids)
     qs_comments = _prefetch_for_comments(qs_comments)
-    return model_comment.topic, qs_comments
+    return comment_original.topic, qs_comments
