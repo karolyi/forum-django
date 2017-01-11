@@ -167,7 +167,7 @@ def paginator_generic_get_list(
 def forum_auth_form():
     global ForumAuthForm
     if ForumAuthForm is None:
-        from forum.accounts.forms import ForumAuthForm
+        from forum.account.forms import ForumAuthForm
     return ForumAuthForm
 
 

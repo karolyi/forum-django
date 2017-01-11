@@ -116,7 +116,7 @@ INSTALLED_APPS = (
     'webpack_loader',
     'django_jinja',
     'forum',
-    'forum.accounts',
+    'forum.account',
     'forum.base',
     'forum.cdn',
     'forum.crowdfunding',

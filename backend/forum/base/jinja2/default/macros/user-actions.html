@@ -1,10 +1,10 @@
 {% from 'default/macros/render-form.html' import render_form with context %}
 {% macro user_actions(request, is_autofocus=False) -%}
-{%- if request.path != url('forum:accounts:login') %}
+{%- if request.path != url('forum:account:login') %}
 {%- if request.user.is_anonymous -%}
 <section class="card card-block" aria-label="{{ _('Login') }}">
     <div class="card-text">
-    <form method="post" action="{{ url('forum:accounts:login') }}">
+    <form method="post" action="{{ url('forum:account:login') }}">
         {% csrf_token %}
         <legend>{{ _('Login') }}</legend>
         {{ render_form(form=forum_auth_form(is_autofocus=is_autofocus)) }}
@@ -17,7 +17,7 @@
 {% else %}
 <section class="card card-block" aria-label="{{ _('User actions') }}">
     <div class="card-text">
-        <a href="{{ url('forum:accounts:logout') }}" class="btn btn-primary">{{ _('Logout') }}</a>
+        <a href="{{ url('forum:account:logout') }}" class="btn btn-primary">{{ _('Logout') }}</a>
     </div>
 </section>
 {%- endif %}

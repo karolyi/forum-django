@@ -16,7 +16,7 @@ class LogoutViewTest(TestCase):
         client = Client(HTTP_REFERER='https://testhost/a/b/c/')
         client.login(username='ValidUser', password='ValidPassword')
         response = client.get(
-            path=reverse(viewname='forum:accounts:logout'))
+            path=reverse(viewname='forum:account:logout'))
         self.assertRedirects(
             response=response, expected_url='/a/b/c/',
             fetch_redirect_response=False)

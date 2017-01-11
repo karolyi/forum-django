@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
-from forum.accounts.forms import ForumAuthForm
+from forum.account.forms import ForumAuthForm
 
 from ...views import LoginView
 
@@ -35,7 +35,7 @@ class LoginViewTestCase(TestCase):
         The `GET` should render an HTML if the user is not authenticated.
         """
         client = Client()
-        response = client.get(path=reverse(viewname='forum:accounts:login'))
+        response = client.get(path=reverse(viewname='forum:account:login'))
         self.assertEqual(response.status_code, 200)
 
     def test_post_valid_active_user(self):
@@ -44,7 +44,7 @@ class LoginViewTestCase(TestCase):
         """
         client = Client()
         response = client.post(
-            path=reverse(viewname='forum:accounts:login'),
+            path=reverse(viewname='forum:account:login'),
             data={
                 'username': 'ValidUser',
                 'password': 'ValidPassword',
@@ -59,7 +59,7 @@ class LoginViewTestCase(TestCase):
         """
         client = Client()
         response = client.post(
-            path=reverse(viewname='forum:accounts:login'),
+            path=reverse(viewname='forum:account:login'),
             data={
                 'username': 'ValidUser',
                 'password': 'inValidPassword',
@@ -81,7 +81,7 @@ class LoginViewTestCase(TestCase):
         """
         client = Client()
         response = client.post(
-            path=reverse(viewname='forum:accounts:login'),
+            path=reverse(viewname='forum:account:login'),
             data={
                 'username': 'InactiveUser',
                 'password': 'ValidPassword',
