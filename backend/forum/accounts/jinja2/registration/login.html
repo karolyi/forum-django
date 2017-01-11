@@ -4,6 +4,7 @@
 {% block main_content %}
 <form method="post" action="{{ url('forum:accounts:login') }}" class="login-form">
     {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
     <legend>{{ _('Login') }}</legend>
     {{ render_form(form=auth_form) }}
     <button type="submit" class="btn btn-primary">
