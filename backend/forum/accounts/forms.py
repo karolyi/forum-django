@@ -1,6 +1,6 @@
 from django.contrib.auth.forms import AuthenticationForm, UsernameField
-from django.forms.fields import BooleanField, CharField
-from django.forms.widgets import CheckboxInput, PasswordInput, TextInput
+from django.forms.fields import CharField
+from django.forms.widgets import PasswordInput, TextInput
 from django.utils.translation import ugettext_lazy as _
 
 
