@@ -7,12 +7,12 @@ from django.http.response import Http404
 from django.test import RequestFactory
 from forum.base.models import Comment
 
-from ....utils.topic import _expansion_sanitize
+from ....utils.topic import _topic_comment_sanitize
 
 
-class ExpansionSanitizeTestCase(TestCase):
+class TopicCommentSanitizeTestCase(TestCase):
     """
-    Testing `_expansion_sanitize`.
+    Testing `_topic_comment_sanitize`.
     """
 
     factory = RequestFactory()
@@ -47,7 +47,7 @@ class ExpansionSanitizeTestCase(TestCase):
         """
         request = self.factory.get('bla')
         request.user = user
-        comment, search_kwargs_comment = _expansion_sanitize(
+        comment, search_kwargs_comment = _topic_comment_sanitize(
             request=request, comment_id=123)
         self.assertDictEqual(search_kwargs_comment, {
             'topic__is_staff_only': False, 'topic__is_enabled': True})
@@ -62,7 +62,7 @@ class ExpansionSanitizeTestCase(TestCase):
         """
         request = self.factory.get('bla')
         request.user = user
-        comment, search_kwargs_comment = _expansion_sanitize(
+        comment, search_kwargs_comment = _topic_comment_sanitize(
             request=request, comment_id=123)
         self.assertDictEqual(
             search_kwargs_comment, {'topic__is_enabled': True})
@@ -130,4 +130,4 @@ class ExpansionSanitizeTestCase(TestCase):
         self.mock_comment.objects.select_related.return_value.only\
             .return_value.get.side_effect = Comment.DoesNotExist()
         with self.assertRaises(expected_exception=Http404):
-            _expansion_sanitize(request=request, comment_id=234)
+            _topic_comment_sanitize(request=request, comment_id=234)

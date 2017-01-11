@@ -26,6 +26,8 @@ class ListCommentsTestCase(TestCase):
         """
         self.topic = self.page = None
         self.mock_prefetch_for_comments_result = Mock(spec=QuerySet)
+        self.mock_topic_comment_sanitize_result = [Mock(), Mock()]
+        self.mock_topic_comment_sanitize_result[0].topic.slug = 'foo'
         self.patch_get_comments_per_page = patch(
             target='forum.base.utils.topic._get_comments_per_page',
             return_value=50)
@@ -40,6 +42,9 @@ class ListCommentsTestCase(TestCase):
             target='forum.base.utils.topic.Topic', spec=Topic)
         self.patch_paginator = patch(
             target='forum.base.utils.topic.Paginator', spec=Paginator)
+        self.patch_topic_comment_sanitize = patch(
+            target='forum.base.utils.topic._topic_comment_sanitize',
+            return_value=self.mock_topic_comment_sanitize_result)
         self.mock_get_comment_pageid = self.patch_get_comment_pageid.start()
         self.mock_get_comments_per_page = \
             self.patch_get_comments_per_page.start()
@@ -54,6 +59,8 @@ class ListCommentsTestCase(TestCase):
         self.mock_comment.DoesNotExist = Comment.DoesNotExist
         self.mock_topic.return_value = 'topic-return-value'
         self.mock_paginator = self.patch_paginator.start()
+        self.mock_topic_comment_sanitize = \
+            self.patch_topic_comment_sanitize.start()
         self.request = self.factory.get('/foo/')
         self.request.user = AnonymousUser()
 
@@ -67,6 +74,7 @@ class ListCommentsTestCase(TestCase):
         self.patch_comment.stop()
         self.patch_topic.stop()
         self.patch_paginator.stop()
+        self.patch_topic_comment_sanitize.stop()
 
     def assert_normal_flow(self):
         """
@@ -171,9 +179,10 @@ class ListCommentsTestCase(TestCase):
 
     def test_user_is_staff(self):
         """
-        Should return a page, filtered for staff
+        Should return a page, filtered for staff.
         """
         self.request.user = self.User(is_staff=True, is_superuser=False)
+        self.mock_topic_comment_sanitize_result[0].topic.slug = 'fooo'
         topic, page = list_comments(
             request=self.request, topic_slug='fooo', comment_id=123)
         self.mock_topic.objects.get.assert_called_once_with(
@@ -183,9 +192,10 @@ class ListCommentsTestCase(TestCase):
 
     def test_user_is_superuser(self):
         """
-        Should return a page, filtered for staff
+        Should return a page, filtered for superuser.
         """
         self.request.user = self.User(is_staff=False, is_superuser=True)
+        self.mock_topic_comment_sanitize_result[0].topic.slug = 'fooo'
         topic, page = list_comments(
             request=self.request, topic_slug='fooo', comment_id=123)
         self.mock_topic.objects.get.assert_called_once_with(
@@ -195,9 +205,10 @@ class ListCommentsTestCase(TestCase):
 
     def test_user_is_superuser_and_staff(self):
         """
-        Should return a page, filtered for staff
+        Should return a page, filtered for staff.
         """
         self.request.user = self.User(is_staff=True, is_superuser=True)
+        self.mock_topic_comment_sanitize_result[0].topic.slug = 'fooo'
         topic, page = list_comments(
             request=self.request, topic_slug='fooo', comment_id=123)
         self.mock_topic.objects.get.assert_called_once_with(

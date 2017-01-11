@@ -37,7 +37,7 @@
     user: 2
     topic: 1 # Staff topic
     moved_from: null
-    time: '2017-01-05 20:57:37.540040+00:00'
+    time: '2017-01-05 20:58:37.540040+00:00'
     number: 3
     voting_value: 0
     prev_comment: null
@@ -53,7 +53,7 @@
     user: 4
     topic: 1 # Staff topic
     moved_from: null
-    time: '2017-01-05 20:57:37.540040+00:00'
+    time: '2017-01-05 20:59:37.540040+00:00'
     number: 4
     voting_value: 0
     prev_comment: 2

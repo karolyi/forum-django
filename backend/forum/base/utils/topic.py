@@ -43,15 +43,15 @@ def _prefetch_for_comments(qs_comments: QuerySet) -> QuerySet:
         'reply_set__user__settings')
 
 
-def _expansion_sanitize(
+def _topic_comment_sanitize(
         request: WSGIRequest, comment_id: int) -> Tuple[Comment, Dict]:
     """
-    Sanitize the expansion parameters and check if a requested topic
+    Sanitize the request parameters and check if a requested topic
     is available to the requesting user.
 
     Raise Http404 if not.
 
-    Return the :model:`forum_base.Comment` for further expansion, and
+    Return the :model:`forum_base.Comment` for further evaluation, and
     the extra kwargs for the comment selection query (don't display
     comments that are in a topic not visible to the user).
     """
@@ -100,6 +100,16 @@ def list_comments(
     Return the topic model and the requested page containing the
     `comment_id`.
     """
+    if comment_id is not None:
+        model_comment, search_kwargs_comment = _topic_comment_sanitize(
+            request=request, comment_id=comment_id)
+        if model_comment.topic.slug != topic_slug:
+            url = reverse(
+                'forum:base:topic-comment-listing',
+                kwargs={
+                    'topic_slug': model_comment.topic.slug,
+                    'comment_id': model_comment.id})
+            raise HttpResponsePermanentRedirect(url=url)
     search_kwargs_topic = {
         'slug': topic_slug, 'is_enabled': True}
     if not request.user.is_staff and not request.user.is_superuser:
@@ -141,7 +151,7 @@ def replies_up_recursive(
     As the code flows, invisible comment won't get filtered in.
     """
     # Get the requested comment
-    model_comment, search_kwargs_comment = _expansion_sanitize(
+    model_comment, search_kwargs_comment = _topic_comment_sanitize(
         request=request, comment_id=comment_id)
     if model_comment.topic.slug != topic_slug:
         url = reverse(
@@ -180,7 +190,7 @@ def replies_up(
     is in another topic, `Http404` when not found.
     """
     # Get the requested comment
-    model_comment, search_kwargs_comment = _expansion_sanitize(
+    model_comment, search_kwargs_comment = _topic_comment_sanitize(
         request=request, comment_id=comment_id)
     if model_comment.topic.slug != topic_slug:
         url = reverse(
@@ -211,7 +221,7 @@ def prev_comments_down(
     is in another topic, `Http404` when not found.
     """
     # Get the requested comment
-    comment, search_kwargs_comment = _expansion_sanitize(
+    comment, search_kwargs_comment = _topic_comment_sanitize(
         request=request, comment_id=comment_id)
     if comment.topic.slug != topic_slug:
         url = reverse(

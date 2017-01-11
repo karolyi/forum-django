@@ -35,10 +35,13 @@ def topic_comment_listing(
         request: WSGIRequest, topic_slug: str,
         comment_id: int=None) -> HttpResponse:
     """
-    List a certain topic.
+    List comments in a certain topic.
     """
-    model_topic, page_comments = list_comments(
-        request=request, topic_slug=topic_slug, comment_id=comment_id)
+    try:
+        model_topic, page_comments = list_comments(
+            request=request, topic_slug=topic_slug, comment_id=comment_id)
+    except HttpResponsePermanentRedirect as exc:
+        return exc.http_response()
     return render(
         request=request,
         template_name='default/base/topic-comment-listing.html',

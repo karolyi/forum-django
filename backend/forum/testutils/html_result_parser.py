@@ -301,14 +301,6 @@ class CommentsPageParser(HtmlResultParserBase):
     def __init__(self, *args, **kwargs):
         super(CommentsPageParser, self).__init__(*args, **kwargs)
 
-
-class ExpandedThreadParser(CommentsPageParser):
-    """
-    Parsing the result of `comments_up_recursive` view.
-    """
-
-    def __init__(self, *args, **kwargs) -> None:
-        super(CommentsPageParser, self).__init__(*args, **kwargs)
         self.rendered_comments = OrderedDict()
         self.last_cached_comment = None
 
@@ -347,6 +339,15 @@ class ExpandedThreadParser(CommentsPageParser):
         self.test.assertListEqual(
             id_list, list(self.rendered_comments.keys()), msg=_(
                 'Expected the order of IDs to be the first, got the second'))
+
+
+class ExpandedThreadParser(CommentsPageParser):
+    """
+    Parsing the result of `comments_up_recursive` view.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        super(ExpandedThreadParser, self).__init__(*args, **kwargs)
 
     def _get_topic_group_wrappers(
             self, first: OneTopicCommentParser, second: OneTopicCommentParser):
