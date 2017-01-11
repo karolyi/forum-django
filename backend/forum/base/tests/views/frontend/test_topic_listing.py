@@ -111,3 +111,32 @@ class TopicListingTestCase(TestCase):
         client.login(username='SuperStaffUser', password='ValidPassword')
         response = client.get(reverse(viewname='forum:base:topic-listing'))
         self.assert_topics_for_staff(response=response)
+
+    def test_renders_topics_properly_for_archivesexpanderuser(self):
+        """
+        Assert that the topics in the fixtures do render properly.
+        """
+        client = Client()
+        client.login(username='ArchivesExpanderUser', password='ValidPassword')
+        response = client.get(reverse(viewname='forum:base:topic-listing'))
+        parser = self._get_parser(response=response)
+        parser.assert_topic_listed(
+            topic_type='highlighted',
+            topic_name='Highlighted topic 1 html name',
+            slug='highlighted-topic-1', username='StaffUser',
+            total_comments=3,
+            preview_contains='Highlighted topic html content id 7, a reply '
+            'to 5')
+        parser.assert_topic_listed(
+            topic_type='normal', topic_name='Normal topic 1 html name',
+            slug='normal-topic-1', username='InactiveUser',
+            total_comments=1,
+            preview_contains='moved from staff html content id 3, a non-reply')
+        parser.assert_topic_listed(
+            topic_type='archived',
+            topic_name='Archived enabled non-staff topic 1 html name',
+            slug='archived-enabled-non-staff-topic-1',
+            username='SuperStaffUser', total_comments=2,
+            preview_contains='Archived enabled non-staff second comment HTML')
+        parser.assert_topic_not_listed(topic_type='highlighted', slug='foo')
+        parser.assert_no_more_topics_listed()
