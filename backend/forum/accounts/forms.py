@@ -21,13 +21,6 @@ class ForumAuthForm(AuthenticationForm):
                 'class': 'form-control',
                 'placeholder': _('Password')}))
 
-    is_permanent = BooleanField(
-        label=_('Keep me logged in'),
-        required=False,
-        widget=CheckboxInput(
-            attrs={
-                'class': 'form-check-input'}))
-
     def __init__(self, *args, **kwargs):
         is_autofocus = kwargs.pop('is_autofocus', False)
         init_val = super(ForumAuthForm, self).__init__(*args, **kwargs)
