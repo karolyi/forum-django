@@ -1,0 +1,13 @@
+{% extends 'default/base.html' %}
+{% from 'default/macros/render-form.html' import render_form with context %}
+
+{% block main_content %}
+<form method="post" action="{{ url('forum:account:settings') }}" class="settings-form form-group">
+    {% csrf_token %}
+    <legend>{{ _('Settings') }}</legend>
+    {{ render_form(form=settings_form) }}
+    <button type="submit" class="btn btn-primary">
+        {{ _('Submit') }}
+    </button>
+</form>
+{% endblock main_content %}
