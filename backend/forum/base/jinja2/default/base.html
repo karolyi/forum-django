@@ -1,4 +1,4 @@
-{% from 'default/macros/login-actions.html' import login_actions with context %}
+{% from 'default/macros/user-actions.html' import user_actions with context %}
 {% get_my_language_info as current_language %}
 <!DOCTYPE html>
 <html>
@@ -51,9 +51,7 @@
         </main>
         <footer class="row">
             <div class="col-xs-12 col-sm-6">
-                {% if request.path != url('forum:accounts:login') %}
-                {{ login_actions(request, is_autofocus=False) }}
-                {% endif %}
+                {{ user_actions(request, is_autofocus=False) }}
             </div>
         </footer>
     </div>
