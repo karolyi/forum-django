@@ -20,5 +20,3 @@ class LogoutViewTest(TestCase):
         self.assertRedirects(
             response=response, expected_url='/a/b/c/',
             fetch_redirect_response=False)
-        import IPython
-        IPython.embed()
