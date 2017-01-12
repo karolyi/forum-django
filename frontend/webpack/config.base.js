@@ -28,6 +28,9 @@ module.exports = {
     topicCommentsExpansion: [
       '../src/js/skin-default/topicCommentsExpansion',
     ],
+    settingsPage: [
+      '../src/js/skin-default/settingsPage',
+    ],
   },
 
   output: {

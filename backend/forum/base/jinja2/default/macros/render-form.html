@@ -1,39 +1,54 @@
 {% macro render_form(form) -%}
 <div class="forum-form-horizontal-wrapper">
-    {%- if form.errors.__all__ %}
+    {% if form.errors.__all__ -%}
     <div class="global-error alert alert-danger" role="alert">
-    {% for error in form.errors.__all__ %}
+    {% for error in form.errors.__all__ -%}
         <p>{{ error|escape }}</p>
-    {% endfor %}
+    {%- endfor %}
     </div>
-    {% endif -%}
+    {%- endif %}
     {% for widget in form -%}
-        {% set widget_name = widget.field.widget.__class__.__name__ -%}
-        <fieldset class="widget-wrapper {% spaceless %}
-                {% if widget_name in ['TextInput', 'PasswordInput'] %}
+        {%- set widget_name = widget.field.widget.__class__.__name__ -%}
+        <div class="widget-wrapper row {% spaceless %}
+                {% if widget_name in ['TextInput', 'PasswordInput', 'Select', 'Textarea'] %}
                     form-group
                 {% elif widget_name == 'CheckboxInput' %}
-                    form-check
+                    form-group
                 {% endif %}
         {% endspaceless %} {% spaceless %}
             {% if widget.errors %}
                 has-danger
             {% endif %}
         {% endspaceless %}">
-        {%- if widget.errors %}
+        {% if widget.errors -%}
             <div class="text-danger widget-error col-form-label-sm" role="alert">
                 {{ widget.errors.as_text()|escape|linebreaks }}
             </div>
-        {% endif -%}
-        {%- if widget_name == 'CheckboxInput' %}
-            <label class="form-check-label">
+        {%- endif %}
+        {% if widget_name == 'CheckboxInput' -%}
+            <div class="col-sm-2 hidden-xs-down"></div>
+            <div class="col-sm-10 abc-checkbox">
                 {{ widget }}
-                {{ widget.label }}
+                <label class="form-check-label col-form-label" for="{{ widget.auto_id }}">
+                    {{ widget.label|escape }}
+                </label>
+            </div>
+        {%- elif widget_name == 'Select' -%}
+            <label class="form-check-label col-form-label col-xs-12 col-sm-2" for="{{ widget.auto_id }}">
+                {{ widget.label|escape }}
             </label>
-        {% else %}
-            {{ widget -}}
-        {% endif %}
-        </fieldset>
+            <div class="col-xs-12 col-sm-10">
+                {{ widget|add_class('custom-select') -}}
+            </div>
+        {%- else -%}
+            <label class="form-check-label col-form-label col-xs-12 col-sm-2" for="{{ widget.auto_id }}">
+                {{ widget.label|escape }}
+            </label>
+            <div class="col-xs-12 col-sm-10">
+                {{ widget|add_class('form-control')|set_attr('placeholder:' + widget.help_text|escape) -}}
+            </div>
+        {%- endif %}
+        </div>
     {%- endfor %}
 </div>
 {%- endmacro %}

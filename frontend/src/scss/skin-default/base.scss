@@ -23,12 +23,26 @@
 // Font-awesome
 @import "font-awesome/scss/font-awesome.scss";
 
+// awesome-bootstrap-checkbox
+@import "node_modules/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.scss";
+
+// select2
+@import "node_modules/select2/src/scss/core.scss";
+
 // Import local adjustments
 @import "forum-user-tooltip";
 
+// awesome-bootstrap-checkbox adjustment to not break when the viewport
+// is narrow
+.abc-checkbox {
+  label {
+    display: inline;
+  }
+}
+
 .navbar-content-spacer {
   // Adjust when necessary
-  height: 51px;
+  height: 51px + $grid-gutter-width-base / 2;
 }
 
 .page-content-wrapper {

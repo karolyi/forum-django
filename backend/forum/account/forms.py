@@ -3,7 +3,7 @@ from django.forms import ModelForm
 from django.forms.fields import CharField
 from django.forms.widgets import PasswordInput, TextInput
 from django.utils.translation import ugettext_lazy as _
-from forum.base.models import Settings
+from forum.base.models import IntroductionModification, Settings
 
 
 class ForumAuthForm(AuthenticationForm):
@@ -32,13 +32,30 @@ class ForumAuthForm(AuthenticationForm):
         return init_val
 
 
+class IntroductionModificationForm(ModelForm):
+    """
+    A form that modifies the user's introductions, uses the
+    :model:`forum_base.IntroductionModification`.
+
+    After submitting this form, an admin has to approve.
+    """
+
+    class Meta:
+        model = IntroductionModification
+        exclude = ['user', 'images']
+
+
 class SettingsForm(ModelForm):
+    """
+    A settings form in which the user can modify every setting EXCEPT
+    the introductions, because thosa are handled by the
+    `IntroductionModificationForm`.
+    """
     class Meta:
         model = Settings
-        fields = (
-            'quote', 'comment_vote_hide_limit', 'introduction_md_all',
-            'introduction_md_reg', 'introduction_md_friends',
+        fields = [
+            'comment_vote_hide_limit', 'ignored_users', 'friended_users',
             'uses_auto_bookmarks', 'mails_own_topic_comments',
             'mails_replies_topic', 'mails_moderation_topic', 'mails_messages',
-            'separate_bookmarked_topics', 'show_outsiders', 'has_chat_enabled',
-            'expand_archived')
+            'separate_bookmarked_topics', 'has_chat_enabled',
+            'expand_archived']

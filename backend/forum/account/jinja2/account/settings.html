@@ -1,13 +1,37 @@
 {% extends 'default/base.html' %}
 {% from 'default/macros/render-form.html' import render_form with context %}
 
+{% block extra_scripts_head %}
+{{ render_bundle('settingsPage') }}
+{% endblock extra_scripts_head %}
+
 {% block main_content %}
-<form method="post" action="{{ url('forum:account:settings') }}" class="settings-form form-group">
-    {% csrf_token %}
-    <legend>{{ _('Settings') }}</legend>
-    {{ render_form(form=settings_form) }}
-    <button type="submit" class="btn btn-primary">
-        {{ _('Submit') }}
-    </button>
-</form>
+<div class="row">
+    <div class="col-sm-2 hidden-xs-down"></div>
+    <div class="col-xs-12 col-sm-8">
+        <div class="card card-block">
+            <h4 class="card-title">
+                {{ _('Settings') }}
+            </h4>
+            <div class="card-text">
+                <form method="post" action="{{ url('forum:account:settings') }}" class="settings-form form-group">
+                    {% csrf_token %}
+                    <h6 class="card-subtitle mb-2 text-muted">{{ _('Generic settings (will applied instantly)') }}</h6>
+                    {{ render_form(form=settings_form) }}
+                    <h6 class="card-subtitle mb-2 text-muted">{{ _('Introductions (will be applied after an admin approves them)') }}</h6>
+                    {{ render_form(form=intro_mod_form) }}
+                    <button type="submit" class="btn btn-primary">
+                        {{ _('Submit') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-2 hidden-xs-down"></div>
+</div>
+<script type="text/javascript">
+    Forum.settingsPage.init({
+        stuff: '1123'
+    })
+</script>
 {% endblock main_content %}

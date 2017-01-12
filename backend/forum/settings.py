@@ -45,6 +45,13 @@ TEMPLATES = [
             'match_extension': None,
             # 'match_regex': r'^(?!debug_toolbar/).*',
             'newstyle_gettext': True,
+            # https://github.com/niwinz/django-jinja/issues/140#issuecomment-145696119
+            'filters': {
+                'add_class':
+                    'widget_tweaks.templatetags.widget_tweaks.add_class',
+                'set_attr':
+                    'widget_tweaks.templatetags.widget_tweaks.set_attr',
+            },
             'extensions': DEFAULT_EXTENSIONS + [
                 'django_jinja.builtins.extensions.CsrfExtension',
                 'django_jinja.builtins.extensions.DjangoExtraFiltersExtension',

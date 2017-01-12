@@ -2,10 +2,9 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
-
 from forum.utils import slugify
 
-from .choices import TOPIC_TYPE_CHOICES
+from .choices import COMMENT_VOTE_HIDE_CHOICES, TOPIC_TYPE_CHOICES
 
 
 class Comment(models.Model):
@@ -130,6 +129,10 @@ class Settings(models.Model):
     An object representing the user's settings.
     """
 
+    class Meta:
+        verbose_name = _('User setting')
+        verbose_name_plural = _('User settings')
+
     def _my_slugify(user_instance):
         """
         Returns the username from the OneToOneField relation to User.
@@ -150,9 +153,11 @@ class Settings(models.Model):
     received_comment_vote_count = models.PositiveIntegerField(
         verbose_name=_('Summary received votes count on comments'))
     comment_vote_hide_limit = models.IntegerField(
-        default=-5, verbose_name=_('Hide comments under this vote value'))
+        default=-5, verbose_name=_('Hide comments under this vote value'),
+        choices=COMMENT_VOTE_HIDE_CHOICES)
     quote = models.CharField(
-        max_length=256, verbose_name=_('Chosen quote (appears at username)'))
+        max_length=256, verbose_name=_('Chosen quote'), help_text=_(
+            'Quote (visible in the tooltip of the username)'))
     max_comments_per_day = models.PositiveIntegerField(
         verbose_name=_('Maximum allowed comments per day'))
     comment_count = models.PositiveIntegerField(
@@ -169,17 +174,28 @@ class Settings(models.Model):
     used_skin = models.CharField(
         max_length=256, verbose_name=_('Used skin name'))
     introduction_md_all = models.TextField(
-        verbose_name=_('Introduction visible for everybody (Markdown)'))
+        verbose_name=_('Introduction for everybody (MD)'),
+        help_text=_('Introduction in Markdown format (visible for everyone)'))
     introduction_md_reg = models.TextField(
-        verbose_name=_('Introduction visible for registered users (Markdown)'))
+        verbose_name=_('Introduction for registered users (MD)'), help_text=_(
+            'Introduction in Markdown format (visible for registered users '
+            'only)'))
     introduction_md_friends = models.TextField(
-        verbose_name=_('Introduction visible for friended users (Markdown)'))
+        verbose_name=_('Introduction for friended users (MD)'), help_text=_(
+            'Introduction in Markdown format (visible only for users marked '
+            'as friends)'))
     introduction_html_all = models.TextField(
-        verbose_name=_('Introduction visible for everybody (HTML)'))
+        verbose_name=_('Introduction for everybody (HTML)'), help_text=_(
+            'Introduction in HTML format (visible for everyone)'))
     introduction_html_reg = models.TextField(
-        verbose_name=_('Introduction visible for registered users (HTML)'))
+        verbose_name=_('Introduction for registered users (HTML)'),
+        help_text=_(
+            'Introduction in HTML format (visible for registered users '
+            'only)'))
     introduction_html_friends = models.TextField(
-        verbose_name=_('Introduction visible for friended users (HTML)'))
+        verbose_name=_('Introduction for friended users (HTML)'), help_text=_(
+            'Introduction in HTML format (visible only for users marked as '
+            'friends)'))
     picture_emails = models.CharField(
         max_length=256, verbose_name=_(
             'Email addresses used for image upload'
@@ -187,6 +203,8 @@ class Settings(models.Model):
     ignored_users = models.ManyToManyField(
         User, related_name='ignored_him',
         verbose_name=_('List of ignored users'))
+    friended_users = models.ManyToManyField(
+        User, verbose_name=_('Friended users'), related_name='friended_him')
     uses_auto_bookmarks = models.BooleanField(
         default=False, verbose_name=_('Use automatic bookmark placement'))
     mails_own_topic_comments = models.BooleanField(
@@ -214,8 +232,40 @@ class Settings(models.Model):
         default=False, verbose_name=_('Is approved by admins'))
     expand_archived = models.BooleanField(
         default=False, verbose_name=_('Expand archived topics'))
-    friended_users = models.ManyToManyField(
-        User, verbose_name=_('Friended users'), related_name='friended_him')
+    images = models.ManyToManyField(
+        'forum_cdn.Image',
+        verbose_name=_('Images in this user\'s descriptions'))
+
+
+class IntroductionModification(models.Model):
+    """
+    When a user modifies his introductions, an admin has to approve it.
+
+    Until that happens, this model stores the changes.
+    """
+
+    class Meta:
+        verbose_name = _('Settings modification')
+        verbose_name_plural = _('Settings modifications')
+
+    def __str__(self):
+        return str(self.user)
+
+    user = models.OneToOneField(User, verbose_name=_('Respective user'))
+    quote = models.CharField(
+        max_length=256, verbose_name=_('Chosen quote'), help_text=_(
+            'Quote (visible in the tooltip of the username)'))
+    introduction_md_all = models.TextField(
+        verbose_name=_('Introduction for everybody (MD)'),
+        help_text=_('Introduction in Markdown format (visible for everyone)'))
+    introduction_md_reg = models.TextField(
+        verbose_name=_('Introduction for registered users (MD)'), help_text=_(
+            'Introduction in Markdown format (visible for registered users '
+            'only)'))
+    introduction_md_friends = models.TextField(
+        verbose_name=_('Introduction for friended users (MD)'), help_text=_(
+            'Introduction in Markdown format (visible only for users marked '
+            'as friends)'))
     images = models.ManyToManyField(
         'forum_cdn.Image',
         verbose_name=_('Images in this user\'s descriptions'))

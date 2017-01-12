@@ -11,3 +11,5 @@ TOPIC_TYPE_CHOICES = (
 )
 
 LIST_TOPIC_TYPE = [x[0] for x in TOPIC_TYPE_CHOICES]
+
+COMMENT_VOTE_HIDE_CHOICES = [(x, x) for x in range(-1, -11, -1)]

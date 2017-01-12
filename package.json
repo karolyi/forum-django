@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "A forum engine based on Django",
   "main": "index.js",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
+    "awesome-bootstrap-checkbox": "git+https://github.com/flatlogic/awesome-bootstrap-checkbox#bump-to-bootstrap4",
     "babel-core": "^6.21.0",
     "babel-eslint": "^7.1.1",
     "babel-loader": "^6.2.10",
@@ -32,8 +32,10 @@
     "mutation-observer": "^1.0.2",
     "node-sass": "^4.2.0",
     "npm": "^4.0.5",
+    "npm-check-updates": "^2.8.9",
     "resolve-url-loader": "^1.6.1",
     "sass-loader": "^4.1.1",
+    "select2": "^4.0.3",
     "style-loader": "^0.13.1",
     "tether": "^1.4.0",
     "url-loader": "^0.5.7",
