@@ -10,6 +10,7 @@ django-extensions==1.7.5
 django-jinja==2.2.2
 django-nose==1.4.4
 django-webpack-loader==0.4.1
+django-widget-tweaks==1.4.1
 filemagic==1.6
 flake8==3.2.1
 futures==3.0.5

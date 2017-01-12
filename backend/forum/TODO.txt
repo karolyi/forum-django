@@ -3,3 +3,4 @@ TODO:
 fix package.json:
 replace when https://github.com/Availity/availity-uikit/issues/154 is fixed:
 "bootstrap": "git+https://github.com/twbs/bootstrap.git#v4-dev",
+gulp build should go through successfully after the newest bootstrap is installed with 'npm i'
