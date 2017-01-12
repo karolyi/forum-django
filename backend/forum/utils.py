@@ -20,13 +20,3 @@ class DjangoTestRunner(ColourRunnerMixin, DiscoverRunner):
     Colorized test runner for the project:
     """
     pass
-
-
-def _add_widget_class(widget, class_name: str):
-    """
-    Add a class passed in `class_name` to the passed widget.
-    """
-    classes = widget.attrs.get('class', '').split(' ')  # type: list
-    classes.remove('')  # Remove the empty string
-    classes.append(class_name)
-    widget.attrs['class'] = ' '.join(classes)
