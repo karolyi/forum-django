@@ -189,6 +189,7 @@ DATABASES = {
     }
 }
 
+AUTH_USER_MODEL = 'forum_base.User'
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.AllowAllUsersModelBackend',)
 

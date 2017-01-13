@@ -34,7 +34,7 @@ def collect_topic_page(
         if isinstance(request.user, AnonymousUser):
             # AnonymousUser does not have settings, return False
             return False
-        if not request.user.settings.expand_archived:
+        if not request.user.expand_archived:
             # Return False
             return False
 
@@ -46,7 +46,7 @@ def collect_topic_page(
         search_kwargs['is_staff_only'] = False
     search_kwargs['type'] = topic_type
     qs_topics = Topic.objects.filter(**search_kwargs).select_related(
-        'last_comment', 'last_comment__user', 'last_comment__user__settings'
+        'last_comment', 'last_comment__user', 'last_comment__user'
     ).only(
         'name_text', 'comment_count', 'last_comment__user__username',
         'last_comment__time')

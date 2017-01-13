@@ -35,12 +35,9 @@ def _prefetch_for_comments(qs_comments: QuerySet) -> QuerySet:
     Return the `QuerySet` with the prefetch statements added.
     """
     return qs_comments.select_related(
-        'topic', 'user', 'user__settings', 'prev_comment',
-        'prev_comment__user', 'prev_comment__user__settings',
+        'topic', 'user', 'prev_comment', 'prev_comment__user',
         'prev_comment__topic'
-    ).prefetch_related(
-        'reply_set', 'reply_set__user', 'reply_set__topic',
-        'reply_set__user__settings')
+    ).prefetch_related('reply_set', 'reply_set__user', 'reply_set__topic')
 
 
 def _topic_comment_sanitize(

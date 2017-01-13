@@ -3,8 +3,8 @@
 - model: forum_base.comment
   pk: 6
   fields:
-    user: 4
-    topic: 3 # Highlighted topic
+    user: superuser
+    topic: highlighted-topic-1
     moved_from: null
     time: '2017-01-05 21:32:01.540040+00:00'
     number: 1
@@ -19,8 +19,8 @@
 - model: forum_base.comment
   pk: 5
   fields:
-    user: 2
-    topic: 3 # Highlighted topic
+    user: inactiveuser
+    topic: highlighted-topic-1
     moved_from: null
     time: '2017-01-05 21:32:02.540040+00:00'
     number: 2
@@ -35,8 +35,8 @@
 - model: forum_base.comment
   pk: 7
   fields:
-    user: 3
-    topic: 3 # Highlighted topic
+    user: staffuser
+    topic: highlighted-topic-1
     moved_from: null
     time: '2017-01-05 21:32:03.540040+00:00'
     number: 3

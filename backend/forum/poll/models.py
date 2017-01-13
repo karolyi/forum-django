@@ -1,9 +1,7 @@
-from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
-
-from forum.base.models import Topic
+from forum.base.models import Topic, User
 from forum.utils import slugify
 
 
@@ -20,10 +18,11 @@ class Question(models.Model):
     def __str__(self):
         return self.text
 
-    text = models.CharField(verbose_name=_('Text'), max_length=150)
     slug = AutoSlugField(
         verbose_name=_('Slug'), null=False, max_length=50,
-        populate_from=('text',), unique=True, slugify_function=slugify)
+        populate_from=('text',), unique=True, slugify_function=slugify,
+        primary_key=True)
+    text = models.CharField(verbose_name=_('Text'), max_length=150)
     topic = models.ForeignKey(
         Topic, verbose_name=_('In topic'), null=True, default=None)
     created_by = models.ForeignKey(User, verbose_name=_('Created by'))

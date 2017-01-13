@@ -5,8 +5,8 @@
 - model: forum_base.comment
   pk: 100
   fields:
-    user: 6 # Banned>User
-    topic: 100 # scenario-1-enabled-non-staff-topic-100
+    user: banneduser
+    topic: scenario-1-enabled-non-staff-topic-100
     moved_from: null
     time: '2017-01-05T20:01:38.540040+00:00'
     number: 1
@@ -23,8 +23,8 @@
 - model: forum_base.comment
   pk: 101
   fields:
-    user: 2 # InactiveUser
-    topic: 100 # scenario-1-enabled-non-staff-topic-100
+    user: inactiveuser
+    topic: scenario-1-enabled-non-staff-topic-100
     moved_from: null
     time: '2017-01-05T20:02:38.540040+00:00'
     number: 2
@@ -41,8 +41,8 @@
 - model: forum_base.comment
   pk: 102
   fields:
-    user: 3 # StaffUser
-    topic: 102 # scenario-1-disabled-non-staff-topic-102
+    user: staffuser
+    topic: scenario-1-disabled-non-staff-topic-102
     moved_from: null
     time: '2017-01-05T20:03:38.540040+00:00'
     number: 3
@@ -60,8 +60,8 @@
 - model: forum_base.comment
   pk: 103
   fields:
-    user: 4 # SuperUser
-    topic: 101 # scenario-1-enabled-non-staff-topic-101
+    user: superuser
+    topic: scenario-1-enabled-non-staff-topic-101
     moved_from: null
     time: '2017-01-05T20:04:38.540040+00:00'
     number: 4
@@ -79,8 +79,8 @@
 - model: forum_base.comment
   pk: 104
   fields:
-    user: 5 # SuperStaffUser
-    topic: 100 # scenario-1-enabled-non-staff-topic-100
+    user: superstaffuser
+    topic: scenario-1-enabled-non-staff-topic-100
     moved_from: null
     time: '2017-01-05T20:05:38.540040+00:00'
     number: 5
@@ -98,9 +98,9 @@
 - model: forum_base.comment
   pk: 105
   fields:
-    user: 6 # Banned>User
-    topic: 100 # scenario-1-enabled-non-staff-topic-100
-    moved_from: 102
+    user: banneduser
+    topic: scenario-1-enabled-non-staff-topic-100
+    moved_from: scenario-1-disabled-non-staff-topic-102
     time: '2017-01-05T20:06:38.540040+00:00'
     number: 6
     voting_value: 1
@@ -117,9 +117,9 @@
 - model: forum_base.comment
   pk: 106
   fields:
-    user: 1 # ValidUser
-    topic: 102 # scenario-1-disabled-non-staff-topic-102
-    moved_from: 100
+    user: validuser
+    topic: scenario-1-disabled-non-staff-topic-102
+    moved_from: scenario-1-enabled-non-staff-topic-100
     time: '2017-01-05T20:07:38.540040+00:00'
     number: 7
     voting_value: 1
@@ -136,9 +136,9 @@
 - model: forum_base.comment
   pk: 107
   fields:
-    user: 2 # InactiveUser
-    topic: 101 # scenario-1-enabled-non-staff-topic-101
-    moved_from: 100
+    user: inactiveuser
+    topic: scenario-1-enabled-non-staff-topic-101
+    moved_from: scenario-1-enabled-non-staff-topic-100
     time: '2017-01-05T20:08:38.540040+00:00'
     number: 8
     voting_value: 1

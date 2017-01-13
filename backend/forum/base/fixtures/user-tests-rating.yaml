@@ -4,8 +4,8 @@
   pk: 1
   fields:
     is_enabled: true
-    ratee: 1 # ValidUser
-    rater: 2 # InactiveUser
+    ratee: validuser
+    rater: inactiveuser
     value: 5
     created_at: '2017-01-08 16:23:12.889291+00:00'
     content_html: <b>bold enabled rating of ValidUser from InactiveUser</b>
@@ -14,8 +14,8 @@
   pk: 2
   fields:
     is_enabled: true
-    ratee: 1 # ValidUser
-    rater: 3 # StaffUser
+    ratee: validuser
+    rater: staffuser
     value: 0
     created_at: '2017-01-08 16:23:13.889291+00:00'
     content_html: <i>italic enabled rating of ValidUser from StaffUser</i>
@@ -24,8 +24,8 @@
   pk: 3
   fields:
     is_enabled: false
-    ratee: 1 # ValidUser
-    rater: 4 # SuperUser
+    ratee: validuser
+    rater: superuser
     value: -5
     created_at: '2017-01-08 16:23:14.889291+00:00'
     content_html: <i>italic disabled rating of ValidUser from SuperUser</i>
@@ -36,8 +36,8 @@
   pk: 4
   fields:
     is_enabled: true
-    ratee: 4 # SuperUser
-    rater: 2 # InactiveUser
+    ratee: superuser
+    rater: inactiveuser
     value: 5
     created_at: '2017-01-08 16:25:12.889291+00:00'
     content_html: <b>bold enabled rating of SuperUser from InactiveUser</b>
@@ -46,8 +46,8 @@
   pk: 5
   fields:
     is_enabled: true
-    ratee: 4 # SuperUser
-    rater: 3 # StaffUser
+    ratee: superuser
+    rater: staffuser
     value: 0
     created_at: '2017-01-08 16:25:13.889291+00:00'
     content_html: <i>italic enabled rating of SuperUser from StaffUser</i>
@@ -56,8 +56,8 @@
   pk: 6
   fields:
     is_enabled: true
-    ratee: 4 # SuperUser
-    rater: 5 # SuperStaffUser
+    ratee: superuser
+    rater: superstaffuser
     value: -5
     created_at: '2017-01-08 16:25:14.889291+00:00'
     content_html: <i>italic enabled rating of SuperUser from SuperStaffUser</i>

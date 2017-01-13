@@ -23,10 +23,8 @@ class PrefetchForCommentsTestCase(TestCase):
         qs_mock_select.select_related.return_value = qs_mock_prefetch
         result = _prefetch_for_comments(qs_comments=qs_mock_select)
         qs_mock_select.select_related.assert_called_once_with(
-            'topic', 'user', 'user__settings', 'prev_comment',
-            'prev_comment__user', 'prev_comment__user__settings',
+            'topic', 'user', 'prev_comment', 'prev_comment__user',
             'prev_comment__topic')
         qs_mock_prefetch.prefetch_related.assert_called_once_with(
-            'reply_set', 'reply_set__user', 'reply_set__topic',
-            'reply_set__user__settings')
+            'reply_set', 'reply_set__user', 'reply_set__topic')
         self.assertEqual(result, 'stuff')

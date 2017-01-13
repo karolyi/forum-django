@@ -1,9 +1,9 @@
 - model: forum_base.comment
   pk: 4
   fields:
-    user: 2 # InactiveUser
-    topic: 2 # Normal topic
-    moved_from: 1 # Staff topic
+    user: inactiveuser
+    topic: normal-topic-1
+    moved_from: staff-only-topic-1
     time: '2017-01-05 20:57:38.540040+00:00'
     number: 1
     voting_value: 0

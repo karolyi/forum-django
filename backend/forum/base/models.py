@@ -1,10 +1,122 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
+
 from forum.utils import slugify
 
 from .choices import COMMENT_VOTE_HIDE_CHOICES, TOPIC_TYPE_CHOICES
+
+
+class User(AbstractUser):
+
+    """
+    An object representing the user's settings.
+    """
+
+    class Meta:
+        verbose_name = _('User setting')
+        verbose_name_plural = _('User settings')
+
+    slug = AutoSlugField(
+        verbose_name=_('Slug of the user'), max_length=50, unique=True,
+        populate_from='username', slugify_function=slugify, null=False,
+        primary_key=True)
+    last_global_read = models.PositiveIntegerField(
+        verbose_name=_('Last global message ID read'), default=0)
+    received_comment_vote_sum = models.IntegerField(
+        verbose_name=_('Summary received votes value on comments'), default=0)
+    received_comment_vote_count = models.PositiveIntegerField(
+        verbose_name=_('Summary received votes count on comments'), default=0)
+    comment_vote_hide_limit = models.IntegerField(
+        default=-5, verbose_name=_('Hide comments under this vote value'),
+        choices=COMMENT_VOTE_HIDE_CHOICES)
+    quote = models.CharField(
+        max_length=256, verbose_name=_('Chosen quote'), help_text=_(
+            'Quote (visible in the tooltip of the username)'))
+    max_comments_per_day = models.IntegerField(
+        verbose_name=_('Maximum allowed comments per day'), default=-1)
+    comment_count = models.PositiveIntegerField(
+        verbose_name=_('Comment count'), default=0)
+    invitations_today = models.PositiveIntegerField(
+        verbose_name=_('Sent invitations today'), default=0)
+    invited_by = models.ForeignKey(
+        'self', related_name='invited_user_setting_set', null=True,
+        default=None, verbose_name=_('Invited by'))
+    invitations_success = models.PositiveIntegerField(
+        verbose_name=_('Successful invitations'), default=0)
+    pw_reminders_today = models.PositiveIntegerField(
+        verbose_name=_('Password reminders sent today'), default=0)
+    used_skin = models.CharField(
+        max_length=256, verbose_name=_('Used skin name'), default='default')
+    introduction_md_all = models.TextField(
+        verbose_name=_('Introduction for everybody (MD)'),
+        help_text=_('Introduction in Markdown format (visible for everyone)'),
+        default='')
+    introduction_md_reg = models.TextField(
+        verbose_name=_('Introduction for registered users (MD)'), help_text=_(
+            'Introduction in Markdown format (visible for registered users '
+            'only)'),
+        default='')
+    introduction_md_friends = models.TextField(
+        verbose_name=_('Introduction for friended users (MD)'), help_text=_(
+            'Introduction in Markdown format (visible only for users marked '
+            'as friends)'),
+        default='')
+    introduction_html_all = models.TextField(
+        verbose_name=_('Introduction for everybody (HTML)'), help_text=_(
+            'Introduction in HTML format (visible for everyone)'),
+        default='')
+    introduction_html_reg = models.TextField(
+        verbose_name=_('Introduction for registered users (HTML)'),
+        help_text=_(
+            'Introduction in HTML format (visible for registered users '
+            'only)'),
+        default='')
+    introduction_html_friends = models.TextField(
+        verbose_name=_('Introduction for friended users (HTML)'), help_text=_(
+            'Introduction in HTML format (visible only for users marked as '
+            'friends)'),
+        default='')
+    picture_emails = models.CharField(
+        max_length=256, verbose_name=_(
+            'Email addresses used for image upload'
+            ' separated with semicolons (;)'), default='')
+    ignored_users = models.ManyToManyField(
+        'self', related_name='ignored_him',
+        verbose_name=_('List of ignored users'))
+    friended_users = models.ManyToManyField(
+        'self', verbose_name=_('Friended users'), related_name='friended_him')
+    uses_auto_bookmarks = models.BooleanField(
+        default=False, verbose_name=_('Use automatic bookmark placement'))
+    mails_own_topic_comments = models.BooleanField(
+        default=False, verbose_name=_(
+            'Receive mails from comments in own topic'))
+    mails_replies_topic = models.BooleanField(
+        default=True, verbose_name=_('Receive mails from comment replies'))
+    mails_moderation_topic = models.BooleanField(
+        default=True, verbose_name=_('Receive mails from moderation'))
+    mails_messages = models.BooleanField(
+        default=True, verbose_name=_('Receive mails from messages'))
+    show_replies_comment = models.BooleanField(
+        default=True, verbose_name=_('Show replies on comments'))
+    show_relations = models.BooleanField(
+        default=True, verbose_name=_('Show user relations'))
+    is_banned = models.BooleanField(
+        default=False, verbose_name=_('User is banned'))
+    separate_bookmarked_topics = models.BooleanField(
+        default=True, verbose_name=_('Show bookmarked topics separated'))
+    show_outsiders = models.BooleanField(
+        default=True, verbose_name=_('Show not-logged-in users'))
+    has_chat_enabled = models.BooleanField(
+        default=True, verbose_name=_('Enable chat'))
+    is_approved = models.BooleanField(
+        default=False, verbose_name=_('Is approved by admins'))
+    expand_archived = models.BooleanField(
+        default=False, verbose_name=_('Expand archived topics'))
+    images = models.ManyToManyField(
+        'forum_cdn.Image',
+        verbose_name=_('Images in this user\'s descriptions'))
 
 
 class Comment(models.Model):
@@ -93,6 +205,10 @@ class Topic(models.Model):
     def __str__(self):
         return self.name_text
 
+    slug = AutoSlugField(
+        verbose_name=_('Slug'), null=False, max_length=100,
+        populate_from=('name_text',), unique=True, slugify_function=slugify,
+        primary_key=True)
     creator = models.ForeignKey(User, verbose_name=_('Topic creator'))
     name_html = models.CharField(max_length=256, verbose_name=_('HTML name'))
     name_text = models.CharField(max_length=256, verbose_name=_('Text name'))
@@ -110,9 +226,6 @@ class Topic(models.Model):
     reply_to = models.ForeignKey(
         'self', null=True, default=None, on_delete=models.SET_NULL,
         verbose_name=_('Reply to topic goes to'))
-    slug = AutoSlugField(
-        verbose_name=_('Slug'), null=False, max_length=100,
-        populate_from=('name_text',), unique=True, slugify_function=slugify)
     comment_count = models.PositiveIntegerField(
         verbose_name=_('Comment count'), default=0)
     last_comment = models.ForeignKey(
@@ -121,120 +234,6 @@ class Topic(models.Model):
     description = models.TextField(verbose_name=_('Description'))
     images = models.ManyToManyField(
         'forum_cdn.Image', verbose_name=_('Images in this topic description'))
-
-
-class Settings(models.Model):
-
-    """
-    An object representing the user's settings.
-    """
-
-    class Meta:
-        verbose_name = _('User setting')
-        verbose_name_plural = _('User settings')
-
-    def _my_slugify(user_instance):
-        """
-        Returns the username from the OneToOneField relation to User.
-        """
-        return slugify(user_instance.username)
-
-    def __str__(self):
-        return str(self.user)
-
-    user = models.OneToOneField(User, verbose_name=_('Respective user'))
-    slug = AutoSlugField(
-        verbose_name=_('Slug of the user'), max_length=50, unique=True,
-        populate_from='user', slugify_function=_my_slugify, null=False)
-    last_global_read = models.PositiveIntegerField(
-        verbose_name=_('Last global message ID read'))
-    received_comment_vote_sum = models.IntegerField(
-        verbose_name=_('Summary received votes value on comments'))
-    received_comment_vote_count = models.PositiveIntegerField(
-        verbose_name=_('Summary received votes count on comments'))
-    comment_vote_hide_limit = models.IntegerField(
-        default=-5, verbose_name=_('Hide comments under this vote value'),
-        choices=COMMENT_VOTE_HIDE_CHOICES)
-    quote = models.CharField(
-        max_length=256, verbose_name=_('Chosen quote'), help_text=_(
-            'Quote (visible in the tooltip of the username)'))
-    max_comments_per_day = models.PositiveIntegerField(
-        verbose_name=_('Maximum allowed comments per day'))
-    comment_count = models.PositiveIntegerField(
-        verbose_name=_('Comment count'))
-    invitations_today = models.PositiveIntegerField(
-        verbose_name=_('Sent invitations today'))
-    invited_by = models.ForeignKey(
-        User, related_name='invited_user_setting_set', null=True,
-        default=None, verbose_name=_('Invited by'))
-    invitations_success = models.PositiveIntegerField(
-        verbose_name=_('Successful invitations'))
-    pw_reminders_today = models.PositiveIntegerField(
-        verbose_name=_('Password reminders sent today'))
-    used_skin = models.CharField(
-        max_length=256, verbose_name=_('Used skin name'))
-    introduction_md_all = models.TextField(
-        verbose_name=_('Introduction for everybody (MD)'),
-        help_text=_('Introduction in Markdown format (visible for everyone)'))
-    introduction_md_reg = models.TextField(
-        verbose_name=_('Introduction for registered users (MD)'), help_text=_(
-            'Introduction in Markdown format (visible for registered users '
-            'only)'))
-    introduction_md_friends = models.TextField(
-        verbose_name=_('Introduction for friended users (MD)'), help_text=_(
-            'Introduction in Markdown format (visible only for users marked '
-            'as friends)'))
-    introduction_html_all = models.TextField(
-        verbose_name=_('Introduction for everybody (HTML)'), help_text=_(
-            'Introduction in HTML format (visible for everyone)'))
-    introduction_html_reg = models.TextField(
-        verbose_name=_('Introduction for registered users (HTML)'),
-        help_text=_(
-            'Introduction in HTML format (visible for registered users '
-            'only)'))
-    introduction_html_friends = models.TextField(
-        verbose_name=_('Introduction for friended users (HTML)'), help_text=_(
-            'Introduction in HTML format (visible only for users marked as '
-            'friends)'))
-    picture_emails = models.CharField(
-        max_length=256, verbose_name=_(
-            'Email addresses used for image upload'
-            ' separated with semicolons (;)'))
-    ignored_users = models.ManyToManyField(
-        User, related_name='ignored_him',
-        verbose_name=_('List of ignored users'))
-    friended_users = models.ManyToManyField(
-        User, verbose_name=_('Friended users'), related_name='friended_him')
-    uses_auto_bookmarks = models.BooleanField(
-        default=False, verbose_name=_('Use automatic bookmark placement'))
-    mails_own_topic_comments = models.BooleanField(
-        default=False, verbose_name=_(
-            'Receive mails from comments in own topic'))
-    mails_replies_topic = models.BooleanField(
-        default=True, verbose_name=_('Receive mails from comment replies'))
-    mails_moderation_topic = models.BooleanField(
-        default=True, verbose_name=_('Receive mails from moderation'))
-    mails_messages = models.BooleanField(
-        default=True, verbose_name=_('Receive mails from messages'))
-    show_replies_comment = models.BooleanField(
-        default=True, verbose_name=_('Show replies on comments'))
-    show_relations = models.BooleanField(
-        default=True, verbose_name=_('Show user relations'))
-    is_banned = models.BooleanField(
-        default=False, verbose_name=_('User is banned'))
-    separate_bookmarked_topics = models.BooleanField(
-        default=True, verbose_name=_('Show bookmarked topics separated'))
-    show_outsiders = models.BooleanField(
-        default=True, verbose_name=_('Show not-logged-in users'))
-    has_chat_enabled = models.BooleanField(
-        default=True, verbose_name=_('Enable chat'))
-    is_approved = models.BooleanField(
-        default=False, verbose_name=_('Is approved by admins'))
-    expand_archived = models.BooleanField(
-        default=False, verbose_name=_('Expand archived topics'))
-    images = models.ManyToManyField(
-        'forum_cdn.Image',
-        verbose_name=_('Images in this user\'s descriptions'))
 
 
 class IntroductionModification(models.Model):

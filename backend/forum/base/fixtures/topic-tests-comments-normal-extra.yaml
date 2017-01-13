@@ -1,8 +1,8 @@
 - model: forum_base.comment
   pk: 15
   fields:
-    user: 1 # ValidUser
-    topic: 9 # normal-topic-2
+    user: validuser
+    topic: normal-topic-2
     moved_from: null
     time: '2017-01-07 20:02:38.540040+00:00'
     number: 1
@@ -17,8 +17,8 @@
 - model: forum_base.comment
   pk: 16
   fields:
-    user: 2 # InactiveUser
-    topic: 10 # normal-topic-3
+    user: inactiveuser
+    topic: normal-topic-3
     moved_from: null
     time: '2017-01-07 20:03:38.540040+00:00'
     number: 1
@@ -33,8 +33,8 @@
 - model: forum_base.comment
   pk: 17
   fields:
-    user: 3 # StaffUser
-    topic: 11 # normal-topic-4
+    user: staffuser
+    topic: normal-topic-4
     moved_from: null
     time: '2017-01-07 20:04:38.540040+00:00'
     number: 1
@@ -49,8 +49,8 @@
 - model: forum_base.comment
   pk: 18
   fields:
-    user: 4 # SuperUser
-    topic: 12 # normal-topic-5
+    user: superuser
+    topic: normal-topic-5
     moved_from: null
     time: '2017-01-07 20:05:38.540040+00:00'
     number: 1

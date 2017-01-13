@@ -3,7 +3,7 @@ from django.forms import ModelForm
 from django.forms.fields import CharField
 from django.forms.widgets import PasswordInput, TextInput
 from django.utils.translation import ugettext_lazy as _
-from forum.base.models import IntroductionModification, Settings
+from forum.base.models import IntroductionModification, User
 
 
 class ForumAuthForm(AuthenticationForm):
@@ -52,7 +52,7 @@ class SettingsForm(ModelForm):
     `IntroductionModificationForm`.
     """
     class Meta:
-        model = Settings
+        model = User
         fields = [
             'comment_vote_hide_limit', 'ignored_users', 'friended_users',
             'uses_auto_bookmarks', 'mails_own_topic_comments',

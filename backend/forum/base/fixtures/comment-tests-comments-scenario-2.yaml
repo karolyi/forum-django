@@ -5,8 +5,8 @@
 - model: forum_base.comment
   pk: 200
   fields:
-    user: 6 # Banned>User
-    topic: 200 # scenario-2-enabled-non-staff-topic-200
+    user: banneduser
+    topic: scenario-2-enabled-non-staff-topic-200
     moved_from: null
     time: '2017-01-06T20:01:38.540040+00:00'
     number: 1
@@ -23,8 +23,8 @@
 - model: forum_base.comment
   pk: 201
   fields:
-    user: 2 # InactiveUser
-    topic: 200 # scenario-2-enabled-non-staff-topic-200
+    user: inactiveuser
+    topic: scenario-2-enabled-non-staff-topic-200
     moved_from: null
     time: '2017-01-06T20:02:38.540040+00:00'
     number: 2
@@ -41,8 +41,8 @@
 - model: forum_base.comment
   pk: 202
   fields:
-    user: 3 # StaffUser
-    topic: 202 # scenario-2-enabled-staff-topic-202
+    user: staffuser
+    topic: scenario-2-enabled-staff-topic-202
     moved_from: null
     time: '2017-01-06T20:03:38.540040+00:00'
     number: 3
@@ -60,8 +60,8 @@
 - model: forum_base.comment
   pk: 203
   fields:
-    user: 4 # SuperUser
-    topic: 201 # scenario-2-enabled-non-staff-topic-201
+    user: superuser
+    topic: scenario-2-enabled-non-staff-topic-201
     moved_from: null
     time: '2017-01-06T20:04:38.540040+00:00'
     number: 4
@@ -79,8 +79,8 @@
 - model: forum_base.comment
   pk: 204
   fields:
-    user: 5 # SuperStaffUser
-    topic: 200 # scenario-2-enabled-non-staff-topic-200
+    user: superstaffuser
+    topic: scenario-2-enabled-non-staff-topic-200
     moved_from: null
     time: '2017-01-06T20:05:38.540040+00:00'
     number: 5
@@ -98,9 +98,9 @@
 - model: forum_base.comment
   pk: 205
   fields:
-    user: 6 # Banned>User
-    topic: 200 # scenario-2-enabled-non-staff-topic-200
-    moved_from: 202
+    user: banneduser
+    topic: scenario-2-enabled-non-staff-topic-200
+    moved_from: scenario-2-enabled-staff-topic-202
     time: '2017-01-06T20:06:38.540040+00:00'
     number: 6
     voting_value: 1
@@ -117,9 +117,9 @@
 - model: forum_base.comment
   pk: 206
   fields:
-    user: 1 # ValidUser
-    topic: 202 # scenario-2-enabled-staff-topic-202
-    moved_from: 200
+    user: validuser
+    topic: scenario-2-enabled-staff-topic-202
+    moved_from: scenario-2-enabled-non-staff-topic-200
     time: '2017-01-06T20:07:38.540040+00:00'
     number: 7
     voting_value: 1
@@ -136,9 +136,9 @@
 - model: forum_base.comment
   pk: 207
   fields:
-    user: 2 # InactiveUser
-    topic: 201 # scenario-2-enabled-non-staff-topic-201
-    moved_from: 200
+    user: inactiveuser
+    topic: scenario-2-enabled-non-staff-topic-201
+    moved_from: scenario-2-enabled-non-staff-topic-200
     time: '2017-01-06T20:08:38.540040+00:00'
     number: 8
     voting_value: 1
@@ -154,8 +154,8 @@
 - model: forum_base.comment
   pk: 208
   fields:
-    user: 3 # StaffUser
-    topic: 201 # scenario-2-enabled-non-staff-topic-201
+    user: staffuser
+    topic: scenario-2-enabled-non-staff-topic-201
     moved_from: null
     time: '2017-01-06T20:09:38.540040+00:00'
     number: 9

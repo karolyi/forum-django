@@ -1,8 +1,8 @@
 # These are extra topics for testing the topic list pagination
 - model: forum_base.topic
-  pk: 9
+  pk: normal-topic-2
   fields:
-    creator: 2 # InactiveUser
+    creator: inactiveuser
     name_html: Normal topic 2 html name
     name_text: Normal topic 2 text name
     is_enabled: true
@@ -11,15 +11,14 @@
     type: normal
     truncate_at: null
     reply_to: null
-    slug: normal-topic-2
     comment_count: 1
     last_comment: 15
     description: ''
     images: []
 - model: forum_base.topic
-  pk: 10
+  pk: normal-topic-3
   fields:
-    creator: 3 # StaffUser
+    creator: staffuser
     name_html: <b>Normal topic 3 html name</b>
     name_text: Normal topic 3 text name
     is_enabled: true
@@ -28,15 +27,14 @@
     type: normal
     truncate_at: null
     reply_to: null
-    slug: normal-topic-3
     comment_count: 1
     last_comment: 16
     description: ''
     images: []
 - model: forum_base.topic
-  pk: 11
+  pk: normal-topic-4
   fields:
-    creator: 4 # SuperUser
+    creator: superuser
     name_html: Normal topic 4 html name
     name_text: Normal topic 4 text name
     is_enabled: true
@@ -45,15 +43,14 @@
     type: normal
     truncate_at: null
     reply_to: null
-    slug: normal-topic-4
     comment_count: 1
     last_comment: 17
     description: ''
     images: []
 - model: forum_base.topic
-  pk: 12
+  pk: normal-topic-5
   fields:
-    creator: 5 # SuperStaffUser
+    creator: superstaffuser
     name_html: Normal topic 5 html name
     name_text: Normal topic 5 text name
     is_enabled: true
@@ -62,7 +59,6 @@
     type: normal
     truncate_at: null
     reply_to: null
-    slug: normal-topic-5
     comment_count: 1
     last_comment: 18
     description: ''

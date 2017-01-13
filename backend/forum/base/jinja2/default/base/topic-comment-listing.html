@@ -29,8 +29,8 @@
         </div>
     </section>
     {% endif %}
-    {% for model_comment in page_comments %}
-        {{ topic_comment_template(model_comment=model_comment, is_template=False, show_invisible=False) }}
+    {% for comment in page_comments %}
+        {{ topic_comment_template(comment=comment, is_template=False, show_invisible=False) }}
     {% endfor %}
 </article>
 

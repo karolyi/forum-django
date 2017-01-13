@@ -1,5 +1,5 @@
-- model: auth.user
-  pk: 1
+- model: forum_base.user
+  pk: validuser
   fields:
     password: pbkdf2_sha256$30000$wRknOYiX7col$wmX0d8F6mC5HfGfnPSToDuqZZDce5c/OoB+oPpkgmb8=
     last_login: null
@@ -13,8 +13,43 @@
     date_joined: '2017-01-03 17:06:49.522160+00:00'
     groups: []
     user_permissions: []
-- model: auth.user
-  pk: 2
+    last_global_read: 0
+    received_comment_vote_sum: 0
+    received_comment_vote_count: 0
+    comment_vote_hide_limit: -5
+    quote: validuser quote
+    max_comments_per_day: 0
+    comment_count: 0
+    invitations_today: 0
+    invited_by: null
+    invitations_success: 0
+    pw_reminders_today: 0
+    used_skin: default
+    introduction_md_all: ''
+    introduction_md_reg: ''
+    introduction_md_friends: ''
+    introduction_html_all: ''
+    introduction_html_reg: ''
+    introduction_html_friends: ''
+    picture_emails: ''
+    uses_auto_bookmarks: false
+    mails_own_topic_comments: false
+    mails_replies_topic: true
+    mails_moderation_topic: true
+    mails_messages: true
+    show_replies_comment: true
+    show_relations: true
+    is_banned: false
+    separate_bookmarked_topics: true
+    show_outsiders: true
+    has_chat_enabled: true
+    is_approved: true
+    expand_archived: false
+    ignored_users: []
+    friended_users: []
+    images: []
+- model: forum_base.user
+  pk: inactiveuser
   fields:
     password: pbkdf2_sha256$30000$wRknOYiX7col$wmX0d8F6mC5HfGfnPSToDuqZZDce5c/OoB+oPpkgmb8=
     last_login: null
@@ -28,8 +63,43 @@
     date_joined: '2017-01-03 17:06:49.522160+00:00'
     groups: []
     user_permissions: []
-- model: auth.user
-  pk: 3
+    last_global_read: 0
+    received_comment_vote_sum: 0
+    received_comment_vote_count: 0
+    comment_vote_hide_limit: -5
+    quote: inactiveuser quote
+    max_comments_per_day: 0
+    comment_count: 0
+    invitations_today: 0
+    invited_by: null
+    invitations_success: 0
+    pw_reminders_today: 0
+    used_skin: default
+    introduction_md_all: ''
+    introduction_md_reg: ''
+    introduction_md_friends: ''
+    introduction_html_all: ''
+    introduction_html_reg: ''
+    introduction_html_friends: ''
+    picture_emails: ''
+    uses_auto_bookmarks: false
+    mails_own_topic_comments: false
+    mails_replies_topic: true
+    mails_moderation_topic: true
+    mails_messages: true
+    show_replies_comment: true
+    show_relations: true
+    is_banned: false
+    separate_bookmarked_topics: true
+    show_outsiders: true
+    has_chat_enabled: true
+    is_approved: true
+    expand_archived: false
+    ignored_users: []
+    friended_users: []
+    images: []
+- model: forum_base.user
+  pk: staffuser
   fields:
     password: pbkdf2_sha256$30000$wRknOYiX7col$wmX0d8F6mC5HfGfnPSToDuqZZDce5c/OoB+oPpkgmb8=
     last_login: null
@@ -43,8 +113,43 @@
     date_joined: '2017-01-03 17:06:49.522160+00:00'
     groups: []
     user_permissions: []
-- model: auth.user
-  pk: 4
+    last_global_read: 0
+    received_comment_vote_sum: 0
+    received_comment_vote_count: 0
+    comment_vote_hide_limit: -5
+    quote: staffuser quote
+    max_comments_per_day: 0
+    comment_count: 0
+    invitations_today: 0
+    invited_by: null
+    invitations_success: 0
+    pw_reminders_today: 0
+    used_skin: default
+    introduction_md_all: ''
+    introduction_md_reg: ''
+    introduction_md_friends: ''
+    introduction_html_all: ''
+    introduction_html_reg: ''
+    introduction_html_friends: ''
+    picture_emails: ''
+    uses_auto_bookmarks: false
+    mails_own_topic_comments: false
+    mails_replies_topic: true
+    mails_moderation_topic: true
+    mails_messages: true
+    show_replies_comment: true
+    show_relations: true
+    is_banned: false
+    separate_bookmarked_topics: true
+    show_outsiders: true
+    has_chat_enabled: true
+    is_approved: true
+    expand_archived: false
+    ignored_users: []
+    friended_users: []
+    images: []
+- model: forum_base.user
+  pk: superuser
   fields:
     password: pbkdf2_sha256$30000$wRknOYiX7col$wmX0d8F6mC5HfGfnPSToDuqZZDce5c/OoB+oPpkgmb8=
     last_login: null
@@ -58,8 +163,43 @@
     date_joined: '2017-01-03 17:06:49.522160+00:00'
     groups: []
     user_permissions: []
-- model: auth.user
-  pk: 5
+    last_global_read: 0
+    received_comment_vote_sum: 0
+    received_comment_vote_count: 0
+    comment_vote_hide_limit: -5
+    quote: superuser quote
+    max_comments_per_day: 0
+    comment_count: 0
+    invitations_today: 0
+    invited_by: null
+    invitations_success: 0
+    pw_reminders_today: 0
+    used_skin: default
+    introduction_md_all: ''
+    introduction_md_reg: ''
+    introduction_md_friends: ''
+    introduction_html_all: ''
+    introduction_html_reg: ''
+    introduction_html_friends: ''
+    picture_emails: ''
+    uses_auto_bookmarks: false
+    mails_own_topic_comments: false
+    mails_replies_topic: true
+    mails_moderation_topic: true
+    mails_messages: true
+    show_replies_comment: true
+    show_relations: true
+    is_banned: false
+    separate_bookmarked_topics: true
+    show_outsiders: true
+    has_chat_enabled: true
+    is_approved: true
+    expand_archived: false
+    ignored_users: []
+    friended_users: []
+    images: []
+- model: forum_base.user
+  pk: superstaffuser
   fields:
     password: pbkdf2_sha256$30000$wRknOYiX7col$wmX0d8F6mC5HfGfnPSToDuqZZDce5c/OoB+oPpkgmb8=
     last_login: null
@@ -73,8 +213,43 @@
     date_joined: '2017-01-03 17:06:49.522160+00:00'
     groups: []
     user_permissions: []
-- model: auth.user
-  pk: 6
+    last_global_read: 0
+    received_comment_vote_sum: 0
+    received_comment_vote_count: 0
+    comment_vote_hide_limit: -5
+    quote: superstaffuser quote
+    max_comments_per_day: 0
+    comment_count: 0
+    invitations_today: 0
+    invited_by: null
+    invitations_success: 0
+    pw_reminders_today: 0
+    used_skin: default
+    introduction_md_all: ''
+    introduction_md_reg: ''
+    introduction_md_friends: ''
+    introduction_html_all: ''
+    introduction_html_reg: ''
+    introduction_html_friends: ''
+    picture_emails: ''
+    uses_auto_bookmarks: false
+    mails_own_topic_comments: false
+    mails_replies_topic: true
+    mails_moderation_topic: true
+    mails_messages: true
+    show_replies_comment: true
+    show_relations: true
+    is_banned: false
+    separate_bookmarked_topics: true
+    show_outsiders: true
+    has_chat_enabled: true
+    is_approved: true
+    expand_archived: false
+    ignored_users: []
+    friended_users: []
+    images: []
+- model: forum_base.user
+  pk: banneduser
   fields:
     password: pbkdf2_sha256$30000$wRknOYiX7col$wmX0d8F6mC5HfGfnPSToDuqZZDce5c/OoB+oPpkgmb8=
     last_login: null
@@ -88,231 +263,11 @@
     date_joined: '2017-01-03 17:09:49.522160+00:00'
     groups: []
     user_permissions: []
-- model: auth.user
-  pk: 7
-  fields:
-    password: pbkdf2_sha256$30000$wRknOYiX7col$wmX0d8F6mC5HfGfnPSToDuqZZDce5c/OoB+oPpkgmb8=
-    last_login: null
-    is_superuser: false
-    username: ArchivesExpanderUser
-    first_name: ''
-    last_name: ''
-    email: ''
-    is_staff: false
-    is_active: true
-    date_joined: '2017-01-03 17:09:49.522160+00:00'
-    groups: []
-    user_permissions: []
-- model: forum_base.settings
-  pk: 1
-  fields:
-    user: 1
-    slug: validuser
     last_global_read: 0
     received_comment_vote_sum: 0
     received_comment_vote_count: 0
     comment_vote_hide_limit: -5
-    quote: 'validuser quote'
-    max_comments_per_day: 0
-    comment_count: 0
-    invitations_today: 0
-    invited_by: null
-    invitations_success: 0
-    pw_reminders_today: 0
-    used_skin: default
-    introduction_md_all: ''
-    introduction_md_reg: ''
-    introduction_md_friends: ''
-    introduction_html_all: ''
-    introduction_html_reg: ''
-    introduction_html_friends: ''
-    picture_emails: ''
-    uses_auto_bookmarks: false
-    mails_own_topic_comments: false
-    mails_replies_topic: true
-    mails_moderation_topic: true
-    mails_messages: true
-    show_replies_comment: true
-    show_relations: true
-    is_banned: false
-    separate_bookmarked_topics: true
-    show_outsiders: true
-    has_chat_enabled: true
-    is_approved: true
-    expand_archived: false
-    ignored_users: []
-    friended_users: []
-    images: []
-- model: forum_base.settings
-  pk: 2
-  fields:
-    user: 2
-    slug: inactiveuser
-    last_global_read: 0
-    received_comment_vote_sum: 0
-    received_comment_vote_count: 0
-    comment_vote_hide_limit: -5
-    quote: 'inactiveuser quote'
-    max_comments_per_day: 0
-    comment_count: 0
-    invitations_today: 0
-    invited_by: null
-    invitations_success: 0
-    pw_reminders_today: 0
-    used_skin: default
-    introduction_md_all: ''
-    introduction_md_reg: ''
-    introduction_md_friends: ''
-    introduction_html_all: ''
-    introduction_html_reg: ''
-    introduction_html_friends: ''
-    picture_emails: ''
-    uses_auto_bookmarks: false
-    mails_own_topic_comments: false
-    mails_replies_topic: true
-    mails_moderation_topic: true
-    mails_messages: true
-    show_replies_comment: true
-    show_relations: true
-    is_banned: false
-    separate_bookmarked_topics: true
-    show_outsiders: true
-    has_chat_enabled: true
-    is_approved: true
-    expand_archived: false
-    ignored_users: []
-    friended_users: []
-    images: []
-- model: forum_base.settings
-  pk: 3
-  fields:
-    user: 3
-    slug: staffuser
-    last_global_read: 0
-    received_comment_vote_sum: 0
-    received_comment_vote_count: 0
-    comment_vote_hide_limit: -5
-    quote: 'staffuser quote'
-    max_comments_per_day: 0
-    comment_count: 0
-    invitations_today: 0
-    invited_by: null
-    invitations_success: 0
-    pw_reminders_today: 0
-    used_skin: default
-    introduction_md_all: ''
-    introduction_md_reg: ''
-    introduction_md_friends: ''
-    introduction_html_all: ''
-    introduction_html_reg: ''
-    introduction_html_friends: ''
-    picture_emails: ''
-    uses_auto_bookmarks: false
-    mails_own_topic_comments: false
-    mails_replies_topic: true
-    mails_moderation_topic: true
-    mails_messages: true
-    show_replies_comment: true
-    show_relations: true
-    is_banned: false
-    separate_bookmarked_topics: true
-    show_outsiders: true
-    has_chat_enabled: true
-    is_approved: true
-    expand_archived: false
-    ignored_users: []
-    friended_users: []
-    images: []
-- model: forum_base.settings
-  pk: 4
-  fields:
-    user: 4
-    slug: superuser
-    last_global_read: 0
-    received_comment_vote_sum: 0
-    received_comment_vote_count: 0
-    comment_vote_hide_limit: -5
-    quote: 'superuser quote'
-    max_comments_per_day: 0
-    comment_count: 0
-    invitations_today: 0
-    invited_by: null
-    invitations_success: 0
-    pw_reminders_today: 0
-    used_skin: default
-    introduction_md_all: ''
-    introduction_md_reg: ''
-    introduction_md_friends: ''
-    introduction_html_all: ''
-    introduction_html_reg: ''
-    introduction_html_friends: ''
-    picture_emails: ''
-    uses_auto_bookmarks: false
-    mails_own_topic_comments: false
-    mails_replies_topic: true
-    mails_moderation_topic: true
-    mails_messages: true
-    show_replies_comment: true
-    show_relations: true
-    is_banned: false
-    separate_bookmarked_topics: true
-    show_outsiders: true
-    has_chat_enabled: true
-    is_approved: true
-    expand_archived: false
-    ignored_users: []
-    friended_users: []
-    images: []
-- model: forum_base.settings
-  pk: 5
-  fields:
-    user: 5
-    slug: superstaffuser
-    last_global_read: 0
-    received_comment_vote_sum: 0
-    received_comment_vote_count: 0
-    comment_vote_hide_limit: -5
-    quote: 'superstaffuser quote'
-    max_comments_per_day: 0
-    comment_count: 0
-    invitations_today: 0
-    invited_by: null
-    invitations_success: 0
-    pw_reminders_today: 0
-    used_skin: default
-    introduction_md_all: ''
-    introduction_md_reg: ''
-    introduction_md_friends: ''
-    introduction_html_all: ''
-    introduction_html_reg: ''
-    introduction_html_friends: ''
-    picture_emails: ''
-    uses_auto_bookmarks: false
-    mails_own_topic_comments: false
-    mails_replies_topic: true
-    mails_moderation_topic: true
-    mails_messages: true
-    show_replies_comment: true
-    show_relations: true
-    is_banned: false
-    separate_bookmarked_topics: true
-    show_outsiders: true
-    has_chat_enabled: true
-    is_approved: true
-    expand_archived: false
-    ignored_users: []
-    friended_users: []
-    images: []
-- model: forum_base.settings
-  pk: 6
-  fields:
-    user: 6
-    slug: banneduser
-    last_global_read: 0
-    received_comment_vote_sum: 0
-    received_comment_vote_count: 0
-    comment_vote_hide_limit: -5
-    quote: 'Banned>User quote'
+    quote: Banned>User quote
     max_comments_per_day: 0
     comment_count: 0
     invitations_today: 0
@@ -343,16 +298,26 @@
     ignored_users: []
     friended_users: []
     images: []
-- model: forum_base.settings
-  pk: 7
+- model: forum_base.user
+  pk: archivesexpanderuser
   fields:
-    user: 7
-    slug: archivesexpanderuser
+    password: pbkdf2_sha256$30000$wRknOYiX7col$wmX0d8F6mC5HfGfnPSToDuqZZDce5c/OoB+oPpkgmb8=
+    last_login: null
+    is_superuser: false
+    username: ArchivesExpanderUser
+    first_name: ''
+    last_name: ''
+    email: ''
+    is_staff: false
+    is_active: true
+    date_joined: '2017-01-03 17:09:49.522160+00:00'
+    groups: []
+    user_permissions: []
     last_global_read: 0
     received_comment_vote_sum: 0
     received_comment_vote_count: 0
     comment_vote_hide_limit: -5
-    quote: 'ArchivesExpanderUser quote'
+    quote: ArchivesExpanderUser quote
     max_comments_per_day: 0
     comment_count: 0
     invitations_today: 0

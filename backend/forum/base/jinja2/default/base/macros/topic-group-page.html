@@ -15,7 +15,7 @@
         </div>
         <div class="clearfix visible-xs-block"></div>
         <div class="col-xs-6 col-sm-2 text-center">
-            {{ forum_username(model_user=model_topic.last_comment.user) }}
+            {{ forum_username(user=model_topic.last_comment.user) }}
         </div>
         <div class="col-xs-6 col-sm-2 text-center topic-comment-count">
             {{ model_topic.comment_count }}

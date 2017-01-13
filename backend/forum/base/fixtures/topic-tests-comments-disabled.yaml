@@ -1,8 +1,8 @@
 - model: forum_base.comment
   pk: 8
   fields:
-    user: 2
-    topic: 4 # Disabled topic
+    user: inactiveuser
+    topic: disabled-normal-topic-1
     moved_from: null
     time: '2017-01-05 20:00:38.540040+00:00'
     number: 1

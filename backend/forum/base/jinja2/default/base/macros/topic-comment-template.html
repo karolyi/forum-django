@@ -2,14 +2,14 @@
 {% from 'default/macros/forum-time.html' import forum_time %}
 {% from 'default/base/macros/topic-comment-onereply.html' import topic_comment_onereply %}
 
-{% macro topic_comment_template(model_comment=None, is_template=False, show_invisible=False) -%}
-<section class="card topic-comment-wrapper" data-comment-id="{{ model_comment.id if not is_template else ''}}" data-topic-slug="{{ model_comment.topic.slug if not is_template else '' }}">
+{% macro topic_comment_template(comment=None, is_template=False, show_invisible=False) -%}
+<section class="card topic-comment-wrapper" data-comment-id="{{ comment.id if not is_template else ''}}" data-topic-slug="{{ comment.topic.slug if not is_template else '' }}">
     <div class="card-header">
         <div class="row">
             <div class="col-xs-2 col-sm-1 comment-number-wrapper">
                 {% if not is_template -%}
-                    <a href="{{ url('forum:base:topic-comment-listing', topic_slug=model_comment.topic.slug, comment_id=model_comment.id) }}" data-link-to="{{ model_comment.id }}" class="comment-number">
-                        #<span class="comment-number-inside">{{ model_comment.number }}</span>
+                    <a href="{{ url('forum:base:topic-comment-listing', topic_slug=comment.topic.slug, comment_id=comment.id) }}" data-link-to="{{ comment.id }}" class="comment-number">
+                        #<span class="comment-number-inside">{{ comment.number }}</span>
                     </a>
                 {%- else -%}
                     <a href="" data-link-to="" class="comment-number">
@@ -18,20 +18,20 @@
                 {%- endif %}
             </div>
             <div class="col-xs-3 col-sm-2 commenter-user">
-                {{ forum_username(model_user=model_comment.user|default(None), is_template=is_template) }}
+                {{ forum_username(user=comment.user|default(None), is_template=is_template) }}
             </div>
             <div class="col-xs-3 col-sm-2 comment-time">
-                {{ forum_time(time=model_comment.time, is_template=is_template) }}
+                {{ forum_time(time=comment.time, is_template=is_template) }}
             </div>
             <div class="col-xs-4 col-sm-2 comment-previous">
-            {% if not is_template and model_comment.prev_comment -%}
-                {% set is_prev_comment_visible = is_topic_comment_visible(comment=model_comment.prev_comment, show_invisible=show_invisible, request=request, cache_key='topic-comment-listing') -%}
+            {% if not is_template and comment.prev_comment -%}
+                {% set is_prev_comment_visible = is_topic_comment_visible(comment=comment.prev_comment, show_invisible=show_invisible, request=request, cache_key='topic-comment-listing') -%}
                 {% if is_prev_comment_visible -%}
-                    <a href="{{ url('forum:base:topic-comment-listing', topic_slug=model_comment.prev_comment.topic.slug, comment_id=model_comment.prev_comment_id) }}" data-link-to="{{ model_comment.prev_comment_id }}">
+                    <a href="{{ url('forum:base:topic-comment-listing', topic_slug=comment.prev_comment.topic.slug, comment_id=comment.prev_comment_id) }}" data-link-to="{{ comment.prev_comment_id }}">
                         {{- _('re:&nbsp;#') -}}
-                        {{- model_comment.prev_comment.number -}}
+                        {{- comment.prev_comment.number -}}
                     </a>
-                    ({{- forum_username(model_user=model_comment.prev_comment.user|default(None), is_template=is_template) -}})
+                    ({{- forum_username(user=comment.prev_comment.user|default(None), is_template=is_template) -}})
                 {%- endif %}
             {%- else -%}
                 &nbsp;
@@ -41,15 +41,15 @@
             <div class="col-xs-2 col-sm-1 voting-value-wrapper">
                 <span class="voting-value {% spaceless %}
                     {% if not is_template %}
-                        {% if model_comment.voting_value > 0 %}
+                        {% if comment.voting_value > 0 %}
                             text-success
-                        {% elif model_comment.voting_value < 0 %}
+                        {% elif comment.voting_value < 0 %}
                             text-danger
                         {% endif %}
                     {% endif %}
                 {% endspaceless %}">
                     {% if not is_template %}
-                        {% if model_comment.voting_value > 0 %}+{% endif %}{{ model_comment.voting_value }}
+                        {% if comment.voting_value > 0 %}+{% endif %}{{ comment.voting_value }}
                     {% endif %}
                 </span>
             </div>
@@ -62,14 +62,14 @@
     </div>
     <div class="card-block">
         <div class="card-text comment-content">
-            {{ (model_comment.content_html if not is_template else '')|safe }}
+            {{ (comment.content_html if not is_template else '')|safe }}
         {% if is_template -%}
             {{ topic_comment_onereply(is_template=is_template) }}
-        {%- elif model_comment.reply_set.all() -%}
-            {% for model_comment in model_comment.reply_set.all() -%}
-            {% set is_onereply_visible = is_topic_comment_visible(comment=model_comment, show_invisible=show_invisible, request=request, cache_key='topic-comment-listing') %}
+        {%- elif comment.reply_set.all() -%}
+            {% for comment in comment.reply_set.all() -%}
+            {% set is_onereply_visible = is_topic_comment_visible(comment=comment, show_invisible=show_invisible, request=request, cache_key='topic-comment-listing') %}
             {% if is_onereply_visible -%}
-                {{ topic_comment_onereply(model_comment=model_comment, is_template=is_template) }}
+                {{ topic_comment_onereply(comment=comment, is_template=is_template) }}
             {%- endif %}
             {%- endfor %}
         {%- endif %}

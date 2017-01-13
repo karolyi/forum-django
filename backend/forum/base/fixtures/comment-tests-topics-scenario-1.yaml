@@ -3,9 +3,9 @@
 # `comment-tests-comments-scenario-1.yaml`
 
 - model: forum_base.topic
-  pk: 100
+  pk: scenario-1-enabled-non-staff-topic-100
   fields:
-    creator: 2 # InactiveUser
+    creator: inactiveuser
     name_html: Scenario-1 enabled non-staff 100 html name
     name_text: Scenario-1 enabled non-staff 100 text name
     is_enabled: true
@@ -14,15 +14,14 @@
     type: normal
     truncate_at: null
     reply_to: null
-    slug: scenario-1-enabled-non-staff-topic-100
     comment_count: 4
     last_comment: 105
     description: ''
     images: []
 - model: forum_base.topic
-  pk: 101
+  pk: scenario-1-enabled-non-staff-topic-101
   fields:
-    creator: 3 # StaffUser
+    creator: staffuser
     name_html: <b>Scenario-1 enabled non-staff 101 html name</b>
     name_text: Scenario-1 enabled non-staff 101 text name
     is_enabled: true
@@ -31,15 +30,14 @@
     type: normal
     truncate_at: null
     reply_to: null
-    slug: scenario-1-enabled-non-staff-topic-101
     comment_count: 2
     last_comment: 107
     description: ''
     images: []
 - model: forum_base.topic
-  pk: 102
+  pk: scenario-1-disabled-non-staff-topic-102
   fields:
-    creator: 4 # SuperUser
+    creator: superuser
     name_html: <b>Scenario-1 disabled non-staff 102 html name</b>
     name_text: Scenario-1 disabled non-staff 102 text name
     is_enabled: false
@@ -48,7 +46,6 @@
     type: normal
     truncate_at: null
     reply_to: null
-    slug: scenario-1-disabled-non-staff-topic-102
     comment_count: 2
     last_comment: 106
     description: ''

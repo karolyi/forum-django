@@ -1,8 +1,8 @@
 - model: forum_base.comment
   pk: 10
   fields:
-    user: 1 # ValidUser
-    topic: 5 # Archived enabled non-staff topic
+    user: validuser
+    topic: archived-enabled-non-staff-topic-1
     moved_from: null
     time: '2017-01-05 20:02:38.540040+00:00'
     number: 1
@@ -17,8 +17,8 @@
 - model: forum_base.comment
   pk: 14
   fields:
-    user: 5 # SuperStaffUser
-    topic: 5 # Archived enabled non-staff topic
+    user: superstaffuser
+    topic: archived-enabled-non-staff-topic-1
     moved_from: null
     time: '2017-01-05 20:03:38.540040+00:00'
     number: 1
@@ -33,8 +33,8 @@
 - model: forum_base.comment
   pk: 11
   fields:
-    user: 2 # InactiveUser
-    topic: 6 # Archived disabled non-staff topic
+    user: inactiveuser
+    topic: archived-disabled-non-staff-topic-1
     moved_from: null
     time: '2017-01-05 20:04:38.540040+00:00'
     number: 1
@@ -49,8 +49,8 @@
 - model: forum_base.comment
   pk: 12
   fields:
-    user: 3 # StaffUser
-    topic: 7 # Archived enabled staff topic
+    user: staffuser
+    topic: archived-enabled-staff-topic-1
     moved_from: null
     time: '2017-01-05 20:06:38.540040+00:00'
     number: 1
@@ -65,8 +65,8 @@
 - model: forum_base.comment
   pk: 13
   fields:
-    user: 4 # SuperUser
-    topic: 8 # Archived disabled staff topic
+    user: superuser
+    topic: archived-disabled-staff-topic-1
     moved_from: null
     time: '2017-01-05 20:07:38.540040+00:00'
     number: 1

@@ -1,7 +1,7 @@
 - model: forum_base.topic
-  pk: 5
+  pk: archived-enabled-non-staff-topic-1
   fields:
-    creator: 1 # ValidUser
+    creator: validuser
     name_html: Archived enabled non-staff topic 1 html name
     name_text: Archived enabled non-staff topic 1 text name
     is_enabled: true
@@ -10,15 +10,14 @@
     type: archived
     truncate_at: null
     reply_to: null
-    slug: archived-enabled-non-staff-topic-1
     comment_count: 2
     last_comment: 14
     description: ''
     images: []
 - model: forum_base.topic
-  pk: 6
+  pk: archived-disabled-non-staff-topic-1
   fields:
-    creator: 2 # InactiveUser
+    creator: inactiveuser
     name_html: Archived disabled non-staff topic 1 html name
     name_text: Archived disabled non-staff topic 1 text name
     is_enabled: false
@@ -27,15 +26,14 @@
     type: archived
     truncate_at: null
     reply_to: null
-    slug: archived-disabled-non-staff-topic-1
     comment_count: 1
     last_comment: 11
     description: ''
     images: []
 - model: forum_base.topic
-  pk: 7
+  pk: archived-enabled-staff-topic-1
   fields:
-    creator: 3 # StaffUser
+    creator: staffuser
     name_html: Archived enabled staff topic 1 html name
     name_text: Archived enabled staff topic 1 text name
     is_enabled: true
@@ -44,15 +42,14 @@
     type: archived
     truncate_at: null
     reply_to: null
-    slug: archived-enabled-staff-topic-1
     comment_count: 1
     last_comment: 12
     description: ''
     images: []
 - model: forum_base.topic
-  pk: 8
+  pk: archived-disabled-staff-topic-1
   fields:
-    creator: 4 # SuperUser
+    creator: superuser
     name_html: Archived disabled staff topic 1 html name
     name_text: Archived disabled staff topic 1 text name
     is_enabled: false
@@ -61,7 +58,6 @@
     type: archived
     truncate_at: null
     reply_to: null
-    slug: archived-disabled-staff-topic-1
     comment_count: 1
     last_comment: 13
     description: ''

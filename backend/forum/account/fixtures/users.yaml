@@ -1,5 +1,5 @@
-- model: auth.user
-  pk: 1
+- model: forum_base.user
+  pk: validuser
   fields:
     password: pbkdf2_sha256$30000$wRknOYiX7col$wmX0d8F6mC5HfGfnPSToDuqZZDce5c/OoB+oPpkgmb8=
     last_login: null
@@ -13,26 +13,6 @@
     date_joined: '2017-01-03 17:06:49.522160+00:00'
     groups: []
     user_permissions: []
-- model: auth.user
-  pk: 2
-  fields:
-    password: pbkdf2_sha256$30000$wRknOYiX7col$wmX0d8F6mC5HfGfnPSToDuqZZDce5c/OoB+oPpkgmb8=
-    last_login: null
-    is_superuser: false
-    username: InactiveUser
-    first_name: ''
-    last_name: ''
-    email: ''
-    is_staff: false
-    is_active: false
-    date_joined: '2017-01-03 17:06:49.522160+00:00'
-    groups: []
-    user_permissions: []
-- model: forum_base.settings
-  pk: 1
-  fields:
-    user: 1
-    slug: validuser
     last_global_read: 0
     received_comment_vote_sum: 0
     received_comment_vote_count: 0
@@ -68,11 +48,21 @@
     ignored_users: []
     friended_users: []
     images: []
-- model: forum_base.settings
-  pk: 2
+- model: forum_base.user
+  pk: inactiveuser
   fields:
-    user: 2
-    slug: inactiveuser
+    password: pbkdf2_sha256$30000$wRknOYiX7col$wmX0d8F6mC5HfGfnPSToDuqZZDce5c/OoB+oPpkgmb8=
+    last_login: null
+    is_superuser: false
+    username: InactiveUser
+    first_name: ''
+    last_name: ''
+    email: ''
+    is_staff: false
+    is_active: false
+    date_joined: '2017-01-03 17:06:49.522160+00:00'
+    groups: []
+    user_permissions: []
     last_global_read: 0
     received_comment_vote_sum: 0
     received_comment_vote_count: 0

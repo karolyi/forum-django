@@ -24,28 +24,28 @@
         </a>
     </section>
     {%- set last_comment = {'topic': None} -%}
-    {% for model_comment in qs_comments -%}
-        {% if last_comment.topic != model_comment.topic -%}
+    {% for comment in qs_comments -%}
+        {% if last_comment.topic != comment.topic -%}
         {% if not loop.first -%}
             </div>
         </section>
         {%- endif %}
-        <section class="card card-block card-outline-primary group-comments-in-topic" aria-label="{{ _('Comments in the same topic') }}" data-topic-slug='{{ model_comment.topic.slug }}'>
+        <section class="card card-block card-outline-primary group-comments-in-topic" aria-label="{{ _('Comments in the same topic') }}" data-topic-slug='{{ comment.topic.slug }}'>
             <div class="card-text">
                 <div class="topic-button-wrapper">
-                    <a class="btn btn-primary" href="{{ url('forum:base:topic-comment-listing', topic_slug=model_comment.topic.slug) }}">
-                        {{ model_comment.topic.name_html|safe }}
+                    <a class="btn btn-primary" href="{{ url('forum:base:topic-comment-listing', topic_slug=comment.topic.slug) }}">
+                        {{ comment.topic.name_html|safe }}
                     </a>
                 </div>
         {%- endif %}
 
-        {{ topic_comment_template(model_comment=model_comment, is_template=False) }}
+        {{ topic_comment_template(comment=comment, is_template=False) }}
 
         {% if loop.last -%}
             </div>
         </section>
         {%- endif %}
-        {%- do last_comment.update({'topic': model_comment.topic}) -%}
+        {%- do last_comment.update({'topic': comment.topic}) -%}
     {%- endfor %}
 </article>
 {% jsmin %}
