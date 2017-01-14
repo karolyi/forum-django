@@ -22,7 +22,7 @@
                 {% for error in widget.errors -%}
                     <p>
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        {{- error|e -}}
+                        {{ error|e }}
                     </p>
                 {%- endfor %}
             </div>

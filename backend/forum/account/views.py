@@ -1,4 +1,3 @@
-from typing import Union
 
 from django.conf import settings
 from django.contrib import messages
@@ -10,11 +9,8 @@ from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls.base import reverse
 from django.utils.decorators import method_decorator
-from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import View
-from forum.base.models import IntroductionModification
-
 from .forms import ForumAuthForm, IntroductionModificationForm, SettingsForm
 from .utils import get_next_url
 
@@ -71,19 +67,6 @@ class SettingsView(View):
     """
     template_name = 'account/settings.html'
 
-    @cached_property
-    def last_intro_mod(self) -> Union[IntroductionModification, None]:
-        """
-        Return the :model:`forum_base.IntroductionModification` for the
-        user.
-
-        Return `None` if none exists.
-        """
-        try:
-            return self.request.user.introductionmodification
-        except IntroductionModification.DoesNotExist:
-            return None
-
     def get(self, request: WSGIRequest):
         """
         Serving HTTP GET.
@@ -91,7 +74,7 @@ class SettingsView(View):
         return render(
             request=request, template_name=self.template_name, context={
                 'intro_mod_form': IntroductionModificationForm(
-                    instance=self.last_intro_mod),
+                    user=request.user),
                 'settings_form': SettingsForm(instance=request.user)})
 
     def post(self, request: WSGIRequest):
@@ -99,7 +82,7 @@ class SettingsView(View):
         Try to authenticate the user.
         """
         intro_mod_form = IntroductionModificationForm(
-            data=request.POST, instance=self.last_intro_mod)
+            data=request.POST, user=request.user)
         settings_form = SettingsForm(
             data=request.POST, instance=request.user)
         if intro_mod_form.is_valid() and settings_form.is_valid():
@@ -109,11 +92,12 @@ class SettingsView(View):
             if intro_mod_form.instance.pk is None:
                 # New instance, fill necessary data
                 intro_mod_form.instance.user = request.user
-            intro_mod_form.save()
-            messages.info(request=request, message=_(
-                'Your new introductions have been saved successfully. '
-                'However, they won\'t be visible until an admin approves '
-                'them.'))
+            if intro_mod_form.has_changed():
+                intro_mod_form.save()
+                messages.info(request=request, message=_(
+                    'Your new introductions have been saved successfully. '
+                    'However, they won\'t be visible until an admin approves '
+                    'them.'))
             return HttpResponseRedirect(
                 redirect_to=reverse('forum:account:settings'))
         # Invalid form

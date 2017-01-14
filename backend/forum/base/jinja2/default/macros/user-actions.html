@@ -6,10 +6,14 @@
     <div class="card-text">
     <form method="post" action="{{ url('forum:account:login') }}">
         {% csrf_token %}
-        <legend>{{ _('Login') }}</legend>
+        <legend>
+            <i class="fa fa-sign-in" aria-hidden="true"></i>
+            {{ _('Login') }}
+        </legend>
         {{ render_form(form=forum_auth_form(is_autofocus=is_autofocus)) }}
         <div class="text-center">
             <button type="submit" class="btn btn-primary">
+                <i class="fa fa-check" aria-hidden="true"></i>
                 {{- _('Submit') -}}
             </button>
         </div>
@@ -18,9 +22,19 @@
 </section>
 {% else %}
 <section class="card card-block" aria-label="{{ _('User actions') }}">
+    <h4 class="card-title text-center">
+        <i class="fa fa-user" aria-hidden="true"></i>
+        {{ _('Logged in as {user}').format(user=request.user.username)|e }}
+    </h4>
     <div class="card-text text-center">
-        <a href="{{ url('forum:account:logout') }}" class="btn btn-primary">{{ _('Logout') }}</a>
-        <a href="{{ url('forum:account:settings') }}" class="btn btn-primary">{{ _('Settings') }}</a>
+        <a href="{{ url('forum:account:logout') }}" class="btn btn-primary">
+            <i class="fa fa-sign-out" aria-hidden="true"></i>
+            {{ _('Logout') }}
+        </a>
+        <a href="{{ url('forum:account:settings') }}" class="btn btn-primary">
+            <i class="fa fa-sliders" aria-hidden="true"></i>
+            {{ _('Settings') }}
+        </a>
     </div>
 </section>
 {%- endif %}

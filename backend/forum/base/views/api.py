@@ -109,7 +109,8 @@ def v1_find_users_by_name(request: WSGIRequest) -> JsonResponse:
         raise Http404
     users = User.objects.filter(
         username__icontains=name_contains).only(
-        'slug', 'username').order_by('username')
+        'slug', 'username')
+    # .exclude(slug=request.user.slug)
     paginator = Paginator(object_list=users, per_page=10)
     page = paginator.page(number=page_id)
     result = {

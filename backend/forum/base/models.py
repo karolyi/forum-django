@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
-
 from forum.utils import slugify
 
 from .choices import COMMENT_VOTE_HIDE_CHOICES, TOPIC_TYPE_CHOICES
@@ -17,6 +16,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = _('User setting')
         verbose_name_plural = _('User settings')
+        ordering = ['username']
 
     slug = AutoSlugField(
         verbose_name=_('Slug of the user'), max_length=50, unique=True,
