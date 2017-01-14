@@ -1,10 +1,11 @@
 from decimal import Decimal
 
 from django.core.handlers.wsgi import WSGIRequest
-from django.core.paginator import InvalidPage
+from django.core.paginator import InvalidPage, Paginator
 from django.db.models.aggregates import Avg, Count
 from django.http.response import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render
+from django.views.decorators.http import require_GET
 from forum.base.utils.home import collect_topic_page
 from forum.rating.models import UserRating
 from forum.rest_api.exceptions import NotProduceable
@@ -89,5 +90,33 @@ def v1_archived_topics_start(request: WSGIRequest) -> HttpResponse:
         request=request,
         template_name='default/base/topic-archived-start.html',
         context={
-            'topic_list': qs_topics_archived
-        })
+            'topic_list': qs_topics_archived})
+
+
+@require_GET
+def v1_find_users_by_name(request: WSGIRequest) -> JsonResponse:
+    """
+    Find users by a string their name contains.
+    Return the found users in JSON formatted as a select2 result.
+    """
+    name_contains = request.GET.get('name_contains')
+    if name_contains is None or len(name_contains) < 2:
+        # Nothing to search for or not enough data
+        raise Http404
+    try:
+        page_id = int(request.GET.get('page', 1))
+    except ValueError:
+        raise Http404
+    users = User.objects.filter(
+        username__icontains=name_contains).only(
+        'slug', 'username').order_by('username')
+    paginator = Paginator(object_list=users, per_page=10)
+    page = paginator.page(number=page_id)
+    result = {
+        'pagination': {
+            'more': page.has_next()
+        }
+    }
+    result['results'] = \
+        [{'id': x.slug, 'text': x.username} for x in page]
+    return JsonResponse(data=result)

@@ -37,6 +37,11 @@
 .abc-checkbox {
   label {
     display: inline;
+
+    &::after,
+    &::before {
+      top: 9px;
+    }
   }
 }
 

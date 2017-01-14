@@ -84,9 +84,10 @@ class User(AbstractUser):
             ' separated with semicolons (;)'), default='')
     ignored_users = models.ManyToManyField(
         'self', related_name='ignored_him',
-        verbose_name=_('List of ignored users'))
+        verbose_name=_('List of ignored users'), blank=True)
     friended_users = models.ManyToManyField(
-        'self', verbose_name=_('Friended users'), related_name='friended_him')
+        'self', verbose_name=_('Friended users'), related_name='friended_him',
+        blank=True)
     uses_auto_bookmarks = models.BooleanField(
         default=False, verbose_name=_('Use automatic bookmark placement'))
     mails_own_topic_comments = models.BooleanField(

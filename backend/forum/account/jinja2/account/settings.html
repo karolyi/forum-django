@@ -16,9 +16,9 @@
             <div class="card-text">
                 <form method="post" action="{{ url('forum:account:settings') }}" class="settings-form form-group">
                     {% csrf_token %}
-                    <h6 class="card-subtitle mb-2 text-muted">{{ _('Generic settings (will applied instantly)') }}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ _('Generic settings (will be applied instantly)') }}</h6>
                     {{ render_form(form=settings_form) }}
-                    <h6 class="card-subtitle mb-2 text-muted">{{ _('Introductions (will be applied after an admin approves them)') }}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ _('Introductions (will be applied only after an admin approves them)') }}</h6>
                     {{ render_form(form=intro_mod_form) }}
                     <button type="submit" class="btn btn-primary">
                         {{ _('Submit') }}
@@ -31,7 +31,9 @@
 </div>
 <script type="text/javascript">
     Forum.settingsPage.init({
-        stuff: '1123'
+        urls: {
+            userSearch: '{{ url('forum:rest-api:v1-find-users-by-name') }}'
+        }
     })
 </script>
 {% endblock main_content %}

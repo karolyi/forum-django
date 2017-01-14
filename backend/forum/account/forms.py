@@ -59,3 +59,9 @@ class SettingsForm(ModelForm):
             'mails_replies_topic', 'mails_moderation_topic', 'mails_messages',
             'separate_bookmarked_topics', 'has_chat_enabled',
             'expand_archived']
+
+    def __init__(self, *args, **kwargs):
+        super(SettingsForm, self).__init__(*args, **kwargs)
+        # Only list the ignored users in the SelectMultiple widget
+        self.fields['ignored_users'].queryset = \
+            self.instance.ignored_users.all()

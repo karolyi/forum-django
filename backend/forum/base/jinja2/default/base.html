@@ -1,7 +1,7 @@
 {% from 'default/macros/user-actions.html' import user_actions with context %}
 {% get_my_language_info as current_language %}
 <!DOCTYPE html>
-<html>
+<html lang="{{ current_language.code|escape }}">
 <head>
     {{ render_bundle('vendor') }}
     {{ render_bundle('common') }}

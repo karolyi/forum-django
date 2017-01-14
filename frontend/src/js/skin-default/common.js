@@ -1,4 +1,11 @@
 const $ = require('jquery')
+require('select2')
+const select2Hu = require('select2/src/js/select2/i18n/hu')
+const select2De = require('select2/src/js/select2/i18n/de')
+
+// English language is self-contained in select2, others not.
+$.fn.select2.amd.define('select2/i18n/hu', select2Hu)
+$.fn.select2.amd.define('select2/i18n/de', select2De)
 
 export const options = {
   /* eslint-disable new-cap */

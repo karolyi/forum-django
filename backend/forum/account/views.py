@@ -90,7 +90,7 @@ class SettingsView(View):
             request=request, template_name=self.template_name, context={
                 'intro_mod_form': IntroductionModificationForm(
                     instance=self.last_intro_mod),
-                'settings_form': SettingsForm(instance=request.user.settings)})
+                'settings_form': SettingsForm(instance=request.user)})
 
     def post(self, request: WSGIRequest):
         """
@@ -99,7 +99,7 @@ class SettingsView(View):
         intro_mod_form = IntroductionModificationForm(
             data=request.POST, instance=self.last_intro_mod)
         settings_form = SettingsForm(
-            data=request.POST, instance=request.user.settings)
+            data=request.POST, instance=request.user)
         messages = []
         if intro_mod_form.is_valid() and settings_form.is_valid():
             settings_form.save()
