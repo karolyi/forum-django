@@ -24,18 +24,6 @@ export class Instance {
     })).then(success, failure)
   }
 
-  static escapeMarkup(input) {
-    return input
-  }
-
-  static formatResult(item) {
-    return item.username
-  }
-
-  static formatSelection(item) {
-    return item.text
-  }
-
   initialize() {
     $('#id_comment_vote_hide_limit').select2({
       minimumResultsForSearch: Infinity,
@@ -46,9 +34,7 @@ export class Instance {
         delay: 250,
         transport: ::this.searchUsernames,
       },
-      templateResult: this.formatResult,
-      templateSelection: this.formatSelection,
-      escapeMarkup: this.escapeMarkup,
+      closeOnSelect: false,
       minimumInputLength: 2,
       placeholder: gettext('Choose usernames to ignore...'),
     })
@@ -57,9 +43,7 @@ export class Instance {
         delay: 250,
         transport: ::this.searchUsernames,
       },
-      templateResult: this.formatResult,
-      templateSelection: this.formatSelection,
-      escapeMarkup: this.escapeMarkup,
+      closeOnSelect: false,
       minimumInputLength: 2,
       placeholder: gettext('Choose usernames to befriend...'),
     })

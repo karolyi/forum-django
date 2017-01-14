@@ -64,4 +64,6 @@ class SettingsForm(ModelForm):
         super(SettingsForm, self).__init__(*args, **kwargs)
         # Only list the ignored users in the SelectMultiple widget
         self.fields['ignored_users'].queryset = \
-            self.instance.ignored_users.all()
+            self.instance.ignored_users.only('slug', 'username')
+        self.fields['friended_users'].queryset = \
+            self.instance.friended_users.only('slug', 'username')

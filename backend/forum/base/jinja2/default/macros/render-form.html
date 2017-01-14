@@ -9,13 +9,7 @@
     {%- endif %}
     {% for widget in form -%}
         {%- set widget_name = widget.field.widget.__class__.__name__ -%}
-        <div class="widget-wrapper row {% spaceless %}
-                {% if widget_name in ['TextInput', 'PasswordInput', 'Select', 'Textarea'] %}
-                    form-group
-                {% elif widget_name == 'CheckboxInput' %}
-                    form-group
-                {% endif %}
-        {% endspaceless %} {% spaceless %}
+        <div class="widget-wrapper row form-group {% spaceless %}
             {% if widget.errors %}
                 has-danger
             {% endif %}
@@ -30,7 +24,7 @@
             <div class="col-sm-9 abc-checkbox">
                 {{ widget }}
                 <label class="form-check-label col-form-label" for="{{ widget.auto_id }}">
-                    {{ widget.label|escape }}
+                    {{- widget.label|escape -}}
                 </label>
             </div>
         {%- elif widget_name in ['Select', 'SelectMultiple'] -%}
@@ -38,6 +32,12 @@
                 {{ widget.label|escape }}
             </label>
             <div class="col-xs-12 col-sm-9">
+                {% if widget.help_text -%}
+                    <small class="text-muted">
+                        <i class="fa fa-info" aria-hidden="true"></i>
+                        {{ widget.help_text|e }}
+                    </small>
+                {%- endif %}
                 {{ widget|set_attr('style:width: 100%')|set_attr('placeholder:test123') -}}
             </div>
         {%- else -%}
@@ -45,7 +45,7 @@
                 {{ widget.label|escape }}
             </label>
             <div class="col-xs-12 col-sm-9">
-                {{ widget|add_class('form-control')|set_attr('placeholder:' + widget.help_text|escape) -}}
+                {{- widget|add_class('form-control')|set_attr('placeholder:' + widget.help_text|escape) -}}
             </div>
         {%- endif %}
         </div>

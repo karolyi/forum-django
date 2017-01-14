@@ -18,6 +18,7 @@
                     {% csrf_token %}
                     <h6 class="card-subtitle mb-2 text-muted">{{ _('Generic settings (will be applied instantly)') }}</h6>
                     {{ render_form(form=settings_form) }}
+                    <hr>
                     <h6 class="card-subtitle mb-2 text-muted">{{ _('Introductions (will be applied only after an admin approves them)') }}</h6>
                     {{ render_form(form=intro_mod_form) }}
                     <button type="submit" class="btn btn-primary">

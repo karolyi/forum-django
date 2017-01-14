@@ -30,10 +30,12 @@ class User(AbstractUser):
         verbose_name=_('Summary received votes count on comments'), default=0)
     comment_vote_hide_limit = models.IntegerField(
         default=-5, verbose_name=_('Hide comments under this vote value'),
-        choices=COMMENT_VOTE_HIDE_CHOICES)
+        choices=COMMENT_VOTE_HIDE_CHOICES, help_text=_(
+            'If a comment gets voted down under your selected value, it gets '
+            'completely hidden from you.'))
     quote = models.CharField(
         max_length=256, verbose_name=_('Chosen quote'), help_text=_(
-            'Quote (visible in the tooltip of the username)'))
+            'Quote (visible in the tooltip of the username)'), blank=True)
     max_comments_per_day = models.IntegerField(
         verbose_name=_('Maximum allowed comments per day'), default=-1)
     comment_count = models.PositiveIntegerField(
@@ -84,9 +86,16 @@ class User(AbstractUser):
             ' separated with semicolons (;)'), default='')
     ignored_users = models.ManyToManyField(
         'self', related_name='ignored_him',
-        verbose_name=_('List of ignored users'), blank=True)
+        verbose_name=_('List of ignored users'),
+        help_text=_(
+            'If you choose to ignore a user, you won\'t be able to see any '
+            'interaction from him.'),
+        blank=True)
     friended_users = models.ManyToManyField(
         'self', verbose_name=_('Friended users'), related_name='friended_him',
+        help_text=_(
+            'The users who will be able to see the part of your profile which '
+            'is only visible for them.'),
         blank=True)
     uses_auto_bookmarks = models.BooleanField(
         default=False, verbose_name=_('Use automatic bookmark placement'))
