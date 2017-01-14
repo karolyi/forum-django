@@ -24,10 +24,7 @@
                     <hr>
                     <h6 class="card-subtitle mb-2 text-muted">{{ _('Introductions (will be applied only after an admin approves them)') }}</h6>
                     {% if intro_mod_form.last_intro_mod %}
-                        <div class="alert alert-info alert-dismissible fade show" role="alert">
-                          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                          </button>
+                        <div class="alert alert-info" role="alert">
                           {{- _('You have an introduction modification waiting for approval on behalf an administrator. You can edit it again here until it happens.') -}}
                         </div>
                     {% endif %}
