@@ -11,9 +11,11 @@ fi
 
 mysql -uroot -e 'drop database `test_forum-django2`'
 mysql -uroot -e 'create database `test_forum-django2` default character set utf8mb4 default collate utf8mb4_general_ci'
-find ./ -wholename '*backend/forum/*migrations/*py' -delete
 
-backend/manage.py makemigrations --settings forum.settings_test_2 forum_account forum_base forum_cdn forum_crowdfunding forum_event forum_messaging forum_poll forum_rating forum_rest_api
-isort ./backend/forum/*/migrations/0001_initial.py
+if [[ $1 -ne 'norecreate' ]]; then
+    find ./ -wholename '*backend/forum/*migrations/*py' -delete
+    backend/manage.py makemigrations --settings forum.settings_test_2 forum_account forum_base forum_cdn forum_crowdfunding forum_event forum_messaging forum_poll forum_rating forum_rest_api
+    isort ./backend/forum/*/migrations/0001_initial.py
+fi
 backend/manage.py migrate --settings forum.settings_test_2
 backend/manage.py loaddata backend/forum/base/fixtures/*yaml --settings forum.settings_test_2
