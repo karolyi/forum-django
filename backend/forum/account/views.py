@@ -1,12 +1,14 @@
 from typing import Union
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import login as login_django
 from django.contrib.auth import logout as logout_django
 from django.contrib.auth.decorators import login_required
 from django.core.handlers.wsgi import WSGIRequest
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls.base import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -100,22 +102,22 @@ class SettingsView(View):
             data=request.POST, instance=self.last_intro_mod)
         settings_form = SettingsForm(
             data=request.POST, instance=request.user)
-        messages = []
         if intro_mod_form.is_valid() and settings_form.is_valid():
             settings_form.save()
-            messages.append(_('Settings successfully saved.'))
-            if intro_mod_form.instance.id is None:
+            messages.success(request=request, message=_(
+                'Settings successfully saved.'))
+            if intro_mod_form.instance.pk is None:
                 # New instance, fill necessary data
-                intro_mod_form.user = request.user
+                intro_mod_form.instance.user = request.user
             intro_mod_form.save()
-            messages.append(_(
+            messages.info(request=request, message=_(
                 'Your new introductions have been saved successfully. '
                 'However, they won\'t be visible until an admin approves '
                 'them.'))
-            # next_url = get_next_url(request)
-            # return HttpResponseRedirect(redirect_to=next_url)
+            return HttpResponseRedirect(
+                redirect_to=reverse('forum:account:settings'))
         # Invalid form
         return render(
             request=request, template_name=self.template_name, context={
-                'messages': messages,
-                'intro_mod_form': intro_mod_form})
+                'intro_mod_form': intro_mod_form,
+                'settings_form': settings_form})

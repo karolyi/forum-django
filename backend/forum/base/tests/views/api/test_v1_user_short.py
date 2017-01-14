@@ -1,8 +1,8 @@
 from unittest.mock import Mock, patch
 
-from django.core.urlresolvers import reverse
 from django.http.response import HttpResponseNotFound, JsonResponse
 from django.test import Client, TestCase
+from django.urls.base import reverse
 from forum.rest_api.exceptions import NotProduceable
 
 

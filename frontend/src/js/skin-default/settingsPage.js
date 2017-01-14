@@ -1,5 +1,6 @@
 /* globals gettext */
 require('bootstrap/js/src/tooltip')
+require('bootstrap/js/src/alert')
 const $ = require('jquery')
 // const common = require('./common')
 // const paginator = require('./paginator')

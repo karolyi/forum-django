@@ -7,8 +7,10 @@
     <input type="hidden" name="next" value="{{ next }}">
     <legend>{{ _('Login') }}</legend>
     {{ render_form(form=auth_form) }}
-    <button type="submit" class="btn btn-primary">
-        {{ _('Submit') }}
-    </button>
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary">
+            {{ _('Submit') }}
+        </button>
+    </div>
 </form>
 {% endblock main_content %}

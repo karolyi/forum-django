@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import Client, RequestFactory, TestCase
-from django.urls import reverse
+from django.urls.base import reverse
 from forum.account.forms import ForumAuthForm
 
 from ...views import LoginView

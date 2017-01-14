@@ -31,76 +31,9 @@
 
 // Import local adjustments
 @import "forum-user-tooltip";
-
-// awesome-bootstrap-checkbox adjustment to not break when the viewport
-// is narrow
-.abc-checkbox {
-  label {
-    display: inline;
-
-    // &::after,
-    // &::before {
-    //   top: 9px;
-    // }
-
-  }
-}
-
-// Select2 Bootstrap V4 fixes
-.select2-container--default {
-  &.select2-container--focus {
-    .select2-selection {
-      color: $input-color-focus;
-      background-color: $input-bg-focus;
-      border-color: $input-border-focus;
-      outline: none;
-
-      @include box-shadow($input-box-shadow-focus);
-    }
-  }
-
-  .select2-selection {
-    border: $input-btn-border-width solid $input-border-color;
-
-    @if $enable-rounded {
-      // Manually use the if/else instead of the mixin to account for iOS override
-      border-radius: $input-border-radius;
-    }
-
-    @else {
-      // Otherwise undo the iOS default
-      border-radius: 0;
-    }
-
-    @include box-shadow($input-box-shadow);
-
-    @include transition(border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s);
-  }
-
-  .select2-dropdown {
-    z-index: $zindex-navbar-fixed - 1;
-  }
-}
-
-.select2-container-open {
-  .select2-dropdown {
-    @if $enable-rounded {
-      // Manually use the if/else instead of the mixin to account for iOS override
-      border-radius: $input-border-radius;
-    }
-
-    @else {
-      // Otherwise undo the iOS default
-      border-radius: 0;
-    }
-  }
-}
-
-// Bootstrap V4 fixes
-// http://stackoverflow.com/a/9814390
-small, .small {
-  display: inline-block;
-}
+@import "fixes/temporary";
+@import "fixes/awesome-bootstrap-checkbox";
+@import "fixes/select2";
 
 .navbar-content-spacer {
   // Adjust when necessary
@@ -216,11 +149,6 @@ small, .small {
   }
 
   .forum-form-horizontal-wrapper {
-    label {
-      padding-top: 0;
-      padding-bottom: 0;
-    }
-
     .widget-error,
     .global-error {
       p {

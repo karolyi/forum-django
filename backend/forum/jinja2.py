@@ -2,6 +2,7 @@ from functools import lru_cache
 
 from debug_toolbar.panels.templates import TemplatesPanel as BaseTemplatesPanel
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.core.handlers.wsgi import WSGIRequest
 from django.core.paginator import Page
@@ -207,3 +208,4 @@ class ForumToolsExtension(Extension):
         environment.globals['paginator_generic_get_list'] = \
             paginator_generic_get_list
         environment.filters['naturaltime'] = naturaltime
+        environment.globals['messages'] = messages

@@ -1,0 +1,13 @@
+// This has been fixed in the newest bootstrap but because of awesome-bootstrap-checkbox, it can't be installed
+.fade.show {
+  opacity: 1;
+}
+
+// http://stackoverflow.com/a/9814390
+small, .small {
+  display: inline-block;
+}
+
+.text-center {
+  text-align: center;
+}

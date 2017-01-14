@@ -31,8 +31,8 @@ class User(AbstractUser):
     comment_vote_hide_limit = models.IntegerField(
         default=-5, verbose_name=_('Hide comments under this vote value'),
         choices=COMMENT_VOTE_HIDE_CHOICES, help_text=_(
-            'If a comment gets voted down under your selected value, it gets '
-            'completely hidden from you.'))
+            'If a comment gets voted down under the selected value here, it '
+            'gets completely hidden.'))
     quote = models.CharField(
         max_length=256, verbose_name=_('Chosen quote'), help_text=_(
             'Quote (visible in the tooltip of the username)'), blank=True)
@@ -88,26 +88,38 @@ class User(AbstractUser):
         'self', related_name='ignored_him',
         verbose_name=_('List of ignored users'),
         help_text=_(
-            'If you choose to ignore a user, you won\'t be able to see any '
-            'interaction from him.'),
+            'An ignored user\'s posts are invisible when added here.'),
         blank=True)
     friended_users = models.ManyToManyField(
         'self', verbose_name=_('Friended users'), related_name='friended_him',
         help_text=_(
-            'The users who will be able to see the part of your profile which '
-            'is only visible for them.'),
+            'The users who will see the part of the profile which is only '
+            'visible for friended users.'),
         blank=True)
     uses_auto_bookmarks = models.BooleanField(
-        default=False, verbose_name=_('Use automatic bookmark placement'))
+        default=False, verbose_name=_('Use automatic bookmark placement'),
+        help_text=_(
+            'When checked, the previously set bookmarks will automatically '
+            'update to the newest seen comment in the topic pages as they are '
+            'listed.'))
     mails_own_topic_comments = models.BooleanField(
         default=False, verbose_name=_(
-            'Receive mails from comments in own topic'))
+            'Receive mails from comments in own topic'), help_text=_(
+            'Receive email alerts if someone posts a comment in a created '
+            'topic.'))
     mails_replies_topic = models.BooleanField(
-        default=True, verbose_name=_('Receive mails from comment replies'))
+        default=True, verbose_name=_('Receive mails from comment replies'),
+        help_text=_(
+            'Receive email alerts from replies to posted comments.'))
     mails_moderation_topic = models.BooleanField(
-        default=True, verbose_name=_('Receive mails from moderation'))
+        default=True, verbose_name=_('Receive mails from moderation'),
+        help_text=_(
+            'Receive emails when an administrator takes a moderation action '
+            '(e.g. edit, deletion, move) on the a posted comment.'))
     mails_messages = models.BooleanField(
-        default=True, verbose_name=_('Receive mails from messages'))
+        default=True, verbose_name=_('Receive mails from messages'),
+        help_text=_(
+            'Receive email alerts when a new private message arrives.'))
     show_replies_comment = models.BooleanField(
         default=True, verbose_name=_('Show replies on comments'))
     show_relations = models.BooleanField(
@@ -115,15 +127,20 @@ class User(AbstractUser):
     is_banned = models.BooleanField(
         default=False, verbose_name=_('User is banned'))
     separate_bookmarked_topics = models.BooleanField(
-        default=True, verbose_name=_('Show bookmarked topics separated'))
+        default=True, verbose_name=_('Show bookmarked topics separated'),
+        help_text=_(
+            'Split the normal topic view to topics with set bookmarks and '
+            'topics with none set.'))
     show_outsiders = models.BooleanField(
         default=True, verbose_name=_('Show not-logged-in users'))
     has_chat_enabled = models.BooleanField(
-        default=True, verbose_name=_('Enable chat'))
+        default=True, verbose_name=_('Enable chat'), help_text=_(
+            'Show the chat on the main page when logged in.'))
     is_approved = models.BooleanField(
         default=False, verbose_name=_('Is approved by admins'))
     expand_archived = models.BooleanField(
-        default=False, verbose_name=_('Expand archived topics'))
+        default=False, verbose_name=_('Expand archived topics'), help_text=_(
+            'Don\'t hide archived topics on the main page.'))
     images = models.ManyToManyField(
         'forum_cdn.Image',
         verbose_name=_('Images in this user\'s descriptions'))
@@ -263,7 +280,7 @@ class IntroductionModification(models.Model):
     user = models.OneToOneField(User, verbose_name=_('Respective user'))
     quote = models.CharField(
         max_length=256, verbose_name=_('Chosen quote'), help_text=_(
-            'Quote (visible in the tooltip of the username)'))
+            'Quote (visible in the tooltip of the username)'), blank=True)
     introduction_md_all = models.TextField(
         verbose_name=_('Introduction for everybody (MD)'),
         help_text=_('Introduction in Markdown format (visible for everyone)'))

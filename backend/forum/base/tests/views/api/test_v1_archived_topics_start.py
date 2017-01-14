@@ -1,6 +1,6 @@
-from django.core.urlresolvers import reverse
 from django.http.response import HttpResponse
 from django.test import Client, TestCase
+from django.urls.base import reverse
 from forum.testutils.html_result_parser import TopicListingParser
 
 

@@ -60,10 +60,19 @@ class SettingsForm(ModelForm):
             'separate_bookmarked_topics', 'has_chat_enabled',
             'expand_archived']
 
-    def __init__(self, *args, **kwargs):
-        super(SettingsForm, self).__init__(*args, **kwargs)
-        # Only list the ignored users in the SelectMultiple widget
+    def list_only_selected_fields(self):
+        """
+        At `HTTP GET`, only list the users that are selected, so we
+        won't generate a lot of unnecessary HTML. Select2 will take care
+        of loading the extra options available dynamically.
+        """
         self.fields['ignored_users'].queryset = \
             self.instance.ignored_users.only('slug', 'username')
         self.fields['friended_users'].queryset = \
             self.instance.friended_users.only('slug', 'username')
+
+    def __init__(self, *args, **kwargs):
+        super(SettingsForm, self).__init__(*args, **kwargs)
+        if not self.data:
+            # data = {}, HTTP GET time
+            self.list_only_selected_fields()

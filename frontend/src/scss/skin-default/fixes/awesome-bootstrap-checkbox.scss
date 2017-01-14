@@ -1,0 +1,31 @@
+// awesome-bootstrap-checkbox adjustment to not break when the viewport
+// is narrow
+.abc-checkbox {
+  label {
+    display: inline;
+
+    &::after,
+    &::before {
+      @if $enable-rounded {
+        // Manually use the if/else instead of the mixin to account for iOS override
+        border-radius: $input-border-radius;
+      }
+
+      top: 9px;
+    }
+
+    &:before {
+      @include box-shadow($input-box-shadow);
+    }
+  }
+}
+
+.has-danger {
+  .abc-checkbox {
+    label {
+      &:before {
+        border-color: $brand-danger;
+      }
+    }
+  }
+}

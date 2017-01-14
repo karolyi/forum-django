@@ -1,5 +1,6 @@
 {% extends 'default/base.html' %}
 {% from 'default/macros/render-form.html' import render_form with context %}
+{% from 'default/macros/render-messages.html' import render_messages with context %}
 
 {% block extra_scripts_head %}
 {{ render_bundle('settingsPage') }}
@@ -14,6 +15,7 @@
                 {{ _('Settings') }}
             </h4>
             <div class="card-text">
+                {{ render_messages() }}
                 <form method="post" action="{{ url('forum:account:settings') }}" class="settings-form form-group">
                     {% csrf_token %}
                     <h6 class="card-subtitle mb-2 text-muted">{{ _('Generic settings (will be applied instantly)') }}</h6>
@@ -21,9 +23,11 @@
                     <hr>
                     <h6 class="card-subtitle mb-2 text-muted">{{ _('Introductions (will be applied only after an admin approves them)') }}</h6>
                     {{ render_form(form=intro_mod_form) }}
-                    <button type="submit" class="btn btn-primary">
-                        {{ _('Submit') }}
-                    </button>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">
+                            {{ _('Submit') }}
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

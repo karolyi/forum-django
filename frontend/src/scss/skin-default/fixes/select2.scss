@@ -1,0 +1,73 @@
+// Select2 Bootstrap V4 fixes for select2
+.select2-container--default {
+  &.select2-container--focus {
+    .select2-selection {
+      color: $input-color-focus;
+      background-color: $input-bg-focus;
+      border-color: $input-border-focus;
+      outline: none;
+
+      @include box-shadow($input-box-shadow-focus);
+
+      // @if $enable-rounded {
+      //   box-shadow: $input-box-shadow, 0 0 6px lighten($input-color-focus, 20%);
+      // }
+
+    }
+  }
+
+  .select2-selection {
+    border: $input-btn-border-width solid $input-border-color;
+
+    @if $enable-rounded {
+      // Manually use the if/else instead of the mixin to account for iOS override
+      border-radius: $input-border-radius;
+    }
+
+    @else {
+      // Otherwise undo the iOS default
+      border-radius: 0;
+    }
+
+    @include box-shadow($input-box-shadow);
+
+    @include transition(border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s);
+  }
+
+  .select2-dropdown {
+    z-index: $zindex-navbar-fixed - 1;
+  }
+}
+
+.has-danger {
+  .select2-container--default {
+    &.select2-container--focus {
+      .select2-selection {
+        @if $enable-rounded {
+          box-shadow: $input-box-shadow, 0 0 6px lighten($brand-danger, 20%);
+        }
+      }
+    }
+
+    .select2-selection {
+      border-color: $brand-danger;
+
+      // @include box-shadow($input-box-shadow-focus);
+
+    }
+  }
+}
+
+.select2-container-open {
+  .select2-dropdown {
+    @if $enable-rounded {
+      // Manually use the if/else instead of the mixin to account for iOS override
+      border-radius: $input-border-radius;
+    }
+
+    @else {
+      // Otherwise undo the iOS default
+      border-radius: 0;
+    }
+  }
+}

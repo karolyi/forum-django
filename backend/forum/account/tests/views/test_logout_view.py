@@ -1,5 +1,5 @@
-from django.core.urlresolvers import reverse
 from django.test import Client, TestCase
+from django.urls.base import reverse
 
 
 class LogoutViewTest(TestCase):

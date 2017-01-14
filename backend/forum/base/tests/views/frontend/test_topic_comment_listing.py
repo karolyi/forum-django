@@ -1,5 +1,5 @@
-from django.core.urlresolvers import reverse
 from django.test import Client, TestCase
+from django.urls.base import reverse
 from forum.testutils.html_result_parser import CommentsPageParser
 
 VIEWNAME = 'forum:base:topic-comment-listing'

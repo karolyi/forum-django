@@ -8,15 +8,17 @@
         {% csrf_token %}
         <legend>{{ _('Login') }}</legend>
         {{ render_form(form=forum_auth_form(is_autofocus=is_autofocus)) }}
-        <button type="submit" class="btn btn-primary">
-            {{- _('Submit') -}}
-        </button>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">
+                {{- _('Submit') -}}
+            </button>
+        </div>
     </form>
     </div>
 </section>
 {% else %}
 <section class="card card-block" aria-label="{{ _('User actions') }}">
-    <div class="card-text">
+    <div class="card-text text-center">
         <a href="{{ url('forum:account:logout') }}" class="btn btn-primary">{{ _('Logout') }}</a>
         <a href="{{ url('forum:account:settings') }}" class="btn btn-primary">{{ _('Settings') }}</a>
     </div>
