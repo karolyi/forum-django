@@ -16,17 +16,17 @@
                 {{ _('Settings') }}
             </h4>
             <div class="card-text">
-                {{ render_messages() }}
                 <form method="post" action="{{ url('forum:account:settings') }}" class="settings-form form-group">
                     {% csrf_token %}
+                    {{ render_messages() }}
                     <h6 class="card-subtitle mb-2 text-muted">{{ _('Generic settings (will be applied instantly)') }}</h6>
                     {{ render_form_simple(form=settings_form, wrapper_class='form-part-settings') }}
                     <hr>
                     <h6 class="card-subtitle mb-2 text-muted">{{ _('Introductions (will be applied only after an admin approves them)') }}</h6>
                     {% if intro_mod_form.last_intro_mod %}
-                        <div class="alert alert-info" role="alert">
-                          {{- _('You have an introduction modification waiting for approval on behalf an administrator. You can edit it again here until it happens.') -}}
-                        </div>
+                    <div class="alert alert-info intro-approval-is-waiting" role="alert">
+                      {{- _('You have an introduction modification waiting for approval on behalf an administrator. You can edit it again here until it happens.') -}}
+                    </div>
                     {% endif %}
                     {{ render_form_simple(form=intro_mod_form, wrapper_class='form-part-intro-mod') }}
                     <div class="text-center">

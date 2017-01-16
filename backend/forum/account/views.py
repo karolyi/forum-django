@@ -71,11 +71,12 @@ class SettingsView(View):
         """
         Serving HTTP GET.
         """
+        settings_form = SettingsForm(instance=request.user)
         return render(
             request=request, template_name=self.template_name, context={
                 'intro_mod_form': IntroductionModificationForm(
                     user=request.user),
-                'settings_form': SettingsForm(instance=request.user)})
+                'settings_form': settings_form})
 
     def post(self, request: WSGIRequest):
         """
@@ -85,19 +86,29 @@ class SettingsView(View):
             data=request.POST, user=request.user)
         settings_form = SettingsForm(
             data=request.POST, instance=request.user)
+        # Clean the forms before we change anything for rendering
+        settings_form.is_valid()
+        intro_mod_form.is_valid()
+        if not settings_form.is_valid() or not intro_mod_form.is_valid():
+            messages.error(request=request, message=_(
+                'You have an error in your settings. Please correct them and '
+                'submit this form again.'), extra_tags='settings-not-saved')
         if intro_mod_form.is_valid() and settings_form.is_valid():
             settings_form.save()
-            messages.success(request=request, message=_(
-                'Settings successfully saved.'))
+            messages.success(
+                request=request, message=_('Settings successfully saved.'),
+                extra_tags='settings-is-saved')
             if intro_mod_form.instance.pk is None:
                 # New instance, fill necessary data
                 intro_mod_form.instance.user = request.user
             if intro_mod_form.has_changed():
                 intro_mod_form.save()
-                messages.info(request=request, message=_(
-                    'Your new introductions have been saved successfully. '
-                    'However, they won\'t be visible until an admin approves '
-                    'them.'))
+                messages.info(
+                    request=request, message=_(
+                        'Your new introductions have been saved successfully. '
+                        'However, they won\'t be visible until an admin '
+                        'approves them.'),
+                    extra_tags='intro-saved-but-awaits-approval')
             return HttpResponseRedirect(
                 redirect_to=reverse('forum:account:settings'))
         # Invalid form

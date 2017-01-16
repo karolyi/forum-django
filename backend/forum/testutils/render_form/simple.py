@@ -73,6 +73,17 @@ class SimpleFormElementBase(object):
         return self.element.parent.find(
             name='span', class_='help-text').decode_contents()
 
+    @cached_property
+    def widget_wrapper(self) -> Tag:
+        """
+        Return the wrapper for the input element.
+        """
+        wrapper = self.element.find_parent(class_='widget-wrapper')
+        self.test.assertIsInstance(obj=wrapper, cls=Tag, msg=_(
+            'Widget wrapper for {_my_name} \'{name}\' not found.').format(
+            _my_name=self._my_name, name=self.attrs['name']))
+        return wrapper
+
     def _assert_attribute(self, name: str, value: str):
         """
         Assert that the element has a certain attribute set with a
@@ -101,6 +112,41 @@ class SimpleFormElementBase(object):
             'Help text for {_my_name} \'{name_attr}\' differs from expected.'
         ).format(_my_name=self._my_name, name_attr=self.attrs['name']))
 
+    def assert_has_error(self):
+        """
+        Assert that the rendered element has an error.
+        """
+        wrapper_classes = self.widget_wrapper.attrs['class']
+        self.test.assertIn(
+            member='has-danger', container=wrapper_classes, msg=_(
+                'Expected the {_my_name} \'{name_attr}\' to have an error but '
+                'it doesn\'t have any.').format(
+                _my_name=self._my_name, name_attr=self.attrs['name']))
+        widget_error = self.widget_wrapper.find(
+            name='div', class_='widget-error')  # type: Tag
+        self.test.assertIsInstance(obj=widget_error, cls=Tag, msg=_(
+            'Expected the {_my_name} \'{name_attr}\' to have an error alert '
+            'but found none').format(
+            _my_name=self._my_name, name_attr=self.attrs['name']))
+        error_classes = widget_error.attrs['class']
+        self.test.assertIn(
+            member='text-danger', container=error_classes, msg=_(
+                'Expected the {_my_name} \'{name_attr}\' to have an error '
+                'with error class text-danger but it doesn\'t have any.'
+            ).format(
+                _my_name=self._my_name, name_attr=self.attrs['name']))
+
+    def assert_has_no_error(self):
+        """
+        Assert that the rendered element has an error.
+        """
+        wrapper_classes = self.widget_wrapper.attrs['class']
+        self.test.assertNotIn(
+            member='has-danger', container=wrapper_classes, msg=_(
+                'Expected the {_my_name} \'{name_attr}\' NOT to have an error '
+                'but it has errors.').format(
+                _my_name=self._my_name, name_attr=self.attrs['name']))
+
 
 class TextAreaInput(SimpleFormElementBase):
     """
@@ -122,15 +168,10 @@ class TextAreaInput(SimpleFormElementBase):
         """
         Assert that the `TextAreaInput` has specific content.
         """
-        self.test.assertEqual(self.element.decode_contents(), text, msg=(
-            '{my_name} does not contain the expected string.').format(
-            my_name=self._my_name))
-
-    def assert_placeholder(self, text: str):
-        """
-        Assert that the input has a specific placeholder.
-        """
-        self._assert_attribute(name='placeholder', value=text)
+        self.test.assertEqual(
+            self.element.decode_contents().strip(), text, msg=(
+                '{my_name} does not contain the expected string.').format(
+                my_name=self._my_name))
 
 
 class TextInput(SimpleFormElementBase):
@@ -248,9 +289,16 @@ class SelectInput(SimpleFormElementBase):
             self.test.assertEqual(self.selected_values[0][0], value, msg=_(
                 'Selected option differs from expected.'))
             return
-        self.test.assertListEqual(
-            list1=self.selected_values, list2=[value, content], msg=_(
+        self.test.assertTupleEqual(
+            tuple1=self.selected_values[0], tuple2=(value, content), msg=_(
                 'Selected option differs from expected'))
+
+    def assert_none_selected(self):
+        """
+        Assert that the selection in the select menu is empty.
+        """
+        self.test.assertListEqual(list1=self.selected_values, list2=[], msg=_(
+            'Expected empty selection.'))
 
     def assert_multiple_selected(self, option_list: list):
         """

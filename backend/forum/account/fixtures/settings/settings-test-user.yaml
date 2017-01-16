@@ -17,7 +17,7 @@
     received_comment_vote_sum: 0
     received_comment_vote_count: 0
     comment_vote_hide_limit: -5
-    quote: validuser quote
+    quote: 'validuser <>" quote'
     max_comments_per_day: 0
     comment_count: 0
     invitations_today: 0
@@ -25,9 +25,9 @@
     invitations_success: 0
     pw_reminders_today: 0
     used_skin: default
-    introduction_md_all: ''
-    introduction_md_reg: ''
-    introduction_md_friends: ''
+    introduction_md_all: 'validuser md_all'
+    introduction_md_reg: 'validuser md_reg'
+    introduction_md_friends: 'validuser md_friends'
     introduction_html_all: ''
     introduction_html_reg: ''
     introduction_html_friends: ''
@@ -45,8 +45,8 @@
     has_chat_enabled: true
     is_approved: true
     expand_archived: false
-    ignored_users: []
-    friended_users: []
+    ignored_users: [superuser]
+    friended_users: [staffuser, archivesexpanderuser]
     images: []
 - model: forum_base.user
   pk: inactiveuser
@@ -316,7 +316,7 @@
     last_global_read: 0
     received_comment_vote_sum: 0
     received_comment_vote_count: 0
-    comment_vote_hide_limit: -5
+    comment_vote_hide_limit: -4
     quote: ArchivesExpanderUser quote
     max_comments_per_day: 0
     comment_count: 0
@@ -325,14 +325,14 @@
     invitations_success: 0
     pw_reminders_today: 0
     used_skin: default
-    introduction_md_all: ''
-    introduction_md_reg: ''
-    introduction_md_friends: ''
+    introduction_md_all: 'md_</textarea><script language="text/javascript">alert("boop")</script>all'
+    introduction_md_reg: 'md_reg'
+    introduction_md_friends: 'md_friends'
     introduction_html_all: ''
     introduction_html_reg: ''
     introduction_html_friends: ''
     picture_emails: ''
-    uses_auto_bookmarks: false
+    uses_auto_bookmarks: true
     mails_own_topic_comments: false
     mails_replies_topic: true
     mails_moderation_topic: true

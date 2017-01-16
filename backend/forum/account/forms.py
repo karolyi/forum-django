@@ -124,14 +124,32 @@ class SettingsForm(ModelForm):
         won't generate a lot of unnecessary HTML. Select2 will take care
         of loading the extra options available dynamically.
         """
+        if not self.is_bound:
+            self.fields['ignored_users'].queryset = \
+                self.instance.ignored_users.only('slug', 'username')
+            self.fields['friended_users'].queryset = \
+                self.instance.friended_users.only('slug', 'username')
+            return
+        if not self.is_valid():
+            # Bound but invalid, get the values from the posted data
+            passed_ignored_users = self.data.getlist('ignored_users')
+            passed_friended_users = self.data.getlist('friended_users')
+            self.fields['ignored_users'].queryset = \
+                self.Meta.model.objects.filter(
+                    slug__in=passed_ignored_users).exclude(
+                    slug=self.instance.slug).only('slug', 'username')
+            self.fields['friended_users'].queryset = \
+                self.Meta.model.objects.filter(
+                    slug__in=passed_friended_users).exclude(
+                    slug=self.instance.slug).only('slug', 'username')
+            return
+        # Valid and bound, so the queryset is the submitted values
         self.fields['ignored_users'].queryset = \
-            self.instance.ignored_users.only('slug', 'username')
+            self.cleaned_data['ignored_users']
         self.fields['friended_users'].queryset = \
-            self.instance.friended_users.only('slug', 'username')
+            self.cleaned_data['friended_users']
 
     def __init__(self, *args, **kwargs):
         return_value = super(SettingsForm, self).__init__(*args, **kwargs)
-        if not self.data:
-            # data = {}, HTTP GET time
-            self.list_only_selected_fields()
+        self.list_only_selected_fields()
         return return_value
