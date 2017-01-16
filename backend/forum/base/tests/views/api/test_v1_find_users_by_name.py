@@ -82,13 +82,35 @@ class V1FindUsersByNameTestCase(TestCase):
                 {'id': 'superstaffuser', 'text': 'SuperStaffUser'},
                 {'id': 'superuser', 'text': 'SuperUser'}]})
 
-    def test_returns_404_for_invalid_page(self):
+    def test_returns_404_for_invalid_page_case_1(self):
         """
-        Should return a `JsonResponse` with all the matching users
-        except the one requesting them.
+        Should return a `HttpResponseNotFound` because a nonexistent
+        page ID was passed.
         """
         self.client.login(username='ValidUser', password='ValidPassword')
         response = self.client.get(
             path=VIEW_URL,
             data={'name_contains': 'us', 'page': '2'})  # type: JsonResponse
+        self.assertIsInstance(obj=response, cls=HttpResponseNotFound)
+
+    def test_returns_404_for_invalid_page_case_2(self):
+        """
+        Should return a `HttpResponseNotFound` because a wrong
+        page ID was passed.
+        """
+        self.client.login(username='ValidUser', password='ValidPassword')
+        response = self.client.get(
+            path=VIEW_URL,
+            data={'name_contains': 'us', 'page': '0'})  # type: JsonResponse
+        self.assertIsInstance(obj=response, cls=HttpResponseNotFound)
+
+    def test_returns_404_for_invalid_page_case_3(self):
+        """
+        Should return a `HttpResponseNotFound` because a wrong
+        page ID was passed.
+        """
+        self.client.login(username='ValidUser', password='ValidPassword')
+        response = self.client.get(
+            path=VIEW_URL,
+            data={'name_contains': 'us', 'page': '-1'})  # type: JsonResponse
         self.assertIsInstance(obj=response, cls=HttpResponseNotFound)
