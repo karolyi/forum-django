@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from django.core.handlers.wsgi import WSGIRequest
-from django.core.paginator import InvalidPage, Paginator
+from django.core.paginator import EmptyPage, InvalidPage, Paginator
 from django.db.models.aggregates import Avg, Count
 from django.http.response import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -10,6 +10,7 @@ from forum.base.utils.home import collect_topic_page
 from forum.rating.models import UserRating
 from forum.rest_api.exceptions import NotProduceable
 from forum.rest_api.utils import cast_to_set_of_slug
+from forum.utils.decorators import logged_in_or_404
 
 from ..choices import LIST_TOPIC_TYPE, TOPIC_TYPE_ARCHIVED
 from ..models import User
@@ -93,7 +94,8 @@ def v1_archived_topics_start(request: WSGIRequest) -> HttpResponse:
             'topic_list': qs_topics_archived})
 
 
-@require_GET
+@require_GET  # Checked second
+@logged_in_or_404  # Checked first
 def v1_find_users_by_name(request: WSGIRequest) -> JsonResponse:
     """
     Find users by a string their name contains.
@@ -107,17 +109,15 @@ def v1_find_users_by_name(request: WSGIRequest) -> JsonResponse:
         page_id = int(request.GET.get('page', 1))
     except ValueError:
         raise Http404
-    users = User.objects.filter(
-        username__icontains=name_contains).only(
-        'slug', 'username')
-    # .exclude(slug=request.user.slug)
+    users = User.objects.filter(username__icontains=name_contains).only(
+        'slug', 'username').exclude(slug=request.user.slug)
     paginator = Paginator(object_list=users, per_page=10)
-    page = paginator.page(number=page_id)
+    try:
+        page = paginator.page(number=page_id)
+    except EmptyPage:
+        raise Http404
     result = {
         'pagination': {
-            'more': page.has_next()
-        }
-    }
-    result['results'] = \
-        [{'id': x.slug, 'text': x.username} for x in page]
+            'more': page.has_next()}}
+    result['results'] = [{'id': x.slug, 'text': x.username} for x in page]
     return JsonResponse(data=result)
