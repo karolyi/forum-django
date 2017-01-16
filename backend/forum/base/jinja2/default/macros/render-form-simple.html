@@ -1,5 +1,5 @@
-{% macro render_form(form) -%}
-<div class="forum-form-horizontal-wrapper">
+{% macro render_form_simple(form, wrapper_class) -%}
+<section class="forum-form-simple-wrapper {{ wrapper_class }}">
     {% if form.errors.__all__ -%}
     <div class="global-error alert alert-danger" role="alert">
     {% for error in form.errors.__all__ -%}
@@ -22,7 +22,9 @@
                 {% for error in widget.errors -%}
                     <p>
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        {{ error|e }}
+                        <span class="error-text">
+                            {{- error|e -}}
+                        </span>
                     </p>
                 {%- endfor %}
             </div>
@@ -33,7 +35,9 @@
                 {% if widget.help_text -%}
                 <small class="text-muted">
                     <i class="fa fa-info" aria-hidden="true"></i>
-                    {{ widget.help_text|e }}
+                    <span class="help-text">
+                        {{- widget.help_text|e -}}
+                    </span>
                 </small><br>
                 {%- endif %}
                 {{ widget }}
@@ -43,20 +47,22 @@
             </div>
         {%- elif widget_name in ['Select', 'SelectMultiple'] -%}
             <label class="form-control-label col-form-label col-xs-12 col-sm-3" for="{{ widget.auto_id }}">
-                {{ widget.label|escape }}
+                {{- widget.label|escape -}}
             </label>
             <div class="col-xs-12 col-sm-9">
                 {% if widget.help_text -%}
                 <small class="text-muted">
                     <i class="fa fa-info" aria-hidden="true"></i>
-                    {{ widget.help_text|e }}
+                    <span class="help-text">
+                        {{- widget.help_text|e -}}
+                    </span>
                 </small>
                 {%- endif %}
                 {{ widget|set_attr('style:width: 100%') }}
             </div>
         {%- else -%}
             <label class="form-control-label col-form-label col-xs-12 col-sm-3" for="{{ widget.auto_id }}">
-                {{ widget.label|escape }}
+                {{- widget.label|escape -}}
             </label>
             <div class="col-xs-12 col-sm-9">
                 {% if widget.errors -%}
@@ -68,5 +74,5 @@
         {%- endif %}
         </div>
     {%- endfor %}
-</div>
+</section>
 {%- endmacro %}

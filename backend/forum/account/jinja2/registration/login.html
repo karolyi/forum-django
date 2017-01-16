@@ -1,5 +1,5 @@
 {% extends 'default/base.html' %}
-{% from 'default/macros/render-form.html' import render_form with context %}
+{% from 'default/macros/render-form-simple.html' import render_form_simple with context %}
 
 {% block main_content %}
 <form method="post" action="{{ url('forum:account:login') }}" class="login-form">
@@ -9,7 +9,7 @@
         <i class="fa fa-sign-in" aria-hidden="true"></i>
         {{ _('Login') }}
     </legend>
-    {{ render_form(form=auth_form) }}
+    {{ render_form_simple(form=auth_form, wrapper_class='forum-forum-login') }}
     <div class="text-center">
         <button type="submit" class="btn btn-primary">
             <i class="fa fa-check" aria-hidden="true"></i>

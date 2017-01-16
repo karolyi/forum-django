@@ -85,17 +85,16 @@ class User(AbstractUser):
             'Email addresses used for image upload'
             ' separated with semicolons (;)'), default='')
     ignored_users = models.ManyToManyField(
-        'self', related_name='ignored_him',
+        'self', related_name='ignored_by',
         verbose_name=_('List of ignored users'),
-        help_text=_(
-            'An ignored user\'s posts are invisible when added here.'),
-        blank=True)
+        help_text=_('An ignored user\'s posts are invisible when added here.'),
+        symmetrical=False, blank=True)
     friended_users = models.ManyToManyField(
-        'self', verbose_name=_('Friended users'), related_name='friended_him',
+        'self', verbose_name=_('Friended users'), related_name='friended_by',
         help_text=_(
             'The users who will see the part of the profile which is only '
             'visible for friended users.'),
-        blank=True)
+        symmetrical=False, blank=True)
     uses_auto_bookmarks = models.BooleanField(
         default=False, verbose_name=_('Use automatic bookmark placement'),
         help_text=_(
@@ -144,6 +143,14 @@ class User(AbstractUser):
     images = models.ManyToManyField(
         'forum_cdn.Image',
         verbose_name=_('Images in this user\'s descriptions'))
+
+
+User.ignored_users.through.__str__ = \
+    lambda x: '{from_u} ignores {to_u}'.format(
+        from_u=x.from_user, to_u=x.to_user)
+User.friended_users.through.__str__ = \
+    lambda x: '{from_u} befriended {to_u}'.format(
+        from_u=x.from_user, to_u=x.to_user)
 
 
 class Comment(models.Model):

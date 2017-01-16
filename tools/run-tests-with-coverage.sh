@@ -22,7 +22,8 @@ coverage html
 
 # Start the http server inly when we're not on travis
 if [[ -z "$TRAVIS" ]]; then
-    python3 -m http.server
+    exit $EXITCODE_TESTS
+    # python3 -m http.server
 else
     exit $EXITCODE_TESTS
 fi
