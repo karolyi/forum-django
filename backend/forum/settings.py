@@ -251,6 +251,7 @@ STATIC_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'static'))
 
 PATH_CDN_ROOT = os.path.join(
     os.path.expanduser('~'), 'Work', 'forum-django-cdn', 'original')
+CDN_URL_PREFIX = 'https://example.cdnhost.com/'
 
 LANGUAGES = (
     ('en', _('English')),

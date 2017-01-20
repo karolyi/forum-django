@@ -24,13 +24,17 @@
             user: {
                 shortData: '{{ url('forum:rest-api:v1-user-short', slug_list='example-slug') }}',
                 exampleSlug: 'example-slug'
-            }
+            },
+            noEmbed: '{{ url('forum:rest-api:noembed-url') }}',
           },
           selectors: {
             navbar: 'body > nav.navbar-fixed-top',
             user: {
                 tooltipTemplate: '.forum-user-tooltip-template'
             }
+          },
+          variables: {
+            cdnHost: '{{ django_settings.CDN_URL_PREFIX }}'
           },
           scrollSpeed: 300
         });

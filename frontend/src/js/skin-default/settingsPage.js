@@ -1,6 +1,7 @@
 /* globals gettext */
 require('bootstrap/js/src/tooltip')
 require('bootstrap/js/src/alert')
+const richTextArea = require('./richTextArea')
 const $ = require('jquery')
 // const common = require('./common')
 // const paginator = require('./paginator')
@@ -25,10 +26,7 @@ export class Instance {
     })).then(success, failure)
   }
 
-  initialize() {
-    $('#id_comment_vote_hide_limit').select2({
-      minimumResultsForSearch: Infinity,
-    })
+  initSelectMenus() {
     $('#id_ignored_users').select2({
       // debug: true,
       ajax: {
@@ -48,6 +46,21 @@ export class Instance {
       minimumInputLength: 2,
       placeholder: gettext('Choose usernames to befriend...'),
     })
+  }
+
+  initTextAreas() {
+    this.introMdTextArea = $('#id_introduction_md_all')
+    richTextArea.init({
+      jqElement: this.introMdTextArea,
+    })
+  }
+
+  initialize() {
+    $('#id_comment_vote_hide_limit').select2({
+      minimumResultsForSearch: Infinity,
+    })
+    this.initSelectMenus()
+    this.initTextAreas()
   }
 }
 

@@ -2,6 +2,7 @@ from django.conf.urls import url
 from forum.base.views.api import (
     v1_archived_topics_start, v1_find_users_by_name, v1_topic_list_page,
     v1_user_short)
+from .views.noembed import noembed_url
 
 urlpatterns = [
     url(r'^v1/user-short/(?P<slug_list>[a-z0-9-,]+)/$',
@@ -11,5 +12,6 @@ urlpatterns = [
     url(r'^v1/archived-topics-start/',
         v1_archived_topics_start, name='v1-archived-topics-start'),
     url(r'^v1/find-users-by-name/', v1_find_users_by_name,
-        name='v1-find-users-by-name')
+        name='v1-find-users-by-name'),
+    url(r'^v1/noembed-url/', noembed_url, name='noembed-url'),
 ]

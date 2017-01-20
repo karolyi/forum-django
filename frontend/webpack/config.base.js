@@ -56,6 +56,14 @@ module.exports = {
           // extends: path.resolve(__dirname, '../../.babelrc'),
         },
       },
+      // {
+      //   // Use SVG loader to `require` SVG files, would be useful for
+      //   // SASS
+      //   test: /\.svg$/,
+      //   loaders: [
+      //     'svg-url-loader',
+      //   ],
+      // },
       {
         // Transpile ES6 to ES5 in Bootstrap V4
         test: /bootstrap\/js\/src\/.*\.js$/,
@@ -72,6 +80,13 @@ module.exports = {
           'babel?babelrc=true',
         ],
       },
+      {
+        // Trumbowyg needs jQuery injected
+        test: /trumbowyg\/.*.js$/,
+        loaders: [
+          'imports?jQuery=jquery',
+        ],
+      },
       // to transform JSX into JS
       // {
       //   test: /\.jsx?$/,
@@ -85,6 +100,9 @@ module.exports = {
       {
         test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         loader: 'file-loader',
+      },
+      { test: /\.json$/,
+        loader: 'json',
       },
     ],
   },

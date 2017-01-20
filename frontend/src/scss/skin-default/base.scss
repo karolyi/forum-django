@@ -35,6 +35,9 @@
 @import "fixes/awesome-bootstrap-checkbox";
 @import "fixes/select2";
 
+// Import simple-md-textarea stylesheet
+@import "rich-textarea";
+
 .navbar-content-spacer {
   // Adjust when necessary
   height: 51px + $grid-gutter-width-base / 2;
