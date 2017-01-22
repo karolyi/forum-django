@@ -4,17 +4,15 @@ const BundleTracker = require('webpack-bundle-tracker')
 const configBase = require('./config.base')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
+const extractCSS = new ExtractTextPlugin('stylesheets/[name]-[hash:6].css')
+
 configBase.plugins = [
-  new webpack.ProvidePlugin({
-    riot: 'riot',
-  }),
   new BundleTracker({
     path: __dirname,
     filename: path.join('..', 'webpack', 'stats.json'),
-    // filename: path.join('..', 'dist', 'assets', 'stats.json'),
   }),
   // To split all the CSS files
-  new ExtractTextPlugin('[name]-[hash].css'),
+  extractCSS,
 
   // removes a lot of debugging code in React
   new webpack.DefinePlugin({
@@ -23,11 +21,11 @@ configBase.plugins = [
     },
   }),
 
-  // keeps hashes consistent between compilations
-  new webpack.optimize.OccurenceOrderPlugin(),
-
-  new webpack.optimize.CommonsChunkPlugin(
-    /* chunkName= */'vendor', /* filename= */'vendor-[hash].bundle.js'),
+  new webpack.optimize.CommonsChunkPlugin({
+    minChunks: 3,
+    name: 'vendor',
+    filename: 'vendor.bundle-[hash:6].js',
+  }),
 
   // minifies your code
   new webpack.optimize.UglifyJsPlugin({
@@ -37,10 +35,39 @@ configBase.plugins = [
   }),
 ]
 
-configBase.module.loaders.push({
-  test: /\.scss$/,
-  loader: ExtractTextPlugin.extract(
-    'style-loader', 'css-loader!sass-loader'),
+configBase.module.rules.push({
+  test: /\.s[ac]ss$/,
+  use: [
+    'to-string-loader',
+    extractCSS.extract({
+      fallbackLoader: 'style-loader',
+      loader: [{
+        loader: 'css-loader',
+        // This should be changed to options as soon as the loader
+        // supports it here.
+        query: {
+          sourceMap: true,
+          importLoaders: 1,
+        },
+      }, {
+        loader: 'sass-loader',
+        // This should be changed to options as soon as the loader
+        // supports it here.
+        query: {
+          sourceMap: true,
+          includePaths: [
+            path.resolve(__dirname, '../../node_modules'),
+          ],
+        },
+      }],
+    }),
+  ],
 })
+
+// Override font naming in production
+configBase.module.rules[0].use[0].options.name = 'fonts/[name]-[hash:6].[ext]'
+configBase.module.rules[1].use[0].options.name = 'fonts/[name]-[hash:6].[ext]'
+
+configBase.output.filename = '[name]-[hash:6].js'
 
 module.exports = configBase

@@ -1,5 +1,6 @@
 /* eslint-env node */
 /* eslint strict: 0, prefer-const: 1 */
+
 'use strict'
 
 const path = require('path')
@@ -33,24 +34,44 @@ configBase.output.publicPath = 'http://localhost:3000/static/assets/'
 // sourcemaps in plugins, this MUST be specified
 configBase.devtool = 'source-map'
 
-configBase.module.loaders.push({
+configBase.module.rules.push({
   test: /\.scss$/,
-  loaders: ['style-loader', 'css-loader?sourceMap', 'sass-loader?sourceMap'],
+  use: [{
+    loader: 'style-loader',
+    options: {
+      useable: true,
+    },
+  }, {
+    loader: 'css-loader',
+    options: {
+      sourceMap: true,
+    },
+  }, {
+    loader: 'sass-loader',
+    options: {
+      sourceMap: true,
+      includePaths: [
+        path.resolve(__dirname, '../../node_modules'),
+      ],
+    },
+  }],
 })
 
 configBase.plugins = [
   new webpack.HotModuleReplacementPlugin(),
-  new webpack.NoErrorsPlugin(), // don't reload if there is an error
+  new webpack.NoEmitOnErrorsPlugin(), // don't reload if there is an error
   new BundleTracker({
     path: __dirname,
     filename: path.join('..', 'webpack', 'stats.json'),
   }),
   new ExtractTextPlugin('[name].css'),
-  // keeps hashes consistent between compilations
-  new webpack.optimize.OccurenceOrderPlugin(),
-  new webpack.optimize.CommonsChunkPlugin(
-    /* chunkName= */'vendor', /* filename= */'vendor.bundle.js'),
+  // keeps hashes consistent between compilations, isn't needed since
+  // webpack 2
+  // new webpack.optimize.OccurrenceOrderPlugin(),
+  new webpack.optimize.CommonsChunkPlugin({
+    name: 'vendor',
+    filename: 'vendor.bundle.js',
+  }),
 ]
-
 
 module.exports = configBase

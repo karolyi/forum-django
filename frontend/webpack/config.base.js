@@ -36,99 +36,117 @@ module.exports = {
   output: {
     path: path.resolve(path.join(__dirname, '..', 'dist', 'assets')),
     publicPath: '/static/assets/',
-    filename: '[name]-[hash].js',
+    filename: '[name].js',
     // http://stackoverflow.com/questions/34357489/calling-webpacked-code-from-outside-html-script-tag
     libraryTarget: 'var',
     library: ['Forum', '[name]'],
   },
 
   // configure your plugins at the separate mode level files
-
   module: {
-    loaders: [
+    rules: [
+      // Keep this at 1st place, prod settings modify this
+      {
+        test: /\.(ttf|eot|svg|woff)(\?.*)?$/,
+        use: [{
+          loader: 'file-loader',
+          options: {
+            name: 'fonts/[name].[ext]',
+          },
+        }],
+      },
+      // Keep this at 2nd place, prod settings modify this
+      {
+        test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        use: [{
+          loader: 'url-loader',
+          options: {
+            limit: 10000,
+            mimetype: 'application/font-woff',
+            name: 'fonts/[name].[ext]',
+          },
+        }],
+      },
       {
         // Transpile ES6 to ES5
         test: /\.js?$/,
         exclude: /node_modules/,
-        loader: 'babel',
-        query: {
-          babelrc: true,
-          // extends: path.resolve(__dirname, '../../.babelrc'),
-        },
+        use: [{
+          loader: 'babel-loader',
+          options: {
+            babelrc: true,
+          },
+        }],
       },
-      // {
-      //   // Use SVG loader to `require` SVG files, would be useful for
-      //   // SASS
-      //   test: /\.svg$/,
-      //   loaders: [
-      //     'svg-url-loader',
-      //   ],
-      // },
       {
         // Transpile ES6 to ES5 in Bootstrap V4
         test: /bootstrap\/js\/src\/.*\.js$/,
-        loaders: [
-          'imports?jQuery=jquery',
-          'babel?babelrc=true',
-        ],
+        use: [{
+          loader: 'imports-loader',
+          options: {
+            jQuery: 'jquery',
+          },
+        }, {
+          loader: 'babel-loader',
+          options: {
+            babelrc: true,
+          },
+        }],
       },
       {
         // Transpile ES6 to ES5 in Bootstrap V4
         test: /bootstrap\/js\/src\/tooltip.js$/,
-        loaders: [
-          'imports?jQuery=jquery,Tether=tether',
-          'babel?babelrc=true',
-        ],
-      },
-      {
-        // Trumbowyg needs jQuery injected
-        test: /trumbowyg\/.*.js$/,
-        loaders: [
-          'imports?jQuery=jquery',
-        ],
-      },
-      // to transform JSX into JS
-      // {
-      //   test: /\.jsx?$/,
-      //   exclude: /node_modules/,
-      //   loaders: ['react-hot', 'babel']
-      // },
-      {
-        test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: 'url?limit=10000&mimetype=application/font-woff',
-      },
-      {
-        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: 'file-loader',
+        use: [{
+          loader: 'imports-loader',
+          options: {
+            jQuery: 'jquery',
+            Tether: 'tether',
+          },
+        }, {
+          loader: 'babel-loader',
+          options: {
+            babelrc: true,
+          },
+        }],
       },
       { test: /\.json$/,
-        loader: 'json',
+        use: [{
+          loader: 'json-loader',
+        }],
       },
-    ],
-  },
-
-  urlLoader: {
-    limit: 10000,
-    mimetype: 'application/font-woff',
-  },
-
-  resolveUrlLoader: {
-    // root: [
-    //   '/assets/',
-    // ],
-  },
-
-  sassLoader: {
-    includePaths: [
-      path.resolve(__dirname, '../../node_modules'),
+      {
+        test: /\.css$/,
+        // loaders: ['style-loader', 'css-loader'],
+        use: [{
+          loader: 'style-loader',
+          options: {
+            useable: true,
+          },
+        }, {
+          loader: 'css-loader',
+        }],
+      },
+      {
+        test: /pen\/src\/pen.js$/,
+        use: [{
+        //   loader: 'imports-loader',
+        //   options: {
+        //     window: 'this',
+        //   },
+        // }, {
+          loader: 'exports-loader',
+          options: {
+            Pen: 'window.Pen',
+          },
+        }],
+      },
     ],
   },
 
   resolve: {
-    modulesDirectories: [
+    modules: [
       'node_modules',
-      'bower_components',
     ],
-    extensions: ['', '.js'],
+    extensions: ['.js'],
   },
 }

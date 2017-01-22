@@ -38,11 +38,11 @@ gulp.task('lint', () => gulp.src(['frontend/src/**/*.{js,html}'])
 )
 
 gulp.task('webpack-prod', ['lint'], () => gulp.src('')
-  .pipe(webpackStream(require('./frontend/webpack/config.prod')))
+  .pipe(webpackStream(require('./frontend/webpack/config.prod'), webpack))
   .pipe(gulp.dest('frontend/dist/assets/')))
 
 gulp.task('webpack-dev', ['lint'], () => gulp.src('')
-  .pipe(webpackStream(require('./frontend/webpack/config.dev')))
+  .pipe(webpackStream(require('./frontend/webpack/config.dev'), webpack))
   .pipe(gulp.dest('frontend/dist/assets/')))
 
 gulp.task('build', ['clean', 'webpack-prod'])
