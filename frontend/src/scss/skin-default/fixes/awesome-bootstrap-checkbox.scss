@@ -1,3 +1,16 @@
+// Left out of newest bootstrap, remove in the future when
+// https://github.com/flatlogic/awesome-bootstrap-checkbox/issues/111
+// gets fixed.
+
+// WebKit-style focus
+@mixin tab-focus {
+  // WebKit-specific. Other browsers will keep their default outline style.
+  // (Initially tried to also force default via `outline: initial`,
+  // but that seems to erroneously remove the outline in Firefox altogether.)
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
+}
+
 // awesome-bootstrap-checkbox adjustment to not break when the viewport
 // is narrow
 .abc-checkbox {

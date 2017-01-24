@@ -41,6 +41,7 @@ export class Instance {
     // }))
     const x = new Pen({
       editor: this.options.jqElement[0],
+      debug: true,
     })
     console.log(x)
   }

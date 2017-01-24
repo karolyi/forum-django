@@ -23,17 +23,17 @@
 // Font-awesome
 @import "font-awesome/scss/font-awesome.scss";
 
-// awesome-bootstrap-checkbox
-@import "node_modules/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.scss";
-
 // select2
+@import "fixes/select2";
 @import "node_modules/select2/src/scss/core.scss";
 
 // Import local adjustments
 @import "forum-user-tooltip";
 @import "fixes/temporary";
+
+// awesome-bootstrap-checkbox
 @import "fixes/awesome-bootstrap-checkbox";
-@import "fixes/select2";
+@import "node_modules/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.scss";
 
 // Import simple-md-textarea stylesheet
 @import "rich-textarea";
@@ -74,15 +74,15 @@
         @include transition(background-color 0.2s linear);
 
         &.even {
-          background-color: lighten($nav-link-hover-bg, 4%);
+          background-color: lighten($nav-tabs-active-link-hover-bg, 4%);
         }
 
         &.odd {
-          background-color: lighten($nav-link-hover-bg, 6%);
+          background-color: lighten($nav-tabs-active-link-hover-bg, 6%);
         }
 
         &:hover {
-          background-color: $nav-link-hover-bg;
+          background-color: $nav-tabs-active-link-hover-bg;
         }
 
         &:last-child {
