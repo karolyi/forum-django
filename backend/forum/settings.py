@@ -105,7 +105,7 @@ TEMPLATES = [
     },
 ]
 
-ALLOWED_HOSTS = ['test.localdomain']
+ALLOWED_HOSTS = ['test.localdomain', 'localhost']
 
 SITE_NAME = _('Forum')
 
@@ -214,9 +214,11 @@ if DEBUG:
     mimetypes.add_type('image/x-sass', '.sass', True)
     mimetypes.add_type('image/svg+xml', '.svg', True)
     mimetypes.add_type('image/svg+xml', '.svgz', True)
-    INSTALLED_APPS += ('debug_toolbar',)
+    INSTALLED_APPS += (
+        'debug_toolbar',
+        'debug_panel')
     MIDDLEWARE_CLASSES += (
-        'debug_toolbar.middleware.DebugToolbarMiddleware',)
+        'debug_panel.middleware.DebugPanelMiddleware',)
     INTERNAL_IPS = ('127.0.0.1',)
     DEBUG_TOOLBAR_PANELS = [
         'debug_toolbar.panels.versions.VersionsPanel',

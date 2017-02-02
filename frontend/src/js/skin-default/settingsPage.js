@@ -51,6 +51,7 @@ export class Instance {
   initTextAreas() {
     this.introMdTextArea = $('#id_introduction_md_all')
     richTextArea.init({
+      jqWrapper: this.introMdTextArea.parent(),
       jqElement: this.introMdTextArea,
     })
   }

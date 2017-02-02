@@ -69,7 +69,7 @@ module.exports = {
       },
       {
         // Transpile ES6 to ES5
-        test: /\.js?$/,
+        test: /\.js$/,
         exclude: /node_modules/,
         use: [{
           loader: 'babel-loader',
@@ -127,17 +127,9 @@ module.exports = {
         }],
       },
       {
-        test: /pen\/src\/pen.js$/,
+        test: /.*\.html(\?.*)?$/,
         use: [{
-        //   loader: 'imports-loader',
-        //   options: {
-        //     window: 'this',
-        //   },
-        // }, {
-          loader: 'exports-loader',
-          options: {
-            Pen: 'window.Pen',
-          },
+          loader: 'raw-loader',
         }],
       },
     ],

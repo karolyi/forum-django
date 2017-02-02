@@ -24,19 +24,17 @@
 @import "font-awesome/scss/font-awesome.scss";
 
 // select2
-@import "fixes/select2";
 @import "node_modules/select2/src/scss/core.scss";
+@import "fixes/select2";
 
 // Import local adjustments
 @import "forum-user-tooltip";
+@import "forum-rich-text-area";
 @import "fixes/temporary";
 
 // awesome-bootstrap-checkbox
 @import "fixes/awesome-bootstrap-checkbox";
 @import "node_modules/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.scss";
-
-// Import simple-md-textarea stylesheet
-@import "rich-textarea";
 
 .navbar-content-spacer {
   // Adjust when necessary

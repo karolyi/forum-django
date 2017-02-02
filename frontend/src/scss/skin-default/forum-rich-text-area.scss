@@ -1,0 +1,17 @@
+.forum-rich-text-area {
+  .tab-content {
+    .tabpane-edit {
+      .textarea-wrapper {
+        textarea {
+          // font-family: monospace;
+
+        }
+      }
+    }
+
+    .tabpane-preview {
+      max-height: 10rem;
+      overflow: auto;
+    }
+  }
+}

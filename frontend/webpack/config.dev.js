@@ -19,31 +19,29 @@ configBase.output.filename = '[name].js'
 
 configBase.module.rules.push({
   test: /\.s[ac]ss$/,
-  use: [
-    'to-string-loader',
-    extractCSS.extract({
-      fallbackLoader: 'style-loader',
-      loader: [{
-        loader: 'css-loader',
-        // This should be changed to options as soon as the loader
-        // supports it here.
-        query: {
-          sourceMap: true,
-          importLoaders: 1,
-        },
-      }, {
-        loader: 'sass-loader',
-        // This should be changed to options as soon as the loader
-        // supports it here.
-        query: {
-          sourceMap: true,
-          includePaths: [
-            path.resolve(__dirname, '../../node_modules'),
-          ],
-        },
-      }],
-    }),
-  ],
+  // 'to-string-loader',
+  use: extractCSS.extract({
+    fallbackLoader: 'style-loader',
+    loader: [{
+      loader: 'css-loader',
+      // This should be changed to options as soon as the loader
+      // supports it here.
+      query: {
+        sourceMap: true,
+        importLoaders: 1,
+      },
+    }, {
+      loader: 'sass-loader',
+      // This should be changed to options as soon as the loader
+      // supports it here.
+      query: {
+        sourceMap: true,
+        includePaths: [
+          path.resolve(__dirname, '../../node_modules'),
+        ],
+      },
+    }],
+  }),
 })
 
 configBase.plugins = [

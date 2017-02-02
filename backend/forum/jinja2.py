@@ -114,6 +114,8 @@ class TemplatesPanel(BaseTemplatesPanel):
     """
 
     def generate_stats(self, *args):
+        if not self.templates:
+            return
         template = self.templates[0]['template']
         if not hasattr(template, 'engine') and hasattr(template, 'backend'):
             template.engine = template.backend

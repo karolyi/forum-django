@@ -66,9 +66,9 @@
             </label>
             <div class="col-xs-12 col-sm-9">
                 {% if widget.errors -%}
-                {{- widget|add_class('form-control form-control-danger')|set_attr('placeholder:' + widget.help_text|escape) -}}
+                    {{- widget|add_class('form-control form-control-danger')|set_attr('placeholder:' + widget.help_text|escape) -}}
                 {%- else -%}
-                {{- widget|add_class('form-control')|set_attr('placeholder:' + widget.help_text|escape) -}}
+                    {{- widget|add_class('form-control')|set_attr('placeholder:' + widget.help_text|escape) -}}
                 {%- endif %}
             </div>
         {%- endif %}
