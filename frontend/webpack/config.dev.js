@@ -19,10 +19,9 @@ configBase.output.filename = '[name].js'
 
 configBase.module.rules.push({
   test: /\.s[ac]ss$/,
-  // 'to-string-loader',
   use: extractCSS.extract({
-    fallbackLoader: 'style-loader',
-    loader: [{
+    fallback: 'style-loader',
+    use: [{
       loader: 'css-loader',
       // This should be changed to options as soon as the loader
       // supports it here.

@@ -34,8 +34,7 @@ gulp.task('lint', () => gulp.src(['frontend/src/**/*.js'])
   .pipe(eslint.format())
   // To have the process exit with an error code (1) on
   // lint error, return the stream and pipe to failAfterError last.
-  .pipe(eslint.failAfterError())
-)
+  .pipe(eslint.failAfterError()))
 
 gulp.task('webpack-prod', ['lint'], () => gulp.src('')
   .pipe(webpackStream(require('./frontend/webpack/config.prod'), webpack))
@@ -56,7 +55,6 @@ gulp.task('webpack-dev-server', ['clean'], () => {
     hot: true,
     inline: true,
     historyApiFallback: true,
-    progress: true,
     contentBase: path.join(__dirname, 'frontend', 'src'),
     publicPath: '/static/assets/',
     stats: {
