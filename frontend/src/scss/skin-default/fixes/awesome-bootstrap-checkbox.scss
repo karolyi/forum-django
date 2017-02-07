@@ -11,6 +11,8 @@
   outline-offset: -2px;
 }
 
+@import "node_modules/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.scss";
+
 // awesome-bootstrap-checkbox adjustment to not break when the viewport
 // is narrow
 .abc-checkbox {
