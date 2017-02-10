@@ -32,6 +32,53 @@ export function extractTemplateHtml(domTemplateElement) {
   return tempElement.innerHTML
 }
 
+/**
+ * Cookie getter function from here:
+ * https://docs.djangoproject.com/en/dev/ref/csrf/
+ * @param  {string} name The cookie name
+ * @return {string}      Cookie value
+ */
+export function getCookie(name) {
+  let cookieValue = null
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';')
+    for (const cookie of cookies) {
+      const cookieTrimmed = $.trim(cookie)
+      // Does this cookie string begin with the name we want?
+      if (cookieTrimmed.substring(0, name.length + 1) === `${name}=`) {
+        cookieValue =
+          decodeURIComponent(cookieTrimmed.substring(name.length + 1))
+        break
+      }
+    }
+  }
+  return cookieValue
+}
+
+export function addCsrfHeader(xhr) {
+  xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'))
+}
+
+/**
+ * Update a hidden CSRF token in a form, using the cookie value
+ * @param {Object} jqElement The element to set the cookie value to
+ * @return {string}          The CSRF cookie value
+ */
+export function updateCsrfToken(jqElement) {
+  const csrfToken = getCookie('csrftoken')
+  if (jqElement) {
+    jqElement.val(csrfToken)
+  }
+  return csrfToken
+}
+
+export function escapeHtml(text) {
+  return $('<div/>', {
+    text,
+  }).html()
+}
+
+
 const calcNavbarHeight = () => {
   // Calculate navbar height
   const cssNavbarHeight = $(options.selectors.navbar).css('height')

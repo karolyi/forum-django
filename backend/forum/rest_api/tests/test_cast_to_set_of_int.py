@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from ..exceptions import NotProduceable
-from ..utils import cast_to_set_of_int
+from ..utils.common import cast_to_set_of_int
 
 
 class CastToSetOfIntTestCase(TestCase):

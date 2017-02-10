@@ -2,7 +2,7 @@ from django.conf.urls import url
 from forum.base.views.api import (
     v1_archived_topics_start, v1_find_users_by_name, v1_topic_list_page,
     v1_user_short)
-from .views.noembed import md_parser
+from .views.md_helper import md_parser
 
 urlpatterns = [
     url(r'^v1/user-short/(?P<slug_list>[a-z0-9-,]+)/$',

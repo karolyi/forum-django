@@ -1,11 +1,13 @@
-/* globals gettext */
+/* globals gettext, interpolate */
 import $ from 'jquery'
 import 'bootstrap/js/src/tooltip'
 import 'bootstrap/js/src/tab'
 import URI from 'urijs'
 import TextareaEditor, { formats as editorFormats } from 'textarea-editor'
-import marked from 'marked'
 import template from './template/rich-text-area.html'
+import {
+  options as commonOptions, addCsrfHeader, updateCsrfToken, escapeHtml,
+} from './common'
 
 editorFormats.strikethrough = {
   prefix: '~~',
@@ -17,14 +19,12 @@ editorFormats.forumEmbed = {
   suffix: ']',
 }
 
+const unknownError = gettext('Unknown error')
+const errorStr = gettext(
+  'An error occurred. If the error persists, please notify the ' +
+  'administrators. The error was: <br><b>%(errorText)s</b>')
+const loadingText = gettext('Loading ...')
 const anyCharRegex = /^\S+$/i
-
-marked.setOptions({
-  sanitize: true,
-  breaks: true,
-})
-
-// import * as common from './common'
 
 // const cachedResponses = {
 //   'www.stuff.com': '<b>wwwstuffreplacedtext</b>',
@@ -58,9 +58,9 @@ export class Instance {
     if (this.isPasteHappened) {
       this.isPasteHappened = false
       this.evaluateUrls()
-      return
+      // return
     }
-    console.debug('onInput', this.options.jqElement.val())
+    // console.debug('onInput', this.options.jqElement.val())
   }
 
   onClickToolbarBold() {
@@ -108,6 +108,25 @@ export class Instance {
   updateSelections() {
     this.selectionStart = this.options.jqElement.prop('selectionStart')
     this.selectionEnd = this.options.jqElement.prop('selectionEnd')
+  }
+
+  onXhrSuccessUpdatePreview(data) {
+    this.jqPreviewWrapper.html(data.html)
+    updateCsrfToken(this.jqCsrfToken)
+  }
+
+  onXhrErrorUpdatePreview(data) {
+    let errorText = unknownError
+    if (data.responseJSON && data.responseJSON.message) {
+      errorText = data.responseJSON.message
+    }
+    const errorStrFormatted = interpolate(errorStr, {
+      errorText: escapeHtml(errorText) }, true)
+    this.jqPreviewWrapper.html(
+      '<span class="text-danger">' +
+      '<i class="fa fa-exclamation-triangle"></i> ' +
+      `${errorStrFormatted}</span>`)
+    updateCsrfToken(this.jqCsrfToken)
   }
 
   evaluateUrls() {
@@ -162,8 +181,19 @@ export class Instance {
 
   updatePreview() {
     const fieldValue = this.options.jqElement.val()
-    const htmlContent = marked(fieldValue)
-    this.jqPreviewWrapper.html(htmlContent)
+    this.jqPreviewWrapper.html(
+      '<i class="fa fa-spinner fa-pulse fa-fw"></i>' +
+      `<span class="sr-only">${loadingText}</span>`)
+    $.when($.ajax({
+      url: commonOptions.urls.mdParser,
+      beforeSend: addCsrfHeader,
+      dataType: 'json',
+      method: 'POST',
+      data: {
+        text_md: fieldValue,
+      },
+    })).then(::this.onXhrSuccessUpdatePreview, ::this.onXhrErrorUpdatePreview)
+    // this.jqPreviewWrapper.html(htmlContent)
   }
 
   initBtnToolbar() {
@@ -228,6 +258,10 @@ export class Instance {
     this.editor = new TextareaEditor(this.options.jqElement[0])
     this.initBtnToolbar()
     this.options.jqWrapper.append(this.jqTemplate)
+    this.jqCsrfToken =
+      this.options.jqElement
+        .parents('form')
+        .find('input[name=csrfmiddlewaretoken]')
   }
 }
 

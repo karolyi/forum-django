@@ -157,3 +157,9 @@
     }
   }
 }
+
+blockquote {
+  border-left: 2px solid $gray-light;
+  background-color: $gray-lightest;
+  padding-left: .5rem;
+}

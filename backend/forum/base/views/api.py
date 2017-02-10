@@ -9,7 +9,7 @@ from django.views.decorators.http import require_GET
 from forum.base.utils.home import collect_topic_page
 from forum.rating.models import UserRating
 from forum.rest_api.exceptions import NotProduceable
-from forum.rest_api.utils import cast_to_set_of_slug
+from forum.rest_api.utils.common import cast_to_set_of_slug
 from forum.utils.decorators import logged_in_or_404
 
 from ..choices import LIST_TOPIC_TYPE, TOPIC_TYPE_ARCHIVED
