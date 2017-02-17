@@ -1,6 +1,6 @@
 import re
 
-from django.conf import settings
+# from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
 from django.utils.translation import ugettext_lazy as _
 
@@ -9,9 +9,9 @@ from .markdown.parser import ForumMarkdownParser
 
 MD_PARSER = ForumMarkdownParser(
     safe_mode='escape', extras=['break-on-newline'])
-URL_NONEMBED_REGEX = re.compile(
-    pattern=r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|'
-    '(?:%[0-9a-fA-F][0-9a-fA-F]))+', flags=re.MULTILINE)
+URL_REGEX = re.compile(
+    pattern=r'http[s]?://(?:[\w@.&+]|[!*\(\),]|'
+    r'(?:%[0-9a-fA-F][0-9a-fA-F]))+', flags=re.MULTILINE)
 
 
 def collect_cdn(input_md: str) -> str:
