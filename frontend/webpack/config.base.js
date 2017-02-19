@@ -68,10 +68,15 @@ module.exports = {
         }],
       },
       {
-        // Transpile ES6 to ES5
-        test: /\.js$/,
-        exclude: /node_modules/,
+        // Transpile ES6 to ES5 in Bootstrap V4
+        test: /bootstrap\/js\/src\/tooltip.js$/,
         use: [{
+          loader: 'imports-loader',
+          options: {
+            jQuery: 'jquery',
+            Tether: 'tether',
+          },
+        }, {
           loader: 'babel-loader',
           options: {
             babelrc: true,
@@ -94,15 +99,10 @@ module.exports = {
         }],
       },
       {
-        // Transpile ES6 to ES5 in Bootstrap V4
-        test: /bootstrap\/js\/src\/tooltip.js$/,
+        // Transpile ES6 to ES5
+        test: /\.js$/,
+        // exclude: /node_modules/,
         use: [{
-          loader: 'imports-loader',
-          options: {
-            jQuery: 'jquery',
-            Tether: 'tether',
-          },
-        }, {
           loader: 'babel-loader',
           options: {
             babelrc: true,
