@@ -30,3 +30,4 @@ venv/
 static/
 # Don't ignore static files under backend/, those have to be collected
 !backend/*static
+package-lock.json

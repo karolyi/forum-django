@@ -2,10 +2,10 @@
 Django settings for forum project.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/1.9/topics/settings/
+https://docs.djangoproject.com/en/2.2/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.9/ref/settings/
+https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import mimetypes
@@ -134,14 +134,13 @@ INSTALLED_APPS = (
     'forum.rest_api',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
-    # https://docs.djangoproject.com/en/1.8/topics/i18n/translation/#how-django-discovers-language-preference
+    # https://docs.djangoproject.com/en/2.2/topics/i18n/translation/#how-django-discovers-language-preference
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -152,7 +151,7 @@ STATICFILES_FINDERS = (
 )
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(DIR_BACKEND, 'static'),
     # We do this so that django's collectstatic copies or our bundles to
     # the STATIC_ROOT or syncs them to whatever storage we use.
     os.path.join(DIR_FRONTEND, 'dist'),
@@ -172,7 +171,7 @@ WSGI_APPLICATION = 'forum.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
+# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -196,7 +195,7 @@ AUTHENTICATION_BACKENDS = (
 TEST_RUNNER = 'forum.utils.DjangoTestRunner'
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.9/topics/i18n/
+# https://docs.djangoproject.com/en/2.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -216,10 +215,12 @@ if DEBUG:
     mimetypes.add_type('image/svg+xml', '.svgz', True)
     INSTALLED_APPS += (
         'debug_toolbar',
-        'debug_panel')
-    MIDDLEWARE_CLASSES += (
-        'debug_panel.middleware.DebugPanelMiddleware',)
-    INTERNAL_IPS = ('127.0.0.1',)
+        # 'debug_panel',
+    )
+    MIDDLEWARE += (
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+        # 'debug_panel.middleware.DebugPanelMiddleware',
+    )
     DEBUG_TOOLBAR_PANELS = [
         'debug_toolbar.panels.versions.VersionsPanel',
         'debug_toolbar.panels.timer.TimerPanel',
@@ -236,17 +237,17 @@ if DEBUG:
         'debug_toolbar.panels.redirects.RedirectsPanel',
     ]
 
-TMP_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'tmp'))
+TMP_DIR = os.path.realpath(os.path.join(DIR_BACKEND, 'tmp'))
 if not os.path.exists(TMP_DIR):
     os.mkdir(TMP_DIR)
 
-LOG_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'logs'))
+LOG_DIR = os.path.realpath(os.path.join(DIR_BACKEND, 'logs'))
 if not os.path.exists(LOG_DIR):
     os.mkdir(LOG_DIR)
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
+# https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'static'))

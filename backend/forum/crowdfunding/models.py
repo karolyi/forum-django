@@ -1,17 +1,19 @@
-from django.db import models
+from django.db.models.base import Model
+from django.db.models.deletion import CASCADE
+from django.db.models.fields import (
+    CharField, DateTimeField, PositiveSmallIntegerField, TextField)
+from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
+
 from forum.base.models import Topic, User
 from forum.utils import slugify
 
 from .choices import STATUS_CHOICES
 
 
-class Project(models.Model):
-
-    """
-    A project for which users can apply for.
-    """
+class Project(Model):
+    'A project for which users can apply.'
 
     class Meta(object):
         verbose_name = _('Project')
@@ -24,28 +26,26 @@ class Project(models.Model):
         verbose_name=_('Slug'), null=False, max_length=50,
         populate_from=('name',), unique=True, slugify_function=slugify,
         primary_key=True)
-    name = models.CharField(verbose_name=_('Name'), max_length=50)
-    owner = models.ForeignKey(User, verbose_name=_('Owner'))
-    last_updated_at = models.DateTimeField(
+    name = CharField(verbose_name=_('Name'), max_length=50)
+    owner = ForeignKey(to=User, on_delete=CASCADE, verbose_name=_('Owner'))
+    last_updated_at = DateTimeField(
         auto_now=True, verbose_name=_('Last updated at'))
-    ends_at = models.DateTimeField(verbose_name=_('Ends at'))
-    related_topic = models.ForeignKey(
-        Topic, verbose_name=_('Related topic'), null=True, default=None)
-    status = models.PositiveSmallIntegerField(
+    ends_at = DateTimeField(verbose_name=_('Ends at'))
+    related_topic = ForeignKey(
+        to=Topic, on_delete=CASCADE, verbose_name=_('Related topic'),
+        null=True, default=None)
+    status = PositiveSmallIntegerField(
         verbose_name=_('Status'), choices=STATUS_CHOICES,
         default=STATUS_CHOICES[0][0])
-    content_html = models.TextField(verbose_name=_('HTML content'))
-    content_md = models.TextField(verbose_name=_('Markdown content'))
-    images = models.ManyToManyField(
+    content_html = TextField(verbose_name=_('HTML content'))
+    content_md = TextField(verbose_name=_('Markdown content'))
+    images = ManyToManyField(
         'forum_cdn.Image',
         verbose_name=_('Images in this project description'))
 
 
-class ProjectBacker(models.Model):
-
-    """
-    A backer of a project.
-    """
+class ProjectBacker(Model):
+    'A backer of a project.'
 
     class Meta(object):
         verbose_name = _('Project backer')
@@ -55,11 +55,12 @@ class ProjectBacker(models.Model):
     def __str__(self):
         return self.user
 
-    project = models.ForeignKey(Project, verbose_name=_('Project'))
-    user = models.ForeignKey(User, verbose_name=_('Backer'))
-    last_updated_at = models.DateTimeField(
+    project = ForeignKey(
+        to=Project, on_delete=CASCADE, verbose_name=_('Project'))
+    user = ForeignKey(to=User, on_delete=CASCADE, verbose_name=_('Backer'))
+    last_updated_at = DateTimeField(
         auto_now=True, verbose_name=_('Last updated at'))
-    content_html = models.TextField(verbose_name=_('HTML content'))
-    content_md = models.TextField(verbose_name=_('Markdown content'))
-    images = models.ManyToManyField(
+    content_html = TextField(verbose_name=_('HTML content'))
+    content_md = TextField(verbose_name=_('Markdown content'))
+    images = ManyToManyField(
         'forum_cdn.Image', verbose_name=_('Images in this backer\'s message'))

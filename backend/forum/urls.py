@@ -1,6 +1,7 @@
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import url
 from django.contrib import admin
+from django.urls.conf import include
 from django.views.i18n import JavaScriptCatalog
 
 from forum.account import urls as urls_account
@@ -8,24 +9,27 @@ from forum.base import urls as urls_base
 from forum.rest_api import urls as urls_api
 
 forum_urlpatterns = [
-    url(r'^api/', include(
-        urls_api, namespace='rest-api', app_name='forum_rest_api')),
-    url(r'^account/', include(
-        urls_account, namespace='account', app_name='forum_account')),
+    url(regex=r'^api/', view=include(
+        arg=(urls_api, 'rest-api'), namespace='rest-api')),
+    url(regex=r'^account/', view=include(
+        arg=(urls_account, 'account'), namespace='account')),
 
-    # url(r'^jsi18n/$', JavaScriptCatalog.as_view(domain='django'),
+    # url(regex=r'^jsi18n/$', JavaScriptCatalog.as_view(domain='django'),
     #     name='javascript-catalog'),
-    url(r'^', include(urls_base, namespace='base', app_name='base')),
+    url(regex=r'^', view=include(arg=(urls_base, 'base'), namespace='base')),
 ]
 
 urlpatterns = [
-    url(r'^', include(forum_urlpatterns, namespace='forum', app_name='forum')),
-    url(r'^admin/', include(admin.site.urls)),
+    url(regex=r'^admin/', view=admin.site.urls),
     # JavaScript i18n
-    url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+    url(regex=r'^jsi18n/$',
+        view=JavaScriptCatalog.as_view(), name='javascript-catalog'),
+    url(regex=r'^', view=include(
+        arg=(forum_urlpatterns, 'forum'), namespace='forum')),
 ]
 
 if settings.DEBUG:
     # Add debug toolbar
     import debug_toolbar
-    urlpatterns += [url(r'^__debug__/', include(debug_toolbar.urls))]
+    urlpatterns += [url(regex=r'^__debug__/',
+                        view=include(debug_toolbar.urls))]

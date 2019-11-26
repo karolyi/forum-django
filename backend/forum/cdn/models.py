@@ -1,7 +1,10 @@
 import os
 
 from django.conf import settings
-from django.db import models
+from django.db.models.base import Model
+from django.db.models.deletion import CASCADE
+from django.db.models.fields import CharField, FilePathField, URLField
+from django.db.models.fields.related import ForeignKey
 from django.db.models.signals import pre_delete
 from django.utils.translation import ugettext_lazy as _
 
@@ -12,21 +15,18 @@ def cdn_delete_file(sender, instance, *args, **kwargs):
         os.remove(abs_path)
 
 
-class Image(models.Model):
-
-    """
-    The saved image files.
-    """
+class Image(Model):
+    'The saved image files.'
 
     class Meta(object):
         verbose_name = _('Image')
         verbose_name_plural = _('Images')
 
-    mime_type = models.CharField(verbose_name=_('Mime type'), max_length=100)
-    cdn_path = models.FilePathField(
+    mime_type = CharField(verbose_name=_('Mime type'), max_length=100)
+    cdn_path = FilePathField(
         path=settings.PATH_CDN_ROOT, verbose_name=_('Path in CDN'),
         max_length=191, unique=True)
-    file_hash = models.CharField(
+    file_hash = CharField(
         verbose_name=_('File SHA512 hash'), max_length=128, unique=True)
 
     def __str__(self):
@@ -36,11 +36,8 @@ class Image(models.Model):
 pre_delete.connect(cdn_delete_file, sender=Image)
 
 
-class ImageUrl(models.Model):
-
-    """
-    The already downloaded image URLs.
-    """
+class ImageUrl(Model):
+    'The already downloaded image URLs.'
 
     class Meta(object):
         verbose_name = _('ImageUrl')
@@ -49,16 +46,15 @@ class ImageUrl(models.Model):
     def __str__(self):
         return self.orig_src
 
-    image = models.ForeignKey(
-        'forum_cdn.Image', verbose_name=_('The CDN file'))
-    orig_src = models.URLField(
+    image = ForeignKey(
+        to=Image, on_delete=CASCADE, verbose_name=_('The CDN file'))
+    orig_src = URLField(
         verbose_name=_('Original source'), max_length=512)
-    src_hash = models.CharField(
+    src_hash = CharField(
         verbose_name=_('SHA512 hash of orig_src'), max_length=128, unique=True)
 
 
-class MissingImage(models.Model):
-
+class MissingImage(Model):
     """
     The missing images, so they don't need to be downloaded again.
     """
@@ -67,6 +63,6 @@ class MissingImage(models.Model):
         verbose_name = _('Missing Image')
         verbose_name_plural = _('Missing Images')
 
-    src = models.URLField(
+    src = URLField(
         verbose_name=_('Original source'), max_length=191, db_index=True,
         unique=True)
