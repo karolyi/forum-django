@@ -33,11 +33,11 @@
 @import "fixes/temporary";
 
 // awesome-bootstrap-checkbox
-@import "fixes/awesome-bootstrap-checkbox";
+// @import "fixes/awesome-bootstrap-checkbox";
 
 .navbar-content-spacer {
   // Adjust when necessary
-  height: 51px + $grid-gutter-width-base / 2;
+  height: 51px + $grid-gutter-width / 2;
 }
 
 .page-content-wrapper {
@@ -45,7 +45,7 @@
     word-wrap: break-word;
 
     &.is-admin {
-      color: $brand-success;
+      color: $success;
     }
   }
 
@@ -54,7 +54,7 @@
   }
 
   .topic-group-wrapper {
-    margin-bottom: $grid-gutter-width-base / 2;
+    margin-bottom: $grid-gutter-width / 2;
 
     .card-header {
       .card-title {
@@ -71,15 +71,15 @@
         @include transition(background-color 0.2s linear);
 
         &.even {
-          background-color: lighten($nav-tabs-active-link-hover-bg, 4%);
+          background-color: lighten($nav-tabs-link-active-bg, 4%);
         }
 
         &.odd {
-          background-color: lighten($nav-tabs-active-link-hover-bg, 6%);
+          background-color: lighten($nav-tabs-link-active-bg, 6%);
         }
 
         &:hover {
-          background-color: $nav-tabs-active-link-hover-bg;
+          background-color: $nav-tabs-link-active-bg;
         }
 
         &:last-child {
@@ -94,7 +94,7 @@
       }
 
       .loader-topics-archived-wrapper {
-        padding-top: $grid-gutter-width-base;
+        padding-top: $grid-gutter-width;
 
         .loader-topics-archived {
           width: 100%;
@@ -106,16 +106,16 @@
   .topic-comment-listing-wrapper,
   .topic-comment-expansion-wrapper {
     .control-buttons {
-      margin-bottom: $grid-gutter-width-base;
+      margin-bottom: $grid-gutter-width;
     }
 
     .topic-comment-wrapper {
-      margin-bottom: $grid-gutter-width-base / 2;
+      margin-bottom: $grid-gutter-width / 2;
 
       &.is-highlighted {
         .card-header,
         .card-block {
-          background-color: lighten($brand-primary, 30%);
+          background-color: lighten($primary, 30%);
 
           @include transition(background 0s linear);
         }
@@ -159,7 +159,7 @@
 }
 
 blockquote {
-  border-left: 2px solid $gray-light;
-  background-color: $gray-lightest;
+  border-left: 2px solid $light;
+  background-color: $gray-200;
   padding-left: .5rem;
 }

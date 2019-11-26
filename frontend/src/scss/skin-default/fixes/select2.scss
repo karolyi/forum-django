@@ -2,12 +2,12 @@
 .select2-container--default {
   &.select2-container--focus {
     .select2-selection {
-      color: $input-color-focus;
-      background-color: $input-bg-focus;
-      border-color: $input-border-focus;
+      color: $input-focus-color;
+      background-color: $input-focus-bg;
+      border-color: $input-focus-border-color;
       outline: none;
 
-      @include box-shadow($input-box-shadow-focus);
+      @include box-shadow($input-focus-box-shadow);
 
       // @if $enable-rounded {
       //   box-shadow: $input-box-shadow, 0 0 6px lighten($input-color-focus, 20%);
@@ -44,13 +44,13 @@
     &.select2-container--focus {
       .select2-selection {
         @if $enable-rounded {
-          box-shadow: $input-box-shadow, 0 0 6px lighten($brand-danger, 20%);
+          box-shadow: $input-box-shadow, 0 0 6px lighten($danger, 20%);
         }
       }
     }
 
     .select2-selection {
-      border-color: $brand-danger;
+      border-color: $danger;
 
       // @include box-shadow($input-box-shadow-focus);
 
