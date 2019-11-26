@@ -1,8 +1,8 @@
 /* globals gettext */
 require('bootstrap/js/src/tooltip')
 require('bootstrap/js/src/alert')
-const richTextArea = require('./richTextArea')
 const $ = require('jquery')
+const richTextArea = require('./richTextArea')
 // const paginator = require('./paginator')
 // const userName = require('./userName')
 // const timeActualizer = require('./timeActualizer')

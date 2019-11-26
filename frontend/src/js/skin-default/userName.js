@@ -49,7 +49,8 @@ const onXhrErrorShortData = () => {
   // Load has failed for some reason
   if (!moduleLocals.jqUserHovered) return
   moduleLocals.jqUserHovered.attr(
-    'title', '<span class="fa fa-chain-broken"></span>')
+    'title', '<span class="fa fa-chain-broken"></span>',
+  )
   moduleLocals.jqUserHovered.tooltip('_fixTitle').tooltip('show')
 }
 
@@ -58,7 +59,8 @@ const loadUserData = (userSlug) => {
   // Load the user data
   $.when($.ajax({
     url: common.options.urls.user.shortData.replace(
-      common.options.urls.user.exampleSlug, userSlug),
+      common.options.urls.user.exampleSlug, userSlug,
+    ),
     dataType: 'json',
   })).then(onXhrSuccessShortData, onXhrErrorShortData)
 }
@@ -91,7 +93,8 @@ export function init(options) {
 export function add(options) {
   options.jqUsers.hover(onMouseInUsername, onMouseOutUsername)
   options.jqUsers.attr(
-    'title', '<span class="fa fa-spinner fa-pulse fa-fw"></span>')
+    'title', '<span class="fa fa-spinner fa-pulse fa-fw"></span>',
+  )
   options.jqUsers.attr('data-toggle', 'tooltip')
   options.jqUsers.tooltip({
     html: true,

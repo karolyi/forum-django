@@ -18,7 +18,8 @@ const getJsAndCssList = (items) => {
 // Prepare a production head tag with the loader script
 const loadSkinData = () => {
   const bundleContent = fs.readFileSync(path.resolve(path.join(
-    __dirname, '..', '..', '..', 'dist', 'assets', 'stats.json')), 'utf-8')
+    __dirname, '..', '..', '..', 'dist', 'assets', 'stats.json',
+  )), 'utf-8')
   const bundleParsed = JSON.parse(bundleContent)
   const vendorPath = getJsAndCssList(bundleParsed.chunks.vendor)[0]
   const loaderPath = getJsAndCssList(bundleParsed.chunks.loader)[0]
@@ -41,8 +42,9 @@ const createJsTag = (options) => {
 
 const createSettingsTag = (settings) => {
   util.format(
-  '<script type="text/javascript">\nvar __assetData = %j\n</script>\n',
-  settings)
+    '<script type="text/javascript">\nvar __assetData = %j\n</script>\n',
+    settings,
+  )
 }
 
 exports.createHeader = () => {

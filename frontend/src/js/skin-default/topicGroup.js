@@ -71,7 +71,8 @@ class Instance {
     // IMPORTANT: keep the same class names in
     // topic-archived-start.html!
     this.jqWrappers.topicList.empty().append(
-      jqHtml.filter(this.options.selectors.topicListWrapper).contents())
+      jqHtml.filter(this.options.selectors.topicListWrapper).contents(),
+    )
     const jqPaginationHtml =
       jqHtml.filter(this.options.selectors.paginationWrapper)
     this.options.pageMax = jqPaginationHtml.data('max-pages')

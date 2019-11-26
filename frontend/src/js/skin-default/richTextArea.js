@@ -22,7 +22,8 @@ editorFormats.forumEmbed = {
 const unknownError = gettext('Unknown error')
 const errorStr = gettext(
   'An error occurred. If the error persists, please notify the ' +
-  'administrators. The error was: <br><b>%(errorText)s</b>')
+  'administrators. The error was: <br><b>%(errorText)s</b>',
+)
 const loadingText = gettext('Loading ...')
 const anyCharRegex = /^\S+$/i
 
@@ -120,12 +121,12 @@ export class Instance {
     if (data.responseJSON && data.responseJSON.message) {
       errorText = data.responseJSON.message
     }
-    const errorStrFormatted = interpolate(errorStr, {
-      errorText: escapeHtml(errorText) }, true)
+    const errorStrFormatted = interpolate(errorStr, { errorText: escapeHtml(errorText) }, true)
     this.jqPreviewWrapper.html(
       '<span class="text-danger">' +
       '<i class="fa fa-exclamation-triangle"></i> ' +
-      `${errorStrFormatted}</span>`)
+      `${errorStrFormatted}</span>`,
+    )
     updateCsrfToken(this.jqCsrfToken)
   }
 
@@ -183,7 +184,8 @@ export class Instance {
     const fieldValue = this.options.jqElement.val()
     this.jqPreviewWrapper.html(
       '<i class="fa fa-spinner fa-pulse fa-fw"></i>' +
-      `<span class="sr-only">${loadingText}</span>`)
+      `<span class="sr-only">${loadingText}</span>`,
+    )
     $.when($.ajax({
       url: commonOptions.urls.mdParser,
       beforeSend: addCsrfHeader,

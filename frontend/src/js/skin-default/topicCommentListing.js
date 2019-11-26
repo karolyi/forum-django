@@ -2,8 +2,8 @@
 import { ScrollFix } from './scrollFix'
 
 require('bootstrap/js/src/tooltip')
-const popOverHoverContent = require('./popOverHoverContent')
 const $ = require('jquery')
+const popOverHoverContent = require('./popOverHoverContent')
 const common = require('./common')
 // const paginator = require('./paginator')
 const userName = require('./userName')
@@ -21,37 +21,46 @@ export class CommentListing {
         .replace(this.options.urls.commentListing.commentId, '%(commentId)s'),
       expandCommentsUpRecursive:
         this.options.urls.expandCommentsUpRecursive.backend
-        .replace(
-          this.options.urls.expandCommentsUpRecursive.exampleSlug,
-          '%(topicSlug)s')
-        .replace(
-          this.options.urls.expandCommentsUpRecursive.commentId,
-          '%(commentId)s')
-        .replace(
-          this.options.urls.expandCommentsUpRecursive.scrollToId,
-          '%(scrollToId)s'),
+          .replace(
+            this.options.urls.expandCommentsUpRecursive.exampleSlug,
+            '%(topicSlug)s',
+          )
+          .replace(
+            this.options.urls.expandCommentsUpRecursive.commentId,
+            '%(commentId)s',
+          )
+          .replace(
+            this.options.urls.expandCommentsUpRecursive.scrollToId,
+            '%(scrollToId)s',
+          ),
       expandCommentsUp:
         this.options.urls.expandCommentsUp.backend
-        .replace(
-          this.options.urls.expandCommentsUp.exampleSlug,
-          '%(topicSlug)s')
-        .replace(
-          this.options.urls.expandCommentsUp.commentId,
-          '%(commentId)s')
-        .replace(
-          this.options.urls.expandCommentsUp.scrollToId,
-          '%(scrollToId)s'),
+          .replace(
+            this.options.urls.expandCommentsUp.exampleSlug,
+            '%(topicSlug)s',
+          )
+          .replace(
+            this.options.urls.expandCommentsUp.commentId,
+            '%(commentId)s',
+          )
+          .replace(
+            this.options.urls.expandCommentsUp.scrollToId,
+            '%(scrollToId)s',
+          ),
       expandCommentsDown:
         this.options.urls.expandCommentsDown.backend
-        .replace(
-          this.options.urls.expandCommentsDown.exampleSlug,
-          '%(topicSlug)s')
-        .replace(
-          this.options.urls.expandCommentsDown.commentId,
-          '%(commentId)s')
-        .replace(
-          this.options.urls.expandCommentsDown.scrollToId,
-          '%(scrollToId)s'),
+          .replace(
+            this.options.urls.expandCommentsDown.exampleSlug,
+            '%(topicSlug)s',
+          )
+          .replace(
+            this.options.urls.expandCommentsDown.commentId,
+            '%(commentId)s',
+          )
+          .replace(
+            this.options.urls.expandCommentsDown.scrollToId,
+            '%(scrollToId)s',
+          ),
     }
   }
 
@@ -121,7 +130,8 @@ export class CommentListing {
     event.preventDefault()
     // Construct the pushed URL
     const constructedPath = this.constructPathFromData(
-      this.options.topicSlugOriginal, commentIdLinked)
+      this.options.topicSlugOriginal, commentIdLinked,
+    )
     history.pushState({}, null, constructedPath)
     this.scrollFix.scrollTo(commentIdLinked)
   }
@@ -205,13 +215,15 @@ export class CommentListing {
           commentId,
           topicSlug,
           scrollToId: commentId,
-        }, true)
+        }, true,
+      )
       const constructedPathUp = interpolate(
         this.urlFormatStrings.expandCommentsUp, {
           commentId,
           topicSlug,
           scrollToId: commentId,
-        }, true)
+        }, true,
+      )
       jqButtonExpandCommentsUpRecursive
         .prop('href', constructedPathUpRecursive)
       jqButtonExpandCommentsUp.prop('href', constructedPathUp)
@@ -222,7 +234,8 @@ export class CommentListing {
           commentId,
           topicSlug,
           scrollToId: commentId,
-        }, true)
+        }, true,
+      )
       jqButtonExpandCommentsDown.prop('href', constructedPathDown)
     }
     jqTip.find('.popover-content').empty().append(jqTemplate)
@@ -234,7 +247,8 @@ export class CommentListing {
     this.prepareUrlFormatStrings()
     this.jqTemplates = {
       commentActions: $(common.extractTemplateHtml(
-        this.jqRoot.find(this.options.selectors.template.action)[0])),
+        this.jqRoot.find(this.options.selectors.template.action)[0],
+      )),
     }
     this.jqWrappers = {
       comments: this.jqRoot.find(this.options.selectors.commentWrapper),
@@ -243,12 +257,14 @@ export class CommentListing {
       .click(::this.onClickLinkPreviousComment)
       .hover(
         ::this.onMouseEnterLinkPreviousComment,
-        ::this.onMouseLeaveLinkPreviousComment)
+        ::this.onMouseLeaveLinkPreviousComment,
+      )
     this.jqWrappers.comments.find(this.options.selectors.replyLinks)
       .click(::this.onClickLinkReplyComment)
       .hover(
         ::this.onMouseEnterLinkReplyComment,
-        ::this.onMouseLeaveLinkReplyComment)
+        ::this.onMouseLeaveLinkReplyComment,
+      )
     this.jqWrappers.comments.find(this.options.selectors.selfLinks)
       .click(::this.onClickLinkComment)
     const jqButtonCommentActions =

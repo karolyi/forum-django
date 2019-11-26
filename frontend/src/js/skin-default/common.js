@@ -27,7 +27,8 @@ export function extractTemplateHtml(domTemplateElement) {
   const tempElement = document.createElement('p')
   const templateCopy = document.importNode(domTemplateElement, true)
   const templateCopyArray = Array.prototype.slice.call(
-    templateCopy.content.childNodes)
+    templateCopy.content.childNodes,
+  )
   for (const item of templateCopyArray) tempElement.appendChild(item)
   return tempElement.innerHTML
 }

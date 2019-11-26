@@ -45,4 +45,3 @@ export function observeRemoveNode(targetNode, callback) {
 export function observeRemoveJq(jqNode, callback) {
   for (const targetNode of jqNode) observeRemoveNode(targetNode, callback)
 }
-

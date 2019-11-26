@@ -13,4 +13,3 @@ exports.insertStylesheet = (source) => {
   stylesheet.setAttribute('href', source)
   document.head.appendChild(stylesheet)
 }
-
