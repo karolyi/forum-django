@@ -1,12 +1,10 @@
 {
-  "ecmaFeatures": {
-    "modules": true
-  },
   "env": {
     "browser": true,
     "node": true
   },
   "parser": "babel-eslint",
+  "extends": ["eslint:recommended", "airbnb-base"],
   "rules": {
     "no-continue": [0],
     "no-console": [1],
@@ -15,17 +13,18 @@
     "strict": [2, "never"],
     "max-len": [2, {"code": 80, "tabWidth": 4, "ignoreUrls": true}],
     "no-restricted-syntax": "off",
+    "max-classes-per-file": "off",
     "import/no-extraneous-dependencies": [
       "error",
       {
         "devDependencies": true
       }
     ],
-    "import/prefer-default-export": ["off"]
+    "import/prefer-default-export": ["off"],
+    "operator-linebreak": "off"
   },
   "globals": {
   },
   "plugins": [
-  ],
-  "extends": ["eslint:recommended", "airbnb-base"]
+  ]
 }

@@ -4,10 +4,20 @@
 'use strict'
 
 const path = require('path')
-const configBase = require('./config.base')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const webpack = require('webpack')
 const BundleTracker = require('webpack-bundle-tracker')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+
+const configBase = require('./config.base')
+
+const postCssConfigPath = path
+  .resolve(path.join(__dirname, '..', '..', 'postcss.config.js'))
+const extractCSS = new MiniCssExtractPlugin({
+  // Options similar to the same options in webpackOptions.output
+  // both options are optional
+  filename: 'stylesheets/[name].css',
+  chunkFilename: 'stylesheets/[id].css',
+})
 
 let key
 const tempEntry = {}
@@ -15,11 +25,12 @@ const tempEntry = {}
 for (key of Object.keys(configBase.entry)) {
   const item = configBase.entry[key].slice()
   // Copy the original list
-  // item.unshift('webpack/hot/only-dev-server')
   item.unshift('webpack/hot/dev-server')
   if (key !== 'loader') {
     // The loader doesn't get a HMR connection (everything else does)
     item.unshift('webpack-dev-server/client?http://localhost:3000/')
+    // item.unshift('webpack-dev-server/client?http://192.168.1.130:3000/')
+    // item.unshift(`webpack-dev-server/client?http://${devHostname}:3000/`)
   }
   tempEntry[key] = item
 }
@@ -36,42 +47,50 @@ configBase.devtool = 'source-map'
 
 configBase.module.rules.push({
   test: /\.scss$/,
-  use: [{
-    loader: 'style-loader',
-    options: {
-      useable: true,
+  use: [
+    { loader: 'style-loader' },
+    { loader: 'css-loader', options: { sourceMap: true } },
+    {
+      loader: 'postcss-loader',
+      options: { config: { path: postCssConfigPath }, sourceMap: true },
     },
-  }, {
-    loader: 'css-loader',
-    options: {
-      sourceMap: true,
+    {
+      loader: 'sass-loader',
+      options: {
+        sourceMap: true,
+        sassOptions: {
+          includePaths: [
+            path.resolve(__dirname, '../../node_modules'),
+          ],
+        },
+      },
     },
-  }, {
-    loader: 'sass-loader',
-    options: {
-      sourceMap: true,
-      includePaths: [
-        path.resolve(__dirname, '../../node_modules'),
-      ],
-    },
-  }],
+  ],
 })
 
-configBase.plugins = [
+configBase.plugins = configBase.plugins.concat([
   new webpack.HotModuleReplacementPlugin(),
   new webpack.NoEmitOnErrorsPlugin(), // don't reload if there is an error
   new BundleTracker({
     path: __dirname,
     filename: path.join('..', 'webpack', 'stats.json'),
   }),
-  new ExtractTextPlugin('[name].css'),
-  // keeps hashes consistent between compilations, isn't needed since
-  // webpack 2
-  // new webpack.optimize.OccurrenceOrderPlugin(),
-  new webpack.optimize.CommonsChunkPlugin({
-    name: 'vendor',
-    filename: 'vendor.bundle.js',
-  }),
-]
+  extractCSS,
+])
+
+configBase.optimization = {
+  runtimeChunk: 'single', // enable 'runtime' chunk
+  splitChunks: {
+    cacheGroups: {
+      vendor: {
+        test: /[\\/]node_modules[\\/]/,
+        name: 'vendor',
+        chunks: 'all',
+      },
+    },
+  },
+}
+
+configBase.mode = 'development'
 
 module.exports = configBase

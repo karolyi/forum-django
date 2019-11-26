@@ -1,65 +1,109 @@
 const path = require('path')
-const webpack = require('webpack')
 const BundleTracker = require('webpack-bundle-tracker')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+const cleanCss = require('clean-css')
+
 const configBase = require('./config.base')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
-const extractCSS = new ExtractTextPlugin('stylesheets/[name]-[hash:6].css')
+const extractCSS = new MiniCssExtractPlugin({
+  // Options similar to the same options in webpackOptions.output
+  // both options are optional
+  filename: 'stylesheets/[name]-[hash:6].css',
+  chunkFilename: 'stylesheets/[id]-[hash:6].css',
+})
 
-configBase.plugins = [
+const postCssConfigPath = path.resolve(
+  path.join(__dirname, '..', '..', 'postcss.config.js'),
+)
+
+configBase.plugins = configBase.plugins.concat([
   new BundleTracker({
     path: __dirname,
     filename: path.join('..', 'webpack', 'stats.json'),
   }),
   // To split all the CSS files
   extractCSS,
+])
 
-  // removes a lot of debugging code in React
-  new webpack.DefinePlugin({
-    'process.env': {
-      NODE_ENV: JSON.stringify('production'),
-    },
-  }),
-
-  new webpack.optimize.CommonsChunkPlugin({
-    minChunks: 3,
-    name: 'vendor',
-    filename: 'vendor.bundle-[hash:6].js',
-  }),
-
-  // minifies your code
-  new webpack.optimize.UglifyJsPlugin({
-    compressor: {
-      warnings: false,
-    },
-  }),
-]
-
+// Sass compiler
 configBase.module.rules.push({
   test: /\.s[ac]ss$/,
-  use: extractCSS.extract({
-    fallback: 'style-loader',
-    use: [{
-      loader: 'css-loader',
-      // This should be changed to options as soon as the loader
-      // supports it here.
-      query: {
-        sourceMap: true,
-        importLoaders: 1,
-      },
-    }, {
+  use: [
+    { loader: MiniCssExtractPlugin.loader },
+    { loader: 'css-loader', options: { importLoaders: 1 } },
+    {
+      loader: 'postcss-loader',
+      options: { config: { path: postCssConfigPath }, sourceMap: false },
+    },
+    {
       loader: 'sass-loader',
-      // This should be changed to options as soon as the loader
-      // supports it here.
-      query: {
-        sourceMap: true,
-        includePaths: [
-          path.resolve(__dirname, '../../node_modules'),
-        ],
+      options: {
+        sassOptions: {
+          includePaths: [
+            path.resolve(__dirname, '../../node_modules'),
+          ],
+        },
       },
-    }],
-  }),
+    },
+  ],
 })
+
+// Stylus compiler
+configBase.module.rules.push({
+  test: /\.styl$/,
+  use: [
+    { loader: MiniCssExtractPlugin.loader },
+    { loader: 'css-loader', options: { importLoaders: 1 } },
+    {
+      loader: 'postcss-loader',
+      options: { config: { path: postCssConfigPath }, sourceMap: false },
+    },
+    { loader: 'stylus-loader', options: { preferPathResolver: 'webpack' } },
+  ],
+})
+
+configBase.optimization = {
+  runtimeChunk: 'single', // enable 'runtime' chunk
+  splitChunks: {
+    cacheGroups: {
+      vendor: {
+        test: /[\\/]node_modules[\\/]/,
+        name: 'vendor',
+        chunks: 'all',
+      },
+    },
+  },
+  minimizer: [
+    // we specify a custom UglifyJsPlugin here to get source maps in production
+    new TerserPlugin({
+      cache: true,
+      extractComments: true,
+      parallel: true,
+      terserOptions: {
+        ecma: 8,
+        // compress: true,
+        compress: false,
+        // mangle: true,
+        mangle: false,
+        output: {
+          comments: false,
+        },
+      },
+      sourceMap: false,
+    }),
+    // Related issue: https://github.com/cssnano/cssnano/issues/712
+    new OptimizeCSSAssetsPlugin({
+      cssProcessor: cleanCss,
+      cssProcessorPluginOptions: {
+        preset: ['default', { discardComments: { removeAll: true } }],
+      },
+      canPrint: true,
+    }),
+  ],
+}
+configBase.mode = 'production'
 
 // Override font naming in production
 configBase.module.rules[0].use[0].options.name = 'fonts/[name]-[hash:6].[ext]'

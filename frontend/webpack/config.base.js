@@ -1,4 +1,6 @@
 const path = require('path')
+const postCssConfigPath = path
+  .resolve(path.join(__dirname, '..', '..', 'postcss.config.js'))
 
 module.exports = {
   context: __dirname,
@@ -68,38 +70,8 @@ module.exports = {
         }],
       },
       {
-        // Transpile ES6 to ES5 in Bootstrap V4
-        test: /bootstrap\/js\/src\/tooltip.js$/,
-        use: [{
-          loader: 'imports-loader',
-          options: {
-            jQuery: 'jquery',
-            Tether: 'tether',
-          },
-        }, {
-          loader: 'babel-loader',
-          options: {
-            babelrc: true,
-          },
-        }],
-      },
-      {
-        // Transpile ES6 to ES5 in Bootstrap V4
-        test: /bootstrap\/js\/src\/.*\.js$/,
-        use: [{
-          loader: 'imports-loader',
-          options: {
-            jQuery: 'jquery',
-          },
-        }, {
-          loader: 'babel-loader',
-          options: {
-            babelrc: true,
-          },
-        }],
-      },
-      {
-        // Transpile ES6 to ES5
+        // https://stackoverflow.com/a/54520451/1067833 ?
+        // Use Babel everywhere except node_modules
         test: /\.js$/,
         // exclude: /node_modules/,
         use: [{
@@ -109,7 +81,8 @@ module.exports = {
           },
         }],
       },
-      { test: /\.json$/,
+      {
+        test: /\.json$/,
         use: [{
           loader: 'json-loader',
         }],
@@ -127,6 +100,10 @@ module.exports = {
         }],
       },
       {
+        loader: 'postcss-loader',
+        options: { config: { path: postCssConfigPath }, sourceMap: true },
+      },
+      {
         test: /.*\.html(\?.*)?$/,
         use: [{
           loader: 'raw-loader',
@@ -135,10 +112,18 @@ module.exports = {
     ],
   },
 
+  // This will be extended later on from configs that inherit this
+  // module
+  plugins: [
+  ],
+
   resolve: {
     modules: [
-      'node_modules',
+      path.resolve(__dirname, '../..'),
+      path.resolve(__dirname, '../../node_modules'),
     ],
     extensions: ['.js'],
+  },
+  optimization: {
   },
 }

@@ -31,5 +31,5 @@ urlpatterns = [
 if settings.DEBUG:
     # Add debug toolbar
     import debug_toolbar
-    urlpatterns += [url(regex=r'^__debug__/',
-                        view=include(debug_toolbar.urls))]
+    urlpatterns += [
+        url(regex=r'^__debug__/', view=include(arg=debug_toolbar.urls))]
