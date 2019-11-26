@@ -89,19 +89,13 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        // loaders: ['style-loader', 'css-loader'],
-        use: [{
-          loader: 'style-loader',
-          options: {
-            useable: true,
+        use: [
+          { loader: 'style-loader', options: { useable: true }},
+          { loader: 'css-loader' },
+          { loader: 'postcss-loader',
+            options: { config: { path: postCssConfigPath }, sourceMap: true },
           },
-        }, {
-          loader: 'css-loader',
-        }],
-      },
-      {
-        loader: 'postcss-loader',
-        options: { config: { path: postCssConfigPath }, sourceMap: true },
+        ],
       },
       {
         test: /.*\.html(\?.*)?$/,

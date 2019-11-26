@@ -1,4 +1,4 @@
-exports.insertScript = (source) => {
+export function insertScript(source) {
   const script = document.createElement('script')
   script.type = 'text/javascript'
   script.src = source
@@ -7,7 +7,7 @@ exports.insertScript = (source) => {
   document.head.appendChild(script)
 }
 
-exports.insertStylesheet = (source) => {
+export function insertStylesheet(source) {
   const stylesheet = document.createElement('link')
   stylesheet.setAttribute('rel', 'stylesheet')
   stylesheet.setAttribute('href', source)
