@@ -3,7 +3,7 @@ blessings==1.7
 certifi==2019.11.28
 chardet==3.0.4
 colour-runner==0.1.1
-Django==2.2.9
+Django==3.0.1
 django-debug-toolbar==2.1
 django-extensions==2.2.5
 django-jinja==2.4.1
