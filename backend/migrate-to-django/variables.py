@@ -1,15 +1,9 @@
 import MySQLdb
 
 
-MYSQL_CONNECTION = {
-    'db': 'crxforum',
-    'user': 'crxforum',
-    'passwd': 'password-changed',
-    'charset': 'utf8',
-    'host': 'jail-mariadb'
-}
+from django.conf import settings
 
-conn = MySQLdb.connect(**MYSQL_CONNECTION)
+conn = MySQLdb.connect(**CRXFORUM_CONNECTION)
 
 user_dict = {}
 topic_dict = {}

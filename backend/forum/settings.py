@@ -269,12 +269,12 @@ PAGINATOR_MAX_PAGES_TOPICLIST = 10
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = 'forum:account:login'
 
-MYSQL_CONNECTION = {
+CRXFORUM_CONNECTION = {
     'db': 'crxforum',
     'user': 'crxforum',
     'passwd': 'test123',
     'charset': 'utf8',
-    'host': 'jail-mariadb'
+    'host': 'localhost'
 }
 
 
