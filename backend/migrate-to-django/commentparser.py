@@ -124,7 +124,7 @@ def check_already_downloaded(img_tag, comment_item, content):
     cdn_url = '/'.join((HTTP_CDN_ROOT, cdn_image.cdn_path))
     logger.info(
         'Object already downloaded: %s, cdn_url: %s', orig_src, cdn_url)
-    img_tag['data-cdnid'] = cdn_image.id
+    img_tag['data-cdn-pk'] = cdn_image.pk
     img_tag['src'] = '/'.join((HTTP_CDN_ROOT, cdn_image.cdn_path))
     wrap_into_picture(img_tag, cdn_image.cdn_path, content)
     variables.ALREADY_DOWNLOADED_IMAGE_COUNT += 1

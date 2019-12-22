@@ -1,1 +1,4 @@
 phpserialize
+python-magic
+html2text
+lxml

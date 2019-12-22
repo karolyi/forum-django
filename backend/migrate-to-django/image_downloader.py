@@ -16,6 +16,7 @@ from django.apps import apps
 from django.contrib.auth import get_user_model
 from forum.utils import slugify
 from unidecode import unidecode
+from .utils import soup
 
 from variables import (
     NONE_SRC, FILE_EXTENSIONS_KEYS, CANCEL_HASH_TUPLE, HTTP_CDN_ROOT,
@@ -57,7 +58,7 @@ def wrap_into_picture(img_tag, cdn_path, content):
     screen-xs: 480px
     """
 
-    picture_tag = img_tag.wrap(bs.new_tag(img_tag, 'picture'))
+    picture_tag = img_tag.wrap(soup.new_tag(name='picture'))
     source_orig = content.new_tag(
         'source', media='(min-width: 1200px)',
         srcset='/'.join((HTTP_CDN_ROOT, cdn_path)))
@@ -150,7 +151,7 @@ def check_hash_existing(img_tag, digest_value, model_item, content):
         'Object hash exists for url %s, existing_cdn_url: %s,'
         ' digest_value is %s',
         orig_src, existing_cdn_url, digest_value)
-    img_tag['data-cdnid'] = cdn_image.id
+    img_tag['data-cdn-pk'] = cdn_image.pk
     img_tag['src'] = existing_cdn_url
     wrap_into_picture(img_tag, cdn_image.cdn_path, content)
     variables.ALREADY_DOWNLOADED_IMAGE_COUNT += 1
@@ -212,7 +213,7 @@ def add_missing_comment_image(img_tag):
     img_tag['src'] = NONE_SRC
     img_tag['class'] = 'notfound-picture'
     img_tag['data-missing'] = '1'
-    img_tag['data-cdnid'] = '%s' % missing_image.id
+    img_tag['data-cdn-pk'] = '%s' % missing_image.pk
     variables.MISSING_IMAGE_COUNT += 1
 
 
@@ -245,7 +246,7 @@ def do_download(img_tag, model_item, content):
     cdn_image_url.save()
     future_assign_model_to_image(cdn_image, model_item)
     img_tag['src'] = '/'.join((HTTP_CDN_ROOT, cdn_relative_path))
-    img_tag['data-cdnid'] = '%s' % cdn_image.id
+    img_tag['data-cdn-pk'] = '%s' % cdn_image.pk
     wrap_into_picture(img_tag, cdn_relative_path, content)
     variables.SUCCESSFULLY_DOWNLOADED += 1
     logger.info('Object downloaded and added to cdn: %s, cdn_path: %s',

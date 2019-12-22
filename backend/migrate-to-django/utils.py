@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 from pytz import timezone
 
 bp_timezone = timezone('Europe/Budapest')
@@ -16,3 +17,6 @@ def non_naive_datetime_utc(input_datetime):
     Used for unix timestamps
     """
     return utc_timezone.localize(input_datetime)
+
+
+soup = BeautifulSoup(markup='', features='lxml')
