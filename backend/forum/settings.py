@@ -269,6 +269,15 @@ PAGINATOR_MAX_PAGES_TOPICLIST = 10
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = 'forum:account:login'
 
+MYSQL_CONNECTION = {
+    'db': 'crxforum',
+    'user': 'crxforum',
+    'passwd': 'test123',
+    'charset': 'utf8',
+    'host': 'jail-mariadb'
+}
+
+
 # Keep this at the very bottom of settings.py
 try:
     from forum.settings_override import *  # NOQA
