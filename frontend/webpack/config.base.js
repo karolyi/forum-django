@@ -1,6 +1,16 @@
 const path = require('path')
+const fs = require('fs')
+
 const postCssConfigPath = path
   .resolve(path.join(__dirname, '..', '..', 'postcss.config.js'))
+
+const babelRc = JSON.parse(
+  fs.readFileSync(
+    path.resolve(
+      path.join(__dirname, '..', '..', '.babelrc'),
+    ),
+  ),
+)
 
 module.exports = {
   context: __dirname,
@@ -70,15 +80,12 @@ module.exports = {
         }],
       },
       {
-        // https://stackoverflow.com/a/54520451/1067833 ?
-        // Use Babel everywhere except node_modules
+        // Transpile ES6 to ES5 everywhere except node_modules
         test: /\.js$/,
         // exclude: /node_modules/,
         use: [{
           loader: 'babel-loader',
-          options: {
-            babelrc: true,
-          },
+          options: babelRc,
         }],
       },
       {
@@ -119,5 +126,21 @@ module.exports = {
     extensions: ['.js'],
   },
   optimization: {
+    runtimeChunk: 'single', // enable 'runtime.js' chunk
+    usedExports: true,
+    sideEffects: false,
+    splitChunks: {
+      chunks: 'all',
+      name: 'runtime',
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+          chunks: 'all',
+          enforce: true,
+          reuseExistingChunk: true,
+        },
+      },
+    },
   },
 }

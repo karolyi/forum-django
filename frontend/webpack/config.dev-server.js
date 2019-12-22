@@ -46,7 +46,7 @@ configBase.output.publicPath = 'http://localhost:3000/static/assets/'
 configBase.devtool = 'source-map'
 
 configBase.module.rules.push({
-  test: /\.scss$/,
+  test: /\.s[ac]ss$/,
   use: [
     { loader: 'style-loader' },
     { loader: 'css-loader', options: { sourceMap: true } },
@@ -77,19 +77,6 @@ configBase.plugins = configBase.plugins.concat([
   }),
   extractCSS,
 ])
-
-configBase.optimization = {
-  runtimeChunk: 'single', // enable 'runtime' chunk
-  splitChunks: {
-    cacheGroups: {
-      vendor: {
-        test: /[\\/]node_modules[\\/]/,
-        name: 'vendor',
-        chunks: 'all',
-      },
-    },
-  },
-}
 
 configBase.mode = 'development'
 

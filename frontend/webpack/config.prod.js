@@ -64,45 +64,33 @@ configBase.module.rules.push({
   ],
 })
 
-configBase.optimization = {
-  runtimeChunk: 'single', // enable 'runtime' chunk
-  splitChunks: {
-    cacheGroups: {
-      vendor: {
-        test: /[\\/]node_modules[\\/]/,
-        name: 'vendor',
-        chunks: 'all',
+configBase.optimization.minimizer = [
+  // we specify a custom UglifyJsPlugin here to get source maps in production
+  new TerserPlugin({
+    cache: true,
+    extractComments: true,
+    parallel: true,
+    terserOptions: {
+      ecma: 8,
+      // compress: true,
+      compress: false,
+      // mangle: true,
+      mangle: false,
+      output: {
+        comments: false,
       },
     },
-  },
-  minimizer: [
-    // we specify a custom UglifyJsPlugin here to get source maps in production
-    new TerserPlugin({
-      cache: true,
-      extractComments: true,
-      parallel: true,
-      terserOptions: {
-        ecma: 8,
-        // compress: true,
-        compress: false,
-        // mangle: true,
-        mangle: false,
-        output: {
-          comments: false,
-        },
-      },
-      sourceMap: false,
-    }),
-    // Related issue: https://github.com/cssnano/cssnano/issues/712
-    new OptimizeCSSAssetsPlugin({
-      cssProcessor: cleanCss,
-      cssProcessorPluginOptions: {
-        preset: ['default', { discardComments: { removeAll: true } }],
-      },
-      canPrint: true,
-    }),
-  ],
-}
+    sourceMap: false,
+  }),
+  // Related issue: https://github.com/cssnano/cssnano/issues/712
+  new OptimizeCSSAssetsPlugin({
+    cssProcessor: cleanCss,
+    cssProcessorPluginOptions: {
+      preset: ['default', { discardComments: { removeAll: true } }],
+    },
+    canPrint: true,
+  }),
+]
 configBase.mode = 'production'
 
 // Override font naming in production

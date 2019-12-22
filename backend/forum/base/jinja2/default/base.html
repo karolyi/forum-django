@@ -4,6 +4,7 @@
 <html lang="{{ current_language.code|escape }}">
 <head>
     {{ render_bundle('vendor') }}
+    {{ render_bundle('runtime') }}
     {{ render_bundle('common') }}
     {{ render_bundle('userName') }}
     <title>{% block title %}{{ django_settings.SITE_NAME }}{% endblock title %}</title>
