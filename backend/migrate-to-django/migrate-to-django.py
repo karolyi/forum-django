@@ -3,6 +3,8 @@
 
 # TODO: comment edits
 
+# This needs to be imported first: sets up django
+from setup import do_setup
 
 import datetime
 import logging
@@ -16,8 +18,6 @@ from comment_bookmark_parser import parse_bookmarks
 from crowfunding_parser import parse_crowdfunding
 from messageparser import parse_global_messages, parse_messaging
 from poll_parser import parse_polls
-# This needs to be imported first: sets up django
-from setup import do_setup
 
 logger = logging.getLogger(__name__)
 

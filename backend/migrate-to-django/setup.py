@@ -5,7 +5,7 @@ import logging
 
 allowed_filters = ('image_downloader', 'commentparser')
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'forum.settings_override')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'forum.settings')
 forum_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(forum_path)
 # http://django.readthedocs.org/en/latest/releases/1.7.html#standalone-scripts

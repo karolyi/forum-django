@@ -1,9 +1,7 @@
 import MySQLdb
-
-
 from django.conf import settings
 
-conn = MySQLdb.connect(**CRXFORUM_CONNECTION)
+conn = MySQLdb.connect(**settings.CRXFORUM_CONNECTION)
 
 user_dict = {}
 topic_dict = {}
