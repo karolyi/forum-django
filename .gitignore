@@ -24,6 +24,7 @@ docs/_build/
 node_modules/
 frontend/dist
 frontend/webpack/stats.json
+backend/forum/settings_override.py
 *.sublime*
 logs/
 venv/

@@ -17,7 +17,7 @@ from django_jinja.builtins import DEFAULT_EXTENSIONS
 
 # Keep this at the beginning, after module imports
 try:
-    from forum.settings_production import *  # NOQA
+    from forum.settings_override import *  # NOQA
 except ImportError as e:
     pass
 
@@ -271,6 +271,6 @@ LOGIN_URL = 'forum:account:login'
 
 # Keep this at the very bottom of settings.py
 try:
-    from forum.settings_production import *  # NOQA
+    from forum.settings_override import *  # NOQA
 except ImportError as e:
     pass
