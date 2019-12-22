@@ -4,7 +4,7 @@ import MySQLdb
 MYSQL_CONNECTION = {
     'db': 'crxforum',
     'user': 'crxforum',
-    'passwd': 'crx57forum',
+    'passwd': 'password-changed',
     'charset': 'utf8',
     'host': 'jail-mariadb'
 }

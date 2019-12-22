@@ -1,28 +1,31 @@
 import datetime
 import logging
 import os
+
 import requests
-# import sys
+from bs4 import BeautifulSoup as bs
+from django.apps import apps
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password  # NOQA
+from django.db import connection as django_connection
+from django.db import transaction
 
 import phpserialize
 import variables
-from markdown import markdown
-from forum.base.choices import TOPIC_TYPE_CHOICES
-from bs4 import BeautifulSoup as bs
 from commentparser import build_comment
-from django.apps import apps
-from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import make_password
-from django.db import connection as django_connection
-from django.db import transaction
+from forum.base.choices import TOPIC_TYPE_CHOICES
+from markdown import markdown
 from markdownparser import parse_to_markdown
 from topicparser import (
     finish_assign_topic_to_image, fix_content_image, parse_description)
 from utils import non_naive_datetime_bp, non_naive_datetime_utc
 from variables import (
-    CDN_FILES_ROOT, conn, event_dict, session_dict, topic_dict, user_dict,
-    comment_uniqid_dict)
+    CDN_FILES_ROOT, comment_uniqid_dict, conn, event_dict, session_dict,
+    topic_dict, user_dict)
 from video_converter import parse_videos
+
+# import sys
+
 
 logger = logging.getLogger(__name__)
 cursor = conn.cursor()

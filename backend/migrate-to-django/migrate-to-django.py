@@ -4,20 +4,20 @@
 # TODO: comment edits
 
 
-# This needs to be imported first: sets up django
-from setup import do_setup
-from django.db import transaction
-
-# Self-written modules need to be imported after initializing
-import variables
-import maintenance
 import datetime
 import logging
 
-from messageparser import parse_messaging, parse_global_messages
-from crowfunding_parser import parse_crowdfunding
+from django.db import transaction
+
+import maintenance
+# Self-written modules need to be imported after initializing
+import variables
 from comment_bookmark_parser import parse_bookmarks
+from crowfunding_parser import parse_crowdfunding
+from messageparser import parse_global_messages, parse_messaging
 from poll_parser import parse_polls
+# This needs to be imported first: sets up django
+from setup import do_setup
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +69,7 @@ def main():
         variables.ALREADY_DOWNLOADED_IMAGE_COUNT,
         variables.ALREADY_MISSING_IMAGE_COUNT,
         variables.CDN_NO_MODEL, variables.CDN_NO_FILE)
+
 
 do_setup()
 main()
