@@ -54,6 +54,7 @@ def wrap_into_picture(img_tag, cdn_path, content):
     screen-xs: 480px
     """
 
+    from IPython import embed; embed()
     picture_tag = img_tag.wrap(img_tag.img.new_tag(name='picture'))
     source_orig = content.new_tag(
         'source', media='(min-width: 1200px)',
@@ -74,7 +75,6 @@ def wrap_into_picture(img_tag, cdn_path, content):
     picture_tag.insert(0, source_md)
     picture_tag.insert(0, source_lg)
     picture_tag.insert(0, source_orig)
-    from IPython import embed; embed()
 
 
 def get_extension(mime_type):

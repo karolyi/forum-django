@@ -145,7 +145,6 @@ def parse_introductions(user_item):
     content = user_item.introduction_html_all.replace('\n', '<br>\n')
     content = bs('<html><body>%s</body></html>' % content, 'lxml')
     for img_tag in content.select('img'):
-        from IPython import embed; embed()
         fix_content_image(img_tag, user_item, content)
     parse_videos(content)
     # Manually remove erroneous closing tag
