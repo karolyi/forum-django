@@ -2,6 +2,7 @@ import datetime
 import logging
 import os
 
+import phpserialize
 import requests
 from bs4 import BeautifulSoup as bs
 from django.apps import apps
@@ -10,7 +11,6 @@ from django.contrib.auth.hashers import make_password  # NOQA
 from django.db import connection as django_connection
 from django.db import transaction
 
-import phpserialize
 import variables
 from commentparser import build_comment
 from forum.base.choices import TOPIC_TYPE_CHOICES
@@ -106,7 +106,7 @@ def cdn_maintenance():
 
 def finish_assign_user_to_image(user_item):
     for cdn_image in getattr(user_item, 'temp_cdn_image_list', []):
-        user_item.settings.images.add(cdn_image)
+        user_item.images.add(cdn_image)
 
 
 def finish_assign_event_to_image(event_instance):
@@ -181,17 +181,16 @@ def parse_introductions(user_item):
 def create_ignored_users_and_inviters():
     for old_id in user_dict:
         user = user_dict[old_id]
-        for key in user.settings.temp_ignored_user_list:
-            ignored_id = int(user.settings.temp_ignored_user_list[key])
+        for key in user.temp_ignored_user_list:
+            ignored_id = int(user.temp_ignored_user_list[key])
             if ignored_id in user_dict:
-                user.settings.ignored_users.add(user_dict[ignored_id])
+                user.ignored_users.add(user_dict[ignored_id])
             else:
                 print('%s: Ignored old user ID does not exist: %s' % (
                     user.username, ignored_id))
-        if user.settings.temp_inviter_id and \
-                user.settings.temp_inviter_id in user_dict:
-            user.settings.invited_by = user_dict[user.settings.temp_inviter_id]
-            user.settings.save()
+        if user.temp_inviter_id and user.temp_inviter_id in user_dict:
+            user.invited_by = user_dict[user.temp_inviter_id]
+            user.save()
 
 
 def create_friends():
@@ -209,7 +208,7 @@ def create_friends():
             print('%s: Friended old user ID does not exist: %s' % (
                 user_dict[item[0]], item[1]))
             continue
-        model_user.settings.friended_users.add(model_friended_user)
+        model_user.friended_users.add(model_friended_user)
 
 
 def load_session_dict():
