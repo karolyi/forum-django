@@ -320,7 +320,7 @@ def parse_users():
 
 
 def parse_topics():
-    Topic = apps.get_model('base.Topic')
+    Topic = apps.get_model('forum_base.Topic')
     cursor.execute(
         'SELECT `topicId`, `htmlName`, `pureName`, `commentCount`, `ownerId`, '
         '`disabled`, `adminOnly`, `status`, `votingEnabled`, `replyTo`, '
