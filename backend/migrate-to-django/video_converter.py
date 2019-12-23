@@ -320,7 +320,7 @@ def get_mixcloud_player(video_url):
 def create_player_if_flash(video_url):
     try:
         req_obj = requests.get(url=video_url, verify=False, timeout=10)
-        mime_type = mime.id_buffer(req_obj.content)
+        mime_type = mime.from_buffer(buf=req_obj.content)
     except:
         return None, None
     if mime_type != 'application/x-shockwave-flash; charset=binary':
