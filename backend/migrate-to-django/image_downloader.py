@@ -52,8 +52,6 @@ def wrap_into_picture(img_tag, cdn_path, content):
     screen-xs: 480px
     """
 
-    from IPython import embed
-    embed()
     picture_tag = img_tag.wrap(content.new_tag(name='picture'))
     source_orig = content.new_tag(
         'source', media='(min-width: 1200px)',
