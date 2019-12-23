@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('slug', django_extensions.db.fields.AutoSlugField(blank=True, editable=False, populate_from=('name',), unique=True, verbose_name='Slug')),
-                ('name', models.CharField(max_length=50, verbose_name='Name')),
+                ('name', models.CharField(max_length=255, verbose_name='Name')),
                 ('last_updated_at', models.DateTimeField(auto_now=True, verbose_name='Last updated at')),
                 ('ends_at', models.DateTimeField(verbose_name='Ends at')),
                 ('status', models.PositiveSmallIntegerField(choices=[(0, 'Disabled'), (1, 'Running'), (2, 'Finished'), (3, 'Archived')], default=0, verbose_name='Status')),
