@@ -7,12 +7,12 @@ import re
 import string
 from urllib.parse import unquote, urlparse
 
+import magic
 import requests
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from unidecode import unidecode
 
-import magic
 import variables
 from variables import (
     CANCEL_HASH_TUPLE, CDN_FILES_ROOT, FILE_EXTENSIONS, FILE_EXTENSIONS_KEYS,
@@ -29,6 +29,7 @@ Topic = apps.get_model('forum_base.Topic')
 User = get_user_model()
 
 missing_origsrc_len = MissingImage._meta.get_field('src').max_length
+MAXLEN_IMAGEURL = ImageUrl._meta.get_field('orig_src').max_length
 
 
 def get_sha512_digest(input_data):
@@ -235,7 +236,7 @@ def do_download(img_tag, model_item, content):
         file_hash=digest_value)
     cdn_image.save()
     cdn_image_url = ImageUrl(
-        image=cdn_image, orig_src=orig_src,
+        image=cdn_image, orig_src=orig_src[:MAXLEN_IMAGEURL],
         src_hash=get_sha512_digest(orig_src))
     cdn_image_url.save()
     future_assign_model_to_image(cdn_image, model_item)
