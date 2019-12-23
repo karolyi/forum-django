@@ -1,29 +1,25 @@
-import os
-import logging
-import re
-import random
-import string
-import hashlib
-import requests
-import magic
-import variables
 import datetime
+import hashlib
+import logging
+import os
+import random
+import re
+import string
+from urllib.parse import unquote, urlparse
 
+import requests
 from bs4 import BeautifulSoup as bs
-from urllib.parse import urlparse, unquote
-
 from django.apps import apps
 from django.contrib.auth import get_user_model
-from forum.utils import slugify
 from unidecode import unidecode
-from .utils import soup
 
+import magic
+import variables
+from forum.utils import slugify
 from variables import (
-    NONE_SRC, FILE_EXTENSIONS_KEYS, CANCEL_HASH_TUPLE, HTTP_CDN_ROOT,
-    CDN_FILES_ROOT, UNNECESSARY_FILENAME_PARTS, FILE_EXTENSIONS,
-    FILENAME_MAXLENGTH, HTTP_CDN_ROOT_LG, HTTP_CDN_ROOT_MD, HTTP_CDN_ROOT_SM,
-    HTTP_CDN_ROOT_XS)
-
+    CANCEL_HASH_TUPLE, CDN_FILES_ROOT, FILE_EXTENSIONS, FILE_EXTENSIONS_KEYS,
+    FILENAME_MAXLENGTH, HTTP_CDN_ROOT, HTTP_CDN_ROOT_LG, HTTP_CDN_ROOT_MD,
+    HTTP_CDN_ROOT_SM, HTTP_CDN_ROOT_XS, NONE_SRC, UNNECESSARY_FILENAME_PARTS)
 
 mime = magic.Magic(mime=True)
 logger = logging.getLogger(__name__)
@@ -58,7 +54,7 @@ def wrap_into_picture(img_tag, cdn_path, content):
     screen-xs: 480px
     """
 
-    picture_tag = img_tag.wrap(soup.new_tag(name='picture'))
+    picture_tag = img_tag.wrap(img_tag.img.new_tag(name='picture'))
     source_orig = content.new_tag(
         'source', media='(min-width: 1200px)',
         srcset='/'.join((HTTP_CDN_ROOT, cdn_path)))
@@ -78,6 +74,7 @@ def wrap_into_picture(img_tag, cdn_path, content):
     picture_tag.insert(0, source_md)
     picture_tag.insert(0, source_lg)
     picture_tag.insert(0, source_orig)
+    from IPython import embed; embed()
 
 
 def get_extension(mime_type):
