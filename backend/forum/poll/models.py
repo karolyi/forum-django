@@ -24,7 +24,7 @@ class Question(Model):
     slug = AutoSlugField(
         verbose_name=_('Slug'), null=False, max_length=50,
         populate_from=('text',), unique=True, slugify_function=slugify)
-    text = CharField(verbose_name=_('Text'), max_length=150)
+    text = CharField(verbose_name=_('Text'), max_length=255)
     topic = ForeignKey(
         to=Topic, on_delete=CASCADE, verbose_name=_('In topic'), null=True,
         default=None)
