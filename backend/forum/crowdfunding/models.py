@@ -24,8 +24,7 @@ class Project(Model):
 
     slug = AutoSlugField(
         verbose_name=_('Slug'), null=False, max_length=50,
-        populate_from=('name',), unique=True, slugify_function=slugify,
-        primary_key=True)
+        populate_from=('name',), unique=True, slugify_function=slugify)
     name = CharField(verbose_name=_('Name'), max_length=50)
     owner = ForeignKey(to=User, on_delete=CASCADE, verbose_name=_('Owner'))
     last_updated_at = DateTimeField(

@@ -35,7 +35,9 @@ def filter_video_url(object_item):
 
 
 def make_empty(object_item):
-    none_img = bs('<img src="%s" class="notfound-embed">' % NONE_SRC).img
+    none_img = bs(
+        markup=f'<img src="{NONE_SRC}" class="notfound-embed">',
+        features='lxml').img
     object_item.replace_with(none_img)
 
 

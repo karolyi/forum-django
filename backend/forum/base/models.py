@@ -28,8 +28,7 @@ class User(AbstractUser):
 
     slug = AutoSlugField(
         verbose_name=_('Slug of the user'), max_length=50, unique=True,
-        populate_from='username', slugify_function=slugify, null=False,
-        primary_key=True)
+        populate_from='username', slugify_function=slugify, null=False)
     last_global_read = PositiveIntegerField(
         verbose_name=_('Last global message ID read'), default=0)
     received_comment_vote_sum = IntegerField(
@@ -172,8 +171,7 @@ class Topic(Model):
 
     slug = AutoSlugField(
         verbose_name=_('Slug'), null=False, max_length=100,
-        populate_from=('name_text',), unique=True, slugify_function=slugify,
-        primary_key=True)
+        populate_from=('name_text',), unique=True, slugify_function=slugify)
     creator = ForeignKey(
         to=User, on_delete=CASCADE, verbose_name=_('Creator'))
     name_html = CharField(max_length=256, verbose_name=_('HTML name'))
