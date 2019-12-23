@@ -175,7 +175,7 @@ def check_right_mime_type(content_data, accepted_mimetypes=('text/html;',)):
     Return False if mimetype not accepted, true when accepted.
     """
     try:
-        mime_type = mime.id_buffer(content_data)
+        mime_type = mime.from_buffer(buf=content_data)
     except:
         return False
     if mime_type is None:
