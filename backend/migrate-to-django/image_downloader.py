@@ -151,7 +151,7 @@ def check_hash_existing(img_tag, digest_value, model_item, content):
     wrap_into_picture(img_tag, cdn_image.cdn_path, content)
     variables.ALREADY_DOWNLOADED_IMAGE_COUNT += 1
     image_url = ImageUrl(
-        image=cdn_image, orig_src=orig_src,
+        image=cdn_image, orig_src=orig_src[:MAXLEN_IMAGEURL],
         src_hash=get_sha512_digest(orig_src))
     image_url.save()
     future_assign_model_to_image(cdn_image, model_item)

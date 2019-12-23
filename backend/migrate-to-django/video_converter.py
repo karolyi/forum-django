@@ -236,9 +236,9 @@ def get_liveleak_player(video_url):
     try:
         path_last_element = urlparse(video_url).path.split('/')[-1]
         page_html = bs(
-            requests.get(
+            markup=requests.get(
                 'http://www.liveleak.com/view?i=%s' % path_last_element
-            ).content)
+            ).content, features='lxml')
         embed_code_a = page_html.select(
             'div#leftcol span a.form_button')[0].get('onclick')
         video_id = embed_code_a.split('\'')[1]
