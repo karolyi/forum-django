@@ -68,7 +68,7 @@ def empty_django_db():
     #     Topic.objects.all().delete()
     transaction.commit()
     for table in TRUNCATED_TABLES:
-        django_cursor.execute(f'ALTER TABLE {table} AUTO_INCREMENT = 1')
+        django_cursor.execute(f'ALTER TABLE `{table}` AUTO_INCREMENT = 1')
     django_connection.commit()
 
 

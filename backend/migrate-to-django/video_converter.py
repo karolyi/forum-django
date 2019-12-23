@@ -1,10 +1,11 @@
+import urllib
+from urllib.parse import parse_qsl, urlparse
+
 import magic
 import requests
-import urllib
-
-from variables import (NONE_SRC, AJAX_LOADER_SRC)
 from bs4 import BeautifulSoup as bs
-from urllib.parse import urlparse, parse_qsl
+
+from variables import AJAX_LOADER_SRC, NONE_SRC
 
 mime = magic.Magic(mime=True)
 
@@ -74,10 +75,9 @@ def create_flash_string(video_url):
 
 
 def create_embed_obj(html_string, ratio_class):
-    embed_obj = bs(
-        '<div class="embedded-player %s">'
-        '%s</div>' %
-        (ratio_class, html_string)).div
+    embed_obj = bs(markup=(
+        f'<div class="embedded-player {ratio_class}">{html_string}</div>'),
+        features='lxml').div
     return embed_obj
 
 
