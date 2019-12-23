@@ -1,14 +1,14 @@
 from pytz import timezone
 
-bp_timezone = timezone('Europe/Budapest')
+ber_timezone = timezone('Europe/Berlin')
 utc_timezone = timezone('UTC')
 
 
-def non_naive_datetime_bp(input_datetime):
+def non_naive_datetime_ber(input_datetime):
     """
     Used for datetimes
     """
-    return bp_timezone.localize(input_datetime)
+    return ber_timezone.localize(input_datetime)
 
 
 def non_naive_datetime_utc(input_datetime):

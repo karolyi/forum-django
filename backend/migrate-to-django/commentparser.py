@@ -1,16 +1,17 @@
 import datetime
 import logging
-import variables
 
 from bs4 import BeautifulSoup as bs
 from django.apps import apps
+
+import variables
 from image_downloader import (
     do_download, future_assign_model_to_image, get_sha512_digest,
     wrap_into_picture)
 from markdownparser import parse_to_markdown
 from utils import non_naive_datetime_utc
 from variables import (
-    HTTP_CDN_ROOT, INNER_IMAGE_URLS, NONE_SRC, OLD_SELF_URL, DEAD_HOSTERS,
+    DEAD_HOSTERS, HTTP_CDN_ROOT, INNER_IMAGE_URLS, NONE_SRC, OLD_SELF_URL,
     comment_uniqid_dict, conn, topic_dict, user_dict)
 from video_converter import parse_videos
 
@@ -172,7 +173,8 @@ def fix_comment_image(img_tag, comment_item, content):
 
 def parse_content(comment_item):
     content = bs(
-        '<html><body>%s</body></html>' % comment_item.content_html, 'lxml')
+        markup='<html><body>%s</body></html>' % comment_item.content_html,
+        features='lxml')
 
     for img_tag in content.select('img'):
         fix_comment_image(img_tag, comment_item, content)

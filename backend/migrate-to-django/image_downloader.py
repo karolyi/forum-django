@@ -8,14 +8,12 @@ import string
 from urllib.parse import unquote, urlparse
 
 import requests
-from bs4 import BeautifulSoup as bs
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from unidecode import unidecode
 
 import magic
 import variables
-from forum.utils import slugify
 from variables import (
     CANCEL_HASH_TUPLE, CDN_FILES_ROOT, FILE_EXTENSIONS, FILE_EXTENSIONS_KEYS,
     FILENAME_MAXLENGTH, HTTP_CDN_ROOT, HTTP_CDN_ROOT_LG, HTTP_CDN_ROOT_MD,
@@ -54,8 +52,9 @@ def wrap_into_picture(img_tag, cdn_path, content):
     screen-xs: 480px
     """
 
-    from IPython import embed; embed()
-    picture_tag = img_tag.wrap(img_tag.img.new_tag(name='picture'))
+    from IPython import embed
+    embed()
+    picture_tag = img_tag.wrap(content.new_tag(name='picture'))
     source_orig = content.new_tag(
         'source', media='(min-width: 1200px)',
         srcset='/'.join((HTTP_CDN_ROOT, cdn_path)))

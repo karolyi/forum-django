@@ -3,8 +3,6 @@ import sys
 import django
 import logging
 
-allowed_filters = ('image_downloader', 'commentparser')
-
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'forum.settings')
 forum_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(forum_path)

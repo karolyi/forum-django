@@ -1,9 +1,10 @@
 import logging
 
 from bs4 import BeautifulSoup as bs
-from commentparser import fix_if_link, download_and_replace
+
+from commentparser import download_and_replace, fix_if_link
+from variables import DEAD_HOSTERS, INNER_IMAGE_URLS, NONE_SRC, OLD_SELF_URL
 from video_converter import parse_videos
-from variables import (INNER_IMAGE_URLS, NONE_SRC, OLD_SELF_URL, DEAD_HOSTERS)
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +39,8 @@ def fix_content_image(img_tag, model_item, content):
 
 def parse_description(topic_item):
     content = bs(
-        '<html><body>%s</body></html>' % topic_item.description, 'lxml')
+        markup='<html><body>%s</body></html>' % topic_item.description,
+        features='lxml')
     for img_tag in content.select('img'):
         fix_content_image(img_tag, topic_item, content)
     parse_videos(content)

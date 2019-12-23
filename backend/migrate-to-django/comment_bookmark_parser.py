@@ -1,7 +1,7 @@
 import logging
 
 from django.apps import apps
-from utils import non_naive_datetime_bp
+from utils import non_naive_datetime_ber
 from variables import conn, topic_dict, user_dict
 
 Comment = apps.get_model('forum_base', 'Comment')
@@ -32,7 +32,7 @@ def parse_bookmarks():
         except Comment.DoesNotExist:
             notfound_error += 1
             continue
-        last_updated_at = non_naive_datetime_bp(item[3])
+        last_updated_at = non_naive_datetime_ber(item[3])
         model_commentbookmark, is_created = CommentBookmark.objects.\
             update_or_create(
                 user=model_user, topic=model_topic, comment=model_comment,

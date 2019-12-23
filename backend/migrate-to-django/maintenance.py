@@ -18,7 +18,7 @@ from markdown import markdown
 from markdownparser import parse_to_markdown
 from topicparser import (
     finish_assign_topic_to_image, fix_content_image, parse_description)
-from utils import non_naive_datetime_bp, non_naive_datetime_utc
+from utils import non_naive_datetime_ber, non_naive_datetime_utc
 from variables import (
     CDN_FILES_ROOT, comment_uniqid_dict, conn, event_dict, session_dict,
     topic_dict, user_dict)
@@ -143,7 +143,8 @@ def parse_settings(user_item, settings):
 def parse_introductions(user_item):
     # introduction_html_all
     content = user_item.introduction_html_all.replace('\n', '<br>\n')
-    content = bs('<html><body>%s</body></html>' % content, 'lxml')
+    content = bs(
+        markup='<html><body>%s</body></html>' % content, features='lxml')
     for img_tag in content.select('img'):
         fix_content_image(img_tag, user_item, content)
     parse_videos(content)
@@ -154,7 +155,8 @@ def parse_introductions(user_item):
 
     # introduction_html_reg
     content = user_item.introduction_html_reg.replace('\n', '<br>\n')
-    content = bs('<html><body>%s</body></html>' % content, 'lxml')
+    content = bs(
+        markup='<html><body>%s</body></html>' % content, features='lxml')
     for img_tag in content.select('img'):
         fix_content_image(img_tag, user_item, content)
     parse_videos(content)
@@ -165,7 +167,8 @@ def parse_introductions(user_item):
 
     # introduction_html_friends
     content = user_item.introduction_html_friends.replace('\n', '<br>\n')
-    content = bs('<html><body>%s</body></html>' % content, 'lxml')
+    content = bs(
+        markup='<html><body>%s</body></html>' % content, features='lxml')
     for img_tag in content.select('img'):
         fix_content_image(img_tag, user_item, content)
     parse_videos(content)
@@ -229,7 +232,7 @@ def _parse_user_reviews():
         if None in [rater, ratee]:
             count_errors += 1
             continue
-        created_at = non_naive_datetime_bp(item[5])
+        created_at = non_naive_datetime_ber(item[5])
         content_md = item[6].replace('\r\n', '\n').replace('\n', '  \n')\
             .replace('  \n  \n', '\n\n')
         content_html = markdown(content_md, output_format='html5')
@@ -271,7 +274,7 @@ def parse_users():
             if not user_item:
                 continue
             settings = item[2]
-            user_item.date_joined = non_naive_datetime_bp(item[1])
+            user_item.date_joined = non_naive_datetime_ber(item[1])
             user_item.last_global_read = item[3]
             user_item.received_comment_vote_sum = item[4]
             user_item.received_comment_vote_count = item[5]
@@ -390,7 +393,8 @@ def parse_events():
         event_instance.place = item[7]
 
         # Parse HTML content
-        content = bs('<html><body>%s</body></html>' % item[9], 'lxml')
+        content = bs(
+            markup='<html><body>%s</body></html>' % item[9], features='lxml')
         for img_tag in content.select('img'):
             fix_content_image(img_tag, event_instance, content)
         parse_videos(content)
@@ -418,7 +422,7 @@ def parse_event_responses():
         )
         model_response.save()
         EventResponse.objects.filter(id=model_response.id).update(
-            last_modified=non_naive_datetime_bp(item[2]))
+            last_modified=non_naive_datetime_ber(item[2]))
     print('Parsed event responses.')
     logger.info('Parsed event responses.')
 

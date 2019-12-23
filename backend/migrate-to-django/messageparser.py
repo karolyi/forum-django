@@ -1,15 +1,14 @@
 import logging
-
-from bs4 import BeautifulSoup as bs
 from datetime import datetime
 
+from bs4 import BeautifulSoup as bs
 from django.apps import apps
 from django.utils.crypto import get_random_string
 
-from markdownparser import parse_to_markdown
-from utils import non_naive_datetime_utc, non_naive_datetime_bp
 from commentparser import fix_comment_image
-from variables import conn, user_dict, message_dict
+from markdownparser import parse_to_markdown
+from utils import non_naive_datetime_ber, non_naive_datetime_utc
+from variables import conn, message_dict, user_dict
 from video_converter import parse_videos
 
 Mail = apps.get_model('forum_messaging', 'Mail')
@@ -48,7 +47,8 @@ def finish_assign_global_message_to_image(model_global_message):
 def parse_content_mail(model_mail):
     # Parse HTML content
     content = bs(
-        '<html><body>%s</body></html>' % model_mail.content_html, 'lxml')
+        markup='<html><body>%s</body></html>' % model_mail.content_html,
+        features='lxml')
     for img_tag in content.select('img'):
         fix_comment_image(img_tag, model_mail, content)
     parse_videos(content)
@@ -140,7 +140,7 @@ def parse_global_messages():
         'SELECT `messageId`, `userId`, `dateTime`, `active`, `subject`, '
         '`messageTextParsed` FROM `globalMessages` ORDER BY `messageId`')
     for item in cursor:
-        created_at = non_naive_datetime_bp(item[2])
+        created_at = non_naive_datetime_ber(item[2])
         model_user = user_dict.get(item[1], user_dict[1])
         model_global_message = GlobalMessage(
             id=item[0], user=model_user, created_at=created_at,

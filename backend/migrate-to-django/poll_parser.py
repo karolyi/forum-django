@@ -1,7 +1,7 @@
 import logging
 
 from django.apps import apps
-from utils import non_naive_datetime_bp
+from utils import non_naive_datetime_ber
 from variables import conn, topic_dict, user_dict
 
 Question = apps.get_model('forum_poll', 'Question')
@@ -23,7 +23,7 @@ def _parse_poll_questions():
         'SELECT `votingId`, `topicId`, `active`, `dateTime`, `userId`, '
         '`questionText` FROM `votingQuestions` ORDER BY `votingId`')
     for item in cursor:
-        created_at = non_naive_datetime_bp(item[3])
+        created_at = non_naive_datetime_ber(item[3])
         model_question = Question(
             text=item[5], topic=topic_dict.get(item[1]),
             created_by=user_dict[item[4]], created_at=created_at,
@@ -62,7 +62,7 @@ def _parse_poll_votes():
         '`votedUsers` ORDER BY `votingId`, `answerId`')
     count_dup = 0
     for item in cursor:
-        last_modified_at = non_naive_datetime_bp(item[2])
+        last_modified_at = non_naive_datetime_ber(item[2])
         model_vote, is_created = Vote.objects.update_or_create(
             user=user_dict[item[1]], question=question_dict[item[0]],
             defaults={

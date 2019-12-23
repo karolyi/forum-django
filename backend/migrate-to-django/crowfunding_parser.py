@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup as bs
 from commentparser import fix_comment_image
 from django.apps import apps
 from markdownparser import parse_to_markdown
-from utils import non_naive_datetime_bp, non_naive_datetime_utc
+from utils import non_naive_datetime_ber, non_naive_datetime_utc
 from variables import conn, topic_dict, user_dict
 from video_converter import parse_videos
 
@@ -33,7 +33,8 @@ def finish_assign_projectbacker_to_image(model_projectbacker):
 def parse_content_html_project(model_project):
     # Parse HTML content
     content = bs(
-        '<html><body>%s</body></html>' % model_project.content_html, 'lxml')
+        markup='<html><body>%s</body></html>' % model_project.content_html,
+        features='lxml')
     for img_tag in content.select('img'):
         fix_comment_image(img_tag, model_project, content)
     parse_videos(content)
@@ -60,7 +61,7 @@ def parse_crowdfunding_project():
         last_updated_at = non_naive_datetime_utc(
             datetime.fromtimestamp(item[2]))
         related_topic = topic_dict.get(item[5])
-        ends_at = non_naive_datetime_bp(datetime.combine(
+        ends_at = non_naive_datetime_ber(datetime.combine(
             item[3] + timedelta(days=1), datetime.min.time()))
         model_project = Project(
             name=item[1], owner=user_dict[item[4]],
