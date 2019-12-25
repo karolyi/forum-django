@@ -26,8 +26,7 @@ missing_origsrc_len = MissingImage._meta.get_field('src').max_length
 
 
 def finish_assign_comment_to_image(comment_item):
-    for cdn_image in getattr(
-            comment_item, 'temp_cdn_image_list', []):
+    for cdn_image in getattr(comment_item, 'temp_cdn_image_list', []):
         comment_item.images.add(cdn_image)
 
 
@@ -38,8 +37,8 @@ def select_comment_by_uniqid(topic_id, uniq_id):
         '`votingValue`, `hostName`, `prevNumber`, `prevUserId`, '
         '`prevTopicId`, `prevUniqId`, `movedTopicId`, `commentUniqId`, '
         '`commentSource`, `commentParsed`, `edits`, `answersToThis`, '
-        '%s as `topic_id` FROM `topic_%s` WHERE `commentUniqId` = %%s') %
-        (topic_id, topic_id),
+        f'{topic_id} as `topic_id` FROM `topic_{topic_id}` WHERE '
+        '`commentUniqId` = %%s'),
         (uniq_id, ))
     return my_cursor.fetchone()
 
@@ -48,27 +47,18 @@ def build_comment(item):
     if item[10] in comment_uniqid_dict:
         # The comment is already parsed
         return comment_uniqid_dict[item[10]]
-    comment_item = Comment()
-    comment_item.number = item[0]
-    comment_item.user = user_dict[item[1]]
-    comment_item.time = non_naive_datetime_utc(
-        datetime.datetime.fromtimestamp(item[2]))
-    comment_item.voting_value = item[3]
-    comment_item.host = item[4]
-    comment_item.ip = '0.0.0.0'
-    comment_item.temp_prev_number = item[5]
-    comment_item.temp_prev_user_id = item[6]
-    comment_item.temp_prev_topic_id = item[7]
-    comment_item.temp_prev_uniq_id = item[8]
-    comment_item.moved_from = topic_dict[item[9]] if item[9] else None
-    comment_item.unique_id = item[10]
-    comment_item.temp_comment_source = item[11]
-    comment_item.content_html = item[12]
-    comment_item.temp_edits = item[13]
-    comment_item.temp_answerstothis = item[14]
-    comment_item.topic_id = topic_dict[item[15]].id
+    comment_item = Comment(
+        number=item[0], user=user_dict[item[1]],
+        time=non_naive_datetime_utc(datetime.datetime.fromtimestamp(item[2])),
+        voting_value=item[3], host=item[4], ip='0.0.0.0',
+        temp_prev_number=item[5], temp_prev_user_id=item[6],
+        temp_prev_topic_id=item[7], temp_prev_uniq_id=item[8],
+        moved_from=topic_dict[item[9]] if item[9] else None,
+        unique_id=item[10], temp_comment_source=item[11],
+        content_html=item[12], temp_edits=item[13],
+        temp_answerstothis=item[14], topic_id=topic_dict[item[15]].id)
     if item[7] and item[8]:
-        if not comment_uniqid_dict.get(item[8]):
+        if item[8] not in comment_uniqid_dict:
             # Build answered comment, when it's not there yet (recursively)
             old_prev_comment = select_comment_by_uniqid(item[7], item[8])
             comment_item.prev_comment_id = build_comment(old_prev_comment)
