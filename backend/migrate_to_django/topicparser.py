@@ -44,5 +44,5 @@ def parse_description(topic_item):
     for img_tag in content.select('img'):
         fix_content_image(img_tag, topic_item, content)
     parse_videos(content)
-    topic_item.description = content.body.encode_contents()\
-        .decode('utf-8').replace('></source>', '/>')
+    topic_item.description = content.body.decode_contents()\
+        .replace('></source>', '/>')

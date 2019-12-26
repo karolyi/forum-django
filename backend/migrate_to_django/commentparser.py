@@ -170,8 +170,7 @@ def parse_content(comment_item):
         fix_comment_image(img_tag, comment_item, content)
     parse_videos(content)
     comment_item.content_html = content.body\
-        .encode_contents()\
-        .decode('utf-8')\
+        .decode_contents()\
         .replace('></source>', '/>')\
         .replace('\r\n', '\n')
 

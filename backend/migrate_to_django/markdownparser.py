@@ -26,8 +26,7 @@ def parse_to_markdown(content, comment_item, md_property):
     for embed_item in content.select('div.embedded-player'):
         embed_item.replace_with(embed_item.md_url)
 
-    content_md_html = content.body.encode_contents()\
-        .decode('utf-8')\
+    content_md_html = content.body.decode_contents()\
         .replace('></source>', '/>')\
         .replace('\r\n', '\n')
     md_content = html2text(content_md_html, bodywidth=0)

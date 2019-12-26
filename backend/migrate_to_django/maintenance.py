@@ -141,8 +141,8 @@ def parse_introductions(user_item):
         parse_videos(content)
         # Manually remove erroneous closing tag
         setattr(
-            user_item, intr_item, content.body.encode_contents().decode(
-                'utf-8').replace('></source>', '/>').replace('\r\n', '\n'))
+            user_item, intr_item, content.body.decode_contents().replace(
+                '></source>', '/>').replace('\r\n', '\n'))
         parse_to_markdown(
             content, user_item, intr_item.replace('_html_', '_md_'))
 
@@ -286,12 +286,17 @@ def parse_users():
 
 def fix_topiclogo_img(topic: Topic):
     'Fix an `[/]?images/topiclogo` prefix.'
-    if topic.name_html.strip().startswith('<img src="/images/topiclogo'):
-        topic.name_html = '<img src="/media/{url}" class="topic-logo">'.format(
-            url=topic.name_html.split('"')[1][8:])
-    elif topic.name_html.strip().startswith('<img src="images/topiclogo'):
-        topic.name_html = '<img src="/media/{url}" class="topic-logo">'.format(
-            url=topic.name_html.split('"')[1][7:])
+    html = bs(markup=topic.name_html, features='lxml')
+    for tagname in ['b', 'font', 'i']:
+        found = html.select(selector=tagname)
+        for item in found:
+            item.unwrap()
+    for tag in html.select(selector='img'):
+        if tag['src'].startswith('/images/topiclogo'):
+            tag['src'] = '/media/' + tag['src'][8:]
+        elif tag['src'].startswith('images/topiclogo'):
+            tag['src'] = '/media/' + tag['src'][7:]
+    topic.name_html = html.body.decode_contents()
 
 
 def parse_topics():
@@ -365,8 +370,8 @@ def parse_events():
             fix_content_image(img_tag, event_instance, content)
         parse_videos(content)
         # Manually remove erroneous closing tag
-        event_instance.content_html = content.body.encode_contents()\
-            .decode('utf-8').replace('></source>', '/>').replace('\r\n', '\n')
+        event_instance.content_html = content.body.decode_contents()\
+            .replace('></source>', '/>').replace('\r\n', '\n')
         parse_to_markdown(content, event_instance, 'content_md')
 
         event_instance.save()

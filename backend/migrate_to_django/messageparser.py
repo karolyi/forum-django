@@ -50,8 +50,8 @@ def parse_content_mail(model_mail):
         fix_comment_image(img_tag, model_mail, content)
     parse_videos(content)
     # Manually remove erroneous closing tag
-    model_mail.content_html = content.body.encode_contents()\
-        .decode('utf-8').replace('></source>', '/>').replace('\r\n', '\n')
+    model_mail.content_html = content.body.decode_contents()\
+        .replace('></source>', '/>').replace('\r\n', '\n')
     parse_to_markdown(content, model_mail, 'content_md')
 
 
