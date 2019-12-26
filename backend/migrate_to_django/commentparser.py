@@ -38,7 +38,7 @@ def select_comment_by_uniqid(topic_id, uniq_id):
         '`prevTopicId`, `prevUniqId`, `movedTopicId`, `commentUniqId`, '
         '`commentSource`, `commentParsed`, `edits`, `answersToThis`, '
         f'{topic_id} as `topic_id` FROM `topic_{topic_id}` WHERE '
-        '`commentUniqId` = %%s'),
+        '`commentUniqId` = %s'),
         (uniq_id, ))
     return my_cursor.fetchone()
 
