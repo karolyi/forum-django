@@ -168,14 +168,6 @@ def get_flash_player(video_url):
         create_flash_string(video_url), 'ratio-16-9'), video_url
 
 
-def get_streetfire_player(video_url):
-    video_id = get_parameter(video_url, 'video')
-    html_string = create_flash_string(
-        'http://www.streetfire.net/flash/splayer.swf?video=%s' % video_id)
-    md_url = 'http://www.streetfire.net/flash/splayer.swf?video=%s' % video_id
-    return create_embed_obj(html_string, 'ratio-16-9'), md_url
-
-
 def get_indavideo_player(video_url):
     video_id = get_parameter(video_url, 'vID')
     try:
@@ -347,7 +339,8 @@ def find_embed_string(video_url):
             or '//assets.indavideo.hu/swf/player.swf?vID=' in video_url:
         return get_indavideo_player(video_url)
     if 'streetfire.net/vidiac.swf?video=' in video_url:
-        return get_streetfire_player(video_url)
+        # streetfire.net doesn't exist anymore
+        return None, None
     if 'www.dailymotion.com/swf/' in video_url:
         return get_dailymotion_player(video_url)
     if 'blip.tv/play/' in video_url:

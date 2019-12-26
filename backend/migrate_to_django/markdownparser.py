@@ -22,7 +22,6 @@ def replace_images(content):
 def parse_to_markdown(content, comment_item, md_property):
 
     replace_images(content)
-    # html_to_md(content)
 
     for embed_item in content.select('div.embedded-player'):
         embed_item.replace_with(embed_item.md_url)

@@ -85,8 +85,7 @@ def cdn_maintenance():
         logger.info('No model for CDN file %s, deleting', relative_path)
         os.unlink(absolute_path)
     cdn_no_file_set = db_images_set - file_images_set
-    model_list = Image.objects.filter(
-        cdn_path__in=cdn_no_file_set)
+    model_list = Image.objects.filter(cdn_path__in=cdn_no_file_set)
     variables.CDN_NO_FILE = len(cdn_no_file_set)
     if model_list:
         logger.info('No CDN file for model(s): %s', model_list)
@@ -131,41 +130,21 @@ def parse_settings(user_item, settings):
 
 
 def parse_introductions(user_item):
-    # introduction_html_all
-    content = user_item.introduction_html_all.replace('\n', '<br>\n')
-    content = bs(
-        markup='<html><body>%s</body></html>' % content, features='lxml')
-    for img_tag in content.select('img'):
-        fix_content_image(img_tag, user_item, content)
-    parse_videos(content)
-    # Manually remove erroneous closing tag
-    user_item.introduction_html_all = content.body.encode_contents()\
-        .decode('utf-8').replace('></source>', '/>').replace('\r\n', '\n')
-    parse_to_markdown(content, user_item, 'introduction_md_all')
-
-    # introduction_html_reg
-    content = user_item.introduction_html_reg.replace('\n', '<br>\n')
-    content = bs(
-        markup='<html><body>%s</body></html>' % content, features='lxml')
-    for img_tag in content.select('img'):
-        fix_content_image(img_tag, user_item, content)
-    parse_videos(content)
-    # Manually remove erroneous closing tag
-    user_item.introduction_html_reg = content.body.encode_contents()\
-        .decode('utf-8').replace('></source>', '/>').replace('\r\n', '\n')
-    parse_to_markdown(content, user_item, 'introduction_md_reg')
-
-    # introduction_html_friends
-    content = user_item.introduction_html_friends.replace('\n', '<br>\n')
-    content = bs(
-        markup='<html><body>%s</body></html>' % content, features='lxml')
-    for img_tag in content.select('img'):
-        fix_content_image(img_tag, user_item, content)
-    parse_videos(content)
-    # Manually remove erroneous closing tag
-    user_item.introduction_html_friends = content.body.encode_contents()\
-        .decode('utf-8').replace('></source>', '/>').replace('\r\n', '\n')
-    parse_to_markdown(content, user_item, 'introduction_md_friends')
+    for intr_item in [
+            'introduction_html_all', 'introduction_html_reg',
+            'introduction_html_friends']:
+        content = getattr(user_item, intr_item).replace('\n', '<br>\n')
+        content = bs(
+            markup='<html><body>%s</body></html>' % content, features='lxml')
+        for img_tag in content.select('img'):
+            fix_content_image(img_tag, user_item, content)
+        parse_videos(content)
+        # Manually remove erroneous closing tag
+        setattr(
+            user_item, intr_item, content.body.encode_contents().decode(
+                'utf-8').replace('></source>', '/>').replace('\r\n', '\n'))
+        parse_to_markdown(
+            content, user_item, intr_item.replace('_html_', '_md_'))
 
 
 def create_ignored_users_and_inviters():
@@ -238,15 +217,15 @@ def parse_users():
     load_session_dict()
     cursor.execute(
         'SELECT userId, userName, password FROM user ORDER BY userId')
-    usernames_lower = []
+    usernames_lower = set()
     with transaction.atomic():
         for user_id, user_name, user_password in cursor:
             user_dict[user_id] = User(
                 # username=user_name, password=make_password(user_password))
                 username=user_name, password='')
             if user_name.lower() in usernames_lower:
-                user_dict[user_id].username = '%s-1' % user_name
-            usernames_lower.append(user_name.lower())
+                user_dict[user_id].username = f'{user_name}-1'
+            usernames_lower.add(user_name.lower())
             # We need an ID for the settings model
             user_dict[user_id].save()
         user_dict[1].is_superuser = True
@@ -287,16 +266,12 @@ def parse_users():
             user_item.introduction_html_friends = item[22]
             user_item.picture_emails = item[23]
             user_item.last_login = non_naive_datetime_utc(
-                datetime.datetime.fromtimestamp(
-                    session_dict[item[0]]))
+                datetime.datetime.fromtimestamp(session_dict[item[0]]))
             parse_settings(user_item, settings)
             parse_introductions(user_item)
             print(
-                'id: %s username: %s                 \r' % (
-                    item[0],
-                    user_item.username
-                ),
-                end='')
+                f'id: {item[0]} username: {user_item.username}               ',
+                end='\r')
             user_item.save()
             finish_assign_user_to_image(user_item)
 
@@ -368,15 +343,10 @@ def parse_events():
         '`topicId`, `meetName`, `meetPlace`, `meetTextPlain`, '
         '`meetTextParsed` FROM `meetDates` ORDER BY `meetId`')
     for item in cursor:
-        event_instance = Event()
-        event_instance.is_enabled = item[1] == 1
-        event_instance.date_start = item[2]
-        event_instance.date_end = item[3]
-        event_instance.owner = user_dict[item[4]]
-        event_instance.topic = topic_dict.get(item[5])
-        event_instance.name = item[6]
-        event_instance.place = item[7]
-
+        event_instance = Event(
+            is_enabled=item[1] == 1, date_start=item[2], date_end=item[3],
+            owner=user_dict[item[4]], topic=topic_dict.get(item[5]),
+            name=item[6], place=item[7])
         # Parse HTML content
         content = bs(
             markup='<html><body>%s</body></html>' % item[9], features='lxml')

@@ -57,8 +57,6 @@ def main():
     maintenance.parse_comment_votes()
     transaction.commit()
 
-    # maintenance.parse_bookmarks()
-    # file_handler.delete_unused_cdn_files()
     logger.info(
         '======================== Finished at: %s', datetime.datetime.now())
     logger.info(
