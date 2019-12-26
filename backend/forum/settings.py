@@ -251,6 +251,8 @@ if not os.path.exists(LOG_DIR):
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'static'))
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'media'))
 
 PATH_CDN_ROOT = os.path.join(
     os.path.expanduser('~'), 'Work', 'forum-django-cdn', 'original')

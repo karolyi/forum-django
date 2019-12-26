@@ -284,6 +284,16 @@ def parse_users():
 # ---------------------------------------------------------
 
 
+def fix_topiclogo_img(topic: Topic):
+    'Fix an `[/]+images/topiclogo` prefix.'
+    if topic.name_html.startswith('<img src="/images/topiclogo'):
+        topic.name_html = \
+            '<img src="/media/images/topiclogo' + topic.name_html[:27]
+    elif topic.name_html.startswith('<img src="images/topiclogo'):
+        topic.name_html = \
+            '<img src="/media/images/topiclogo' + topic.name_html[:26]
+
+
 def parse_topics():
     cursor.execute(
         'SELECT `topicId`, `htmlName`, `pureName`, `commentCount`, `ownerId`, '
@@ -303,6 +313,7 @@ def parse_topics():
                 truncate_at=None if item[10] == 0 else item[10],
                 description=item[18])
             topic_dict[item[0]] = topic_instance
+            fix_topiclogo_img(topic=topic_instance)
             topic_instance.temp_replyto_id = item[9]
             topic_instance.temp_curr_comment_time = item[11]
             topic_instance.temp_last_comment_number = item[12]

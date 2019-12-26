@@ -29,6 +29,8 @@ backend/forum/settings_override.py
 logs/
 venv/
 static/
+media/
 # Don't ignore static files under backend/, those have to be collected
 !backend/*static
 package-lock.json
+hondaforum.dump.sql.gz
