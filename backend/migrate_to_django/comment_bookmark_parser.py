@@ -1,11 +1,8 @@
 import logging
 
-from django.apps import apps
+from forum.base.models import Comment, CommentBookmark
 from utils import non_naive_datetime_ber
 from variables import conn, topic_dict, user_dict
-
-Comment = apps.get_model('forum_base', 'Comment')
-CommentBookmark = apps.get_model('forum_base', 'CommentBookmark')
 
 logger = logging.getLogger(__name__)
 

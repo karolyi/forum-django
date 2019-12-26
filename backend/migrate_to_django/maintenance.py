@@ -5,7 +5,6 @@ import os
 import phpserialize
 import requests
 from bs4 import BeautifulSoup as bs
-from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password  # NOQA
 from django.db import connection as django_connection
@@ -14,6 +13,10 @@ from django.db import transaction
 import variables
 from commentparser import build_comment
 from forum.base.choices import TOPIC_TYPE_CHOICES
+from forum.base.models import Topic
+from forum.cdn.models import Image
+from forum.event.models import Event, EventResponse
+from forum.rating.models import CommentVote, UserRating
 from markdown import markdown
 from markdownparser import parse_to_markdown
 from topicparser import (
@@ -24,16 +27,8 @@ from variables import (
     topic_dict, user_dict)
 from video_converter import parse_videos
 
-# import sys
-
-
 logger = logging.getLogger(__name__)
 cursor = conn.cursor()
-Image = apps.get_model('forum_cdn.Image')
-Event = apps.get_model('forum_event.Event')
-EventResponse = apps.get_model('forum_event.EventResponse')
-CommentVote = apps.get_model('forum_rating.CommentVote')
-UserRating = apps.get_model('forum_rating.UserRating')
 
 TRUNCATED_TABLES = [
     'forum_base_comment', 'forum_base_comment_images',
@@ -61,11 +56,6 @@ def empty_django_db():
         django_cursor.execute(f'TRUNCATE TABLE `{table}`')
     django_cursor.execute('SET foreign_key_checks = 1')
     django_connection.commit()
-    # with transaction.atomic():
-    #     User = get_user_model()
-    #     Topic = apps.get_model('forum_base.Topic')
-    #     User.objects.all().delete()
-    #     Topic.objects.all().delete()
     transaction.commit()
     for table in TRUNCATED_TABLES:
         django_cursor.execute(f'ALTER TABLE `{table}` AUTO_INCREMENT = 1')
@@ -253,7 +243,7 @@ def parse_users():
         for user_id, user_name, user_password in cursor:
             user_dict[user_id] = User(
                 # username=user_name, password=make_password(user_password))
-                username=user_name, password=user_password)
+                username=user_name, password='')
             if user_name.lower() in usernames_lower:
                 user_dict[user_id].username = '%s-1' % user_name
             usernames_lower.append(user_name.lower())
@@ -320,7 +310,6 @@ def parse_users():
 
 
 def parse_topics():
-    Topic = apps.get_model('forum_base.Topic')
     cursor.execute(
         'SELECT `topicId`, `htmlName`, `pureName`, `commentCount`, `ownerId`, '
         '`disabled`, `adminOnly`, `status`, `votingEnabled`, `replyTo`, '

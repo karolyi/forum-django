@@ -9,11 +9,11 @@ from urllib.parse import unquote, urlparse
 
 import magic
 import requests
-from django.apps import apps
-from django.contrib.auth import get_user_model
 from unidecode import unidecode
 
 import variables
+from forum.base.models import Comment, User
+from forum.cdn.models import Image, ImageUrl, MissingImage
 from variables import (
     CANCEL_HASH_TUPLE, CDN_FILES_ROOT, FILE_EXTENSIONS, FILE_EXTENSIONS_KEYS,
     FILENAME_MAXLENGTH, HTTP_CDN_ROOT, HTTP_CDN_ROOT_LG, HTTP_CDN_ROOT_MD,
@@ -21,12 +21,6 @@ from variables import (
 
 mime = magic.Magic(mime=True)
 logger = logging.getLogger(__name__)
-Image = apps.get_model('forum_cdn.Image')
-ImageUrl = apps.get_model('forum_cdn.ImageUrl')
-MissingImage = apps.get_model('forum_cdn.MissingImage')
-Comment = apps.get_model('forum_base.Comment')
-Topic = apps.get_model('forum_base.Topic')
-User = get_user_model()
 
 missing_origsrc_len = MissingImage._meta.get_field('src').max_length
 MAXLEN_IMAGEURL = ImageUrl._meta.get_field('orig_src').max_length

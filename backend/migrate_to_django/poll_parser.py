@@ -1,12 +1,8 @@
 import logging
 
-from django.apps import apps
+from forum.poll.models import Choice, Question, Vote
 from utils import non_naive_datetime_ber
 from variables import conn, topic_dict, user_dict
-
-Question = apps.get_model('forum_poll', 'Question')
-Choice = apps.get_model('forum_poll', 'Choice')
-Vote = apps.get_model('forum_poll', 'Vote')
 
 logger = logging.getLogger(__name__)
 

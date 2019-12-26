@@ -5,7 +5,7 @@ import magic
 import requests
 from bs4 import BeautifulSoup as bs
 
-from variables import AJAX_LOADER_SRC, NONE_SRC
+from variables import NONE_SRC
 
 mime = magic.Magic(mime=True)
 

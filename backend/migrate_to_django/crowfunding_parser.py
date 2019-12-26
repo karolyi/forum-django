@@ -2,15 +2,13 @@ import logging
 from datetime import datetime, timedelta
 
 from bs4 import BeautifulSoup as bs
+
 from commentparser import fix_comment_image
-from django.apps import apps
+from forum.crowdfunding.models import Project, ProjectBacker
 from markdownparser import parse_to_markdown
 from utils import non_naive_datetime_ber, non_naive_datetime_utc
 from variables import conn, topic_dict, user_dict
 from video_converter import parse_videos
-
-Project = apps.get_model('forum_crowdfunding', 'Project')
-ProjectBacker = apps.get_model('forum_crowdfunding', 'ProjectBacker')
 
 logger = logging.getLogger(__name__)
 

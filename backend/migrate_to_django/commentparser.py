@@ -2,9 +2,10 @@ import datetime
 import logging
 
 from bs4 import BeautifulSoup as bs
-from django.apps import apps
 
 import variables
+from forum.base.models import Comment
+from forum.cdn.models import ImageUrl, MissingImage
 from image_downloader import (
     do_download, future_assign_model_to_image, get_sha512_digest,
     wrap_into_picture)
@@ -14,11 +15,6 @@ from variables import (
     DEAD_HOSTERS, HTTP_CDN_ROOT, INNER_IMAGE_URLS, NONE_SRC, OLD_SELF_URL,
     comment_uniqid_dict, conn, topic_dict, user_dict)
 from video_converter import parse_videos
-
-Comment = apps.get_model('forum_base.Comment')
-Image = apps.get_model('forum_cdn.Image')
-ImageUrl = apps.get_model('forum_cdn.ImageUrl')
-MissingImage = apps.get_model('forum_cdn.MissingImage')
 
 logger = logging.getLogger(__name__)
 orig_src_len = ImageUrl._meta.get_field('orig_src').max_length

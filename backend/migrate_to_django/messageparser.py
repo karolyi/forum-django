@@ -2,17 +2,14 @@ import logging
 from datetime import datetime
 
 from bs4 import BeautifulSoup as bs
-from django.apps import apps
 from django.utils.crypto import get_random_string
 
 from commentparser import fix_comment_image
+from forum.messaging.models import GlobalMessage, Mail
 from markdownparser import parse_to_markdown
 from utils import non_naive_datetime_ber, non_naive_datetime_utc
 from variables import conn, message_dict, user_dict
 from video_converter import parse_videos
-
-Mail = apps.get_model('forum_messaging', 'Mail')
-GlobalMessage = apps.get_model('forum_messaging', 'GlobalMessage')
 
 logger = logging.getLogger(__name__)
 thread_dict = {}
