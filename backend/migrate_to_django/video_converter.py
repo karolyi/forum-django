@@ -201,19 +201,6 @@ def get_dailymotion_player(video_url):
     return create_embed_obj(html_string, 'ratio-16-9'), md_url
 
 
-def get_bliptv_player(video_url):
-    try:
-        path_last_element = urlparse(video_url).path.split('/')[-1]
-    except:
-        return None, None
-    html_string = (
-        '<iframe frameborder="0" class="player-wrapper" '
-        'src="http://makerplayer.com/embed/maker/6UxwqJgsWo0w/%s"></iframe>'
-    ) % path_last_element
-    md_url = 'http://www.maker.tv/video/%s' % path_last_element
-    return create_embed_obj(html_string, 'ratio-16-9'), md_url
-
-
 def get_videa_player(video_url):
     video_id = get_parameter(video_url, 'v')
     html_string = (
@@ -344,7 +331,8 @@ def find_embed_string(video_url):
     if 'www.dailymotion.com/swf/' in video_url:
         return get_dailymotion_player(video_url)
     if 'blip.tv/play/' in video_url:
-        return get_bliptv_player(video_url)
+        # streetfire.net doesn't exist anymore
+        return None, None
     if 'videa.hu/flvplayer.swf?v=' in video_url:
         return get_videa_player(video_url)
     if 'www.liveleak.com/e/' in video_url:
