@@ -52,13 +52,15 @@ def build_comment(item):
         time=non_naive_datetime_utc(datetime.datetime.fromtimestamp(item[2])),
         voting_value=item[3], host=item[4], ip='0.0.0.0',
         moved_from=topic_dict[item[9]] if item[9] else None,
-        unique_id=item[10], temp_comment_source=item[11],
-        content_html=item[12], temp_edits=item[13],
-        temp_answerstothis=item[14], topic_id=topic_dict[item[15]].id)
+        unique_id=item[10], content_html=item[12],
+        topic_id=topic_dict[item[15]].id)
     comment_item.temp_prev_number = item[5]
     comment_item.temp_prev_user_id = item[6]
     comment_item.temp_prev_topic_id = item[7]
-    comment_item.temp_prev_uniq_id = item[8],
+    comment_item.temp_prev_uniq_id = item[8]
+    comment_item.temp_comment_source = item[11]
+    comment_item.temp_edits = item[13]
+    comment_item.temp_answerstothis = item[14],
     if item[7] and item[8]:
         if item[8] not in comment_uniqid_dict:
             # Build answered comment, when it's not there yet (recursively)
