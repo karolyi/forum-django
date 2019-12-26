@@ -286,10 +286,10 @@ def parse_users():
 
 def fix_topiclogo_img(topic: Topic):
     'Fix an `[/]?images/topiclogo` prefix.'
-    if topic.name_html.startswith('<img src="/images/topiclogo'):
+    if topic.name_html.strip().startswith('<img src="/images/topiclogo'):
         topic.name_html = '<img src="/media/{url}" class="topic-logo">'.format(
             url=topic.name_html.split('"')[1][8:])
-    elif topic.name_html.startswith('<img src="images/topiclogo'):
+    elif topic.name_html.strip().startswith('<img src="images/topiclogo'):
         topic.name_html = '<img src="/media/{url}" class="topic-logo">'.format(
             url=topic.name_html.split('"')[1][7:])
 
