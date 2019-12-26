@@ -292,10 +292,13 @@ def fix_topiclogo_img(topic: Topic):
         for item in found:
             item.unwrap()
     for tag in html.select(selector='img'):
+        if 'border' in tag.attrs:
+            del tag['border']
         if tag['src'].startswith('/images/topiclogo'):
             tag['src'] = '/media/' + tag['src'][8:]
         elif tag['src'].startswith('images/topiclogo'):
             tag['src'] = '/media/' + tag['src'][7:]
+        tag['class'] = 'topic-logo'
     topic.name_html = html.body.decode_contents()
 
 
