@@ -319,18 +319,16 @@ def parse_topics():
         'FROM `topicData` ORDER BY `topicId`')
     with transaction.atomic():
         for item in cursor:
-            topic_instance = Topic()
+            topic_instance = Topic(
+                name_html=item[1], name_text=item[2], comment_count=item[3],
+                creator=user_dict[item[4]], is_enabled=item[5] == 0,
+                is_staff_only=item[6] == 1,
+                type=TOPIC_TYPE_CHOICES[item[7]][0],
+                is_voting_enabled=item[8] == 1,
+                truncate_at=None if item[10] == 0 else item[10],
+                description=item[18])
             topic_dict[item[0]] = topic_instance
-            topic_instance.name_html = item[1]
-            topic_instance.name_text = item[2]
-            topic_instance.comment_count = item[3]
-            topic_instance.creator = user_dict[item[4]]
-            topic_instance.is_enabled = item[5] == 0
-            topic_instance.is_staff_only = item[6] == 1
-            topic_instance.type = TOPIC_TYPE_CHOICES[item[7]][0]
-            topic_instance.is_voting_enabled = item[8] == 1
             topic_instance.temp_replyto_id = item[9]
-            topic_instance.truncate_at = None if item[10] == 0 else item[10]
             topic_instance.temp_curr_comment_time = item[11]
             topic_instance.temp_last_comment_number = item[12]
             topic_instance.temp_curr_owner_id = item[13]
@@ -338,7 +336,6 @@ def parse_topics():
             topic_instance.temp_curr_comment_uniqid = item[15]
             topic_instance.temp_last_comment_text = item[16]
             topic_instance.temp_description_plain = item[17]
-            topic_instance.description = item[18]
             parse_description(topic_instance)
             topic_instance.save()
             finish_assign_topic_to_image(topic_instance)
