@@ -46,6 +46,7 @@ class HttpResponsePermanentRedirect(FrontendRedirectException):
     """
     status_code = 301
     message = _('HTTP Permanent Redirect (301 Moved Permanently)')
+    exception_class = redirect_permanent
 
-    def http_response(self):
-        return redirect_permanent(self.url)
+    def get_http_response(self) -> redirect_permanent:
+        return self.exception_class(self.url)

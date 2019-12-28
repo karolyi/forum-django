@@ -90,7 +90,7 @@ def _get_comment_pageid(
 
 def list_comments(
         request: WSGIRequest, topic_slug: str,
-        comment_id: int=None) -> Tuple[Topic, Page]:
+        comment_id: int = None) -> Tuple[Topic, Page]:
     """
     List a topic page with comments.
 

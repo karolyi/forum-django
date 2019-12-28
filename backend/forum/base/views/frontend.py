@@ -1,10 +1,11 @@
-from typing import Union
+from typing import Optional, Union
 
 from django.core.handlers.wsgi import WSGIRequest
+from django.http.response import HttpResponse
 from django.http.response import \
     HttpResponseRedirect as DjangoHttpResponsePermanentRedirect
-from django.http.response import HttpResponse
 from django.shortcuts import render
+from django.views.generic.base import TemplateView
 
 from ..choices import (
     TOPIC_TYPE_ARCHIVED, TOPIC_TYPE_HIGHLIGHTED, TOPIC_TYPE_NORMAL)
@@ -14,42 +15,53 @@ from ..utils.topic import (
     list_comments, prev_comments_down, replies_up, replies_up_recursive)
 
 
-def topic_listing(request: WSGIRequest) -> HttpResponse:
-    """
-    Main entry page, with the topic listings.
-    """
-    request_context = {
-        'topics_highlighted': collect_topic_page(
-            request=request, topic_type=TOPIC_TYPE_HIGHLIGHTED, page_id=1),
-        'topics_normal': collect_topic_page(
-            request=request, topic_type=TOPIC_TYPE_NORMAL, page_id=1),
-        'topics_archived': collect_topic_page(
-            request=request, topic_type=TOPIC_TYPE_ARCHIVED, page_id=1),
-    }
-    return render(
-        request=request, template_name='default/base/topic-listing.html',
-        context=request_context)
+class TopicListView(TemplateView):
+    'Main entry page, with the topic listings.'
+
+    template_name = 'default/base/topic-listing.html'
+
+    def get_context_data(self) -> dict:
+        'Fill the context fit topic data.'
+        context = super().get_context_data()
+        context.update(
+            topics_highlighted=collect_topic_page(
+                request=self.request,
+                topic_type=TOPIC_TYPE_HIGHLIGHTED, page_id=1),
+            topics_normal=collect_topic_page(
+                request=self.request,
+                topic_type=TOPIC_TYPE_NORMAL, page_id=1),
+            topics_archived=collect_topic_page(
+                request=self.request,
+                topic_type=TOPIC_TYPE_ARCHIVED, page_id=1))
+        return context
 
 
-def topic_comment_listing(
-        request: WSGIRequest, topic_slug: str,
-        comment_id: int=None) -> HttpResponse:
-    """
-    List comments in a certain topic.
-    """
-    try:
+class TopicCommentListingView(TemplateView):
+    'List comments in a certain topic.'
+
+    template_name = 'default/base/topic-comment-listing.html'
+
+    def get_context_data(
+            self, topic_slug: str, comment_id: Optional[int] = None) -> dict:
+        'Fill the context fit topic data.'
+        context = super().get_context_data()
         model_topic, page_comments = list_comments(
-            request=request, topic_slug=topic_slug, comment_id=comment_id)
-    except HttpResponsePermanentRedirect as exc:
-        return exc.http_response()
-    return render(
-        request=request,
-        template_name='default/base/topic-comment-listing.html',
-        context={
-            'page_comments': page_comments,
-            'model_topic': model_topic,
-            'comment_id': comment_id
-        })
+            request=self.request, topic_slug=topic_slug,
+            comment_id=comment_id)
+        context.update(
+            page_comments=page_comments, model_topic=model_topic,
+            comment_id=comment_id)
+        return context
+
+    def get(
+            self, request: WSGIRequest, topic_slug: str,
+            comment_id: Optional[int] = None) -> HttpResponse:
+        'Watch for a redirect exception, redirect when caught.'
+        try:
+            return super().get(
+                request=request, topic_slug=topic_slug, comment_id=comment_id)
+        except HttpResponsePermanentRedirect as exc:
+            return exc.get_http_response()
 
 
 def expand_comments_up_recursive(
