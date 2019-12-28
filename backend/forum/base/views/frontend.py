@@ -61,7 +61,7 @@ class TopicCommentListingView(TemplateView):
             return super().get(
                 request=request, topic_slug=topic_slug, comment_id=comment_id)
         except HttpResponsePermanentRedirect as exc:
-            return exc.get_http_response()
+            return exc.get_httpresponse()
 
 
 def expand_comments_up_recursive(
