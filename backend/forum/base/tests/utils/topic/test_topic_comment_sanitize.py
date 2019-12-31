@@ -7,12 +7,12 @@ from django.http.response import Http404
 from django.test import RequestFactory
 from forum.base.models import Comment
 
-from ....utils.topic import _topic_comment_sanitize
+from ....utils.topic import topic_comment_sanitize
 
 
 class TopicCommentSanitizeTestCase(TestCase):
     """
-    Testing `_topic_comment_sanitize`.
+    Testing `topic_comment_sanitize`.
     """
 
     factory = RequestFactory()
@@ -47,7 +47,7 @@ class TopicCommentSanitizeTestCase(TestCase):
         """
         request = self.factory.get('bla')
         request.user = user
-        comment, search_kwargs_comment = _topic_comment_sanitize(
+        comment, search_kwargs_comment = topic_comment_sanitize(
             request=request, comment_id=123)
         self.assertDictEqual(search_kwargs_comment, {
             'topic__is_staff_only': False, 'topic__is_enabled': True})
@@ -62,7 +62,7 @@ class TopicCommentSanitizeTestCase(TestCase):
         """
         request = self.factory.get('bla')
         request.user = user
-        comment, search_kwargs_comment = _topic_comment_sanitize(
+        comment, search_kwargs_comment = topic_comment_sanitize(
             request=request, comment_id=123)
         self.assertDictEqual(
             search_kwargs_comment, {'topic__is_enabled': True})
@@ -130,4 +130,4 @@ class TopicCommentSanitizeTestCase(TestCase):
         self.mock_comment.objects.select_related.return_value.only\
             .return_value.get.side_effect = Comment.DoesNotExist()
         with self.assertRaises(expected_exception=Http404):
-            _topic_comment_sanitize(request=request, comment_id=234)
+            topic_comment_sanitize(request=request, comment_id=234)

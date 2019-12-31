@@ -9,7 +9,7 @@ from django.http.response import Http404
 from django.urls.base import reverse
 
 from ..exceptions import HttpResponsePermanentRedirect
-from ..models import Comment, Topic
+from ..models import Comment, Topic, COMMENTS_QS
 
 
 def _get_comments_per_page(request: WSGIRequest) -> int:
@@ -24,23 +24,7 @@ def _get_comments_per_page(request: WSGIRequest) -> int:
     return settings.PAGINATOR_MAX_COMMENTS_LISTED
 
 
-def _prefetch_for_comments(qs_comments: QuerySet) -> QuerySet:
-    """
-    Take a Django :model:`forum_base.Comment` QuerySet and prefetch/select
-    all related models for displaying their variables in the templates.
-
-    In general, this caching speed up the comments page generation,
-    sparing sometimes hundreds of lazily queried data.
-
-    Return the `QuerySet` with the prefetch statements added.
-    """
-    return qs_comments.select_related(
-        'topic', 'user', 'prev_comment', 'prev_comment__user',
-        'prev_comment__topic'
-    ).prefetch_related('reply_set', 'reply_set__user', 'reply_set__topic')
-
-
-def _topic_comment_sanitize(
+def topic_comment_sanitize(
         request: WSGIRequest, comment_id: int) -> Tuple[Comment, Dict]:
     """
     Sanitize the request parameters and check if a requested topic
@@ -53,10 +37,7 @@ def _topic_comment_sanitize(
     comments that are in a topic not visible to the user).
     """
     # Get the requested comment (cast to int before)
-    search_kwargs_comment = {
-        'id': comment_id,
-        'topic__is_enabled': True,
-    }
+    search_kwargs_comment = dict(id=comment_id, topic__is_enabled=True)
     if not request.user.is_staff and not request.user.is_superuser:
         # Filter for only non-staff topics
         search_kwargs_comment['topic__is_staff_only'] = False
@@ -65,7 +46,7 @@ def _topic_comment_sanitize(
             'topic').only('id', 'topic__slug').get(**search_kwargs_comment)
     except Comment.DoesNotExist:
         raise Http404
-    del(search_kwargs_comment['id'])
+    del search_kwargs_comment['id']
     return model_comment, search_kwargs_comment
 
 
@@ -98,25 +79,23 @@ def list_comments(
     `comment_id`.
     """
     if comment_id is not None:
-        model_comment, search_kwargs_comment = _topic_comment_sanitize(
+        model_comment, search_kwargs_comment = topic_comment_sanitize(
             request=request, comment_id=comment_id)
         if model_comment.topic.slug != topic_slug:
             url = reverse(
-                'forum:base:topic-comment-listing',
-                kwargs={
-                    'topic_slug': model_comment.topic.slug,
-                    'comment_id': model_comment.id})
+                viewname='forum:base:topic-comment-listing', kwargs=dict(
+                    topic_slug=model_comment.topic.slug,
+                    comment_id=model_comment.id))
             raise HttpResponsePermanentRedirect(url=url)
-    search_kwargs_topic = {
-        'slug': topic_slug, 'is_enabled': True}
+    search_kwargs_topic = dict(slug=topic_slug, is_enabled=True)
     if not request.user.is_staff and not request.user.is_superuser:
         search_kwargs_topic['is_staff_only'] = False
     try:
         model_topic = Topic.objects.get(**search_kwargs_topic)
     except Topic.DoesNotExist:
         raise Http404
-    search_kwargs_comment = {'topic': model_topic}
-    qs_comments = Comment.objects.filter(
+    search_kwargs_comment = dict(topic=model_topic)
+    qs_comments = COMMENTS_QS.filter(
         **search_kwargs_comment).order_by('-time')
     comments_per_page = _get_comments_per_page(request=request)
     page_id = 1
@@ -124,7 +103,6 @@ def list_comments(
         page_id = _get_comment_pageid(
             qs_comments=qs_comments, comment_id=comment_id,
             comments_per_page=comments_per_page)
-    qs_comments = _prefetch_for_comments(qs_comments=qs_comments)
     if not qs_comments.exists():
         raise Http404
     paginator = Paginator(
@@ -148,29 +126,26 @@ def replies_up_recursive(
     As the code flows, invisible comment won't get filtered in.
     """
     # Get the requested comment
-    model_comment, search_kwargs_comment = _topic_comment_sanitize(
+    model_comment, search_kwargs_comment = topic_comment_sanitize(
         request=request, comment_id=comment_id)
     if model_comment.topic.slug != topic_slug:
         url = reverse(
-            'forum:base:comments-up-recursive',
-            kwargs={
-                'topic_slug': model_comment.topic.slug,
-                'comment_id': model_comment.id,
-                'scroll_to_id': scroll_to_id})
+            viewname='forum:base:comments-up-recursive', kwargs=dict(
+                topic_slug=model_comment.topic.slug,
+                comment_id=model_comment.id, scroll_to_id=scroll_to_id))
         raise HttpResponsePermanentRedirect(url=url)
-    comment_ids = {model_comment.id}
-    iteration_ids = {model_comment.id}
+    comment_ids = set([model_comment.id])
+    iteration_ids = set([model_comment.id])
     while True:
         search_kwargs_comment['prev_comment__in'] = iteration_ids
         qs_comments = Comment.objects.filter(
             **search_kwargs_comment).only('id').order_by()
-        iteration_ids = {x.id for x in qs_comments}
+        iteration_ids = set(x.id for x in qs_comments)
         if len(iteration_ids) == 0:
             # No more comments fetchable
             break
         comment_ids.update(iteration_ids)
-    qs_comments = Comment.objects.filter(id__in=comment_ids)
-    qs_comments = _prefetch_for_comments(qs_comments)
+    qs_comments = COMMENTS_QS.filter(id__in=comment_ids)
     return model_comment.topic, qs_comments
 
 
@@ -187,20 +162,17 @@ def replies_up(
     is in another topic, `Http404` when not found.
     """
     # Get the requested comment
-    model_comment, search_kwargs_comment = _topic_comment_sanitize(
+    model_comment, search_kwargs_comment = topic_comment_sanitize(
         request=request, comment_id=comment_id)
     if model_comment.topic.slug != topic_slug:
         url = reverse(
-            'forum:base:comments-up',
-            kwargs={
-                'topic_slug': model_comment.topic.slug,
-                'comment_id': model_comment.id,
-                'scroll_to_id': scroll_to_id})
+            viewname='forum:base:comments-up', kwargs=dict(
+                topic_slug=model_comment.topic.slug,
+                comment_id=model_comment.id, scroll_to_id=scroll_to_id))
         raise HttpResponsePermanentRedirect(url=url)
-    qs_comments = Comment.objects.filter(
+    qs_comments = COMMENTS_QS.filter(
         Q(id=model_comment.id) | Q(prev_comment_id=model_comment.id),
         **search_kwargs_comment)
-    qs_comments = _prefetch_for_comments(qs_comments)
     return model_comment.topic, qs_comments
 
 
@@ -218,18 +190,16 @@ def prev_comments_down(
     is in another topic, `Http404` when not found.
     """
     # Get the requested comment
-    comment, search_kwargs_comment = _topic_comment_sanitize(
+    comment, search_kwargs_comment = topic_comment_sanitize(
         request=request, comment_id=comment_id)
     if comment.topic.slug != topic_slug:
         url = reverse(
-            'forum:base:comments-down',
-            kwargs={
-                'topic_slug': comment.topic.slug,
-                'comment_id': comment.id,
-                'scroll_to_id': scroll_to_id})
+            viewname='forum:base:comments-down', kwargs=dict(
+                topic_slug=comment.topic.slug, comment_id=comment.id,
+                scroll_to_id=scroll_to_id))
         raise HttpResponsePermanentRedirect(url=url)
     comment_original = comment
-    set_comment_ids = {comment.id}
+    set_comment_ids = set([comment.id])
     while True:
         if comment.prev_comment_id is None:
             # This comment is the root comment, not a previous comment
@@ -242,6 +212,5 @@ def prev_comments_down(
             # No such comment (or in a topic that's not visible)
             break
         set_comment_ids.add(comment.id)
-    qs_comments = Comment.objects.filter(id__in=set_comment_ids)
-    qs_comments = _prefetch_for_comments(qs_comments)
+    qs_comments = COMMENTS_QS.filter(id__in=set_comment_ids)
     return comment_original.topic, qs_comments

@@ -22,7 +22,7 @@ class FrontendRedirectException(ForumExceptionBase):
     Exceptions resolving in HTTP redirects.
     """
 
-    def __init__(self, url, *args, **kwargs):
+    def __init__(self, url: str, *args, **kwargs):
         self.url = url
         super(FrontendRedirectException, self).__init__(*args, **kwargs)
 

@@ -10,7 +10,6 @@ from django.db.models.fields.related import (
     ForeignKey, ManyToManyField, OneToOneField)
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
-
 from forum.utils import slugify
 
 from .choices import COMMENT_VOTE_HIDE_CHOICES, TOPIC_TYPE_CHOICES
@@ -332,3 +331,9 @@ class CommentBookmark(Model):
         to=Comment, on_delete=CASCADE, verbose_name=_('Comment'))
     last_updated_at = DateTimeField(
         auto_now=True, verbose_name=_('Last updated at'))
+
+
+COMMENTS_QS = Comment.objects.select_related(
+    'topic', 'user', 'prev_comment', 'prev_comment__user',
+    'prev_comment__topic'
+).prefetch_related('reply_set', 'reply_set__user', 'reply_set__topic')

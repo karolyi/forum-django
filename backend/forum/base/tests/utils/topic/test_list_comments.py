@@ -43,7 +43,7 @@ class ListCommentsTestCase(TestCase):
         self.patch_paginator = patch(
             target='forum.base.utils.topic.Paginator', spec=Paginator)
         self.patch_topic_comment_sanitize = patch(
-            target='forum.base.utils.topic._topic_comment_sanitize',
+            target='forum.base.utils.topic.topic_comment_sanitize',
             return_value=self.mock_topic_comment_sanitize_result)
         self.mock_get_comment_pageid = self.patch_get_comment_pageid.start()
         self.mock_get_comments_per_page = \
