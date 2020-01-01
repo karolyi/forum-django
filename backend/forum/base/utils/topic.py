@@ -9,7 +9,7 @@ from django.http.response import Http404
 from django.urls.base import reverse
 
 from ..exceptions import HttpResponsePermanentRedirect
-from ..models import Comment, Topic, COMMENTS_QS
+from ..models import COMMENTS_QS, Comment, Topic
 
 
 def _get_comments_per_page(request: WSGIRequest) -> int:
