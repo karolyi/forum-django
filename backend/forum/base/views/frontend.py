@@ -1,6 +1,7 @@
-from typing import Optional, Union
+from typing import Optional, Tuple, Union
 
 from django.core.handlers.wsgi import WSGIRequest
+from django.db.models.query import QuerySet
 from django.http.response import HttpResponse
 from django.http.response import \
     HttpResponseRedirect as DjangoHttpResponsePermanentRedirect
@@ -11,11 +12,10 @@ from django.views.generic.base import TemplateView
 from ..choices import (
     TOPIC_TYPE_ARCHIVED, TOPIC_TYPE_HIGHLIGHTED, TOPIC_TYPE_NORMAL)
 from ..exceptions import HttpResponsePermanentRedirect
-from ..models import COMMENTS_QS, Comment
+from ..models import COMMENTS_QS, Comment, Topic
 from ..utils.home import collect_topic_page
 from ..utils.topic import (
-    list_comments, prev_comments_down, replies_up, replies_up_recursive,
-    topic_comment_sanitize)
+    list_comments, prev_comments_down, replies_up, topic_comment_sanitize)
 
 
 class TopicListView(TemplateView):
@@ -31,8 +31,7 @@ class TopicListView(TemplateView):
                 request=self.request,
                 topic_type=TOPIC_TYPE_HIGHLIGHTED, page_id=1),
             topics_normal=collect_topic_page(
-                request=self.request,
-                topic_type=TOPIC_TYPE_NORMAL, page_id=1),
+                request=self.request, topic_type=TOPIC_TYPE_NORMAL, page_id=1),
             topics_archived=collect_topic_page(
                 request=self.request,
                 topic_type=TOPIC_TYPE_ARCHIVED, page_id=1))
@@ -71,7 +70,8 @@ class TopicExpandRepliesUpRecursive(TemplateView):
     'Expand replies in a topic from a starting comment upwards.'
 
     def _collect_expanded_comments(
-            self, topic_slug: str, comment_id: int, scroll_to_id: int):
+        self, topic_slug: str, comment_id: int, scroll_to_id: int
+    ) -> Tuple[Topic, QuerySet]:
         'Collect and return expanded comments.'
         model_comment, search_kwargs_comment = topic_comment_sanitize(
             request=self.request, comment_id=comment_id)
@@ -96,6 +96,7 @@ class TopicExpandRepliesUpRecursive(TemplateView):
 
     def get_context_data(
             self, topic_slug: str, comment_id: int, scroll_to_id: int) -> dict:
+        'Add data for the template.'
         context = super().get_context_data(
             topic_slug=topic_slug, comment_id=comment_id,
             scroll_to_id=scroll_to_id)

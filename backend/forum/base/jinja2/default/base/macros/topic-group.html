@@ -53,7 +53,7 @@
         topicType: '{{ topic_type|escapejs }}',
         urls: {
             topicListPage: '{{ url('forum:rest-api:v1-topic-list-page') }}'
-            {% if topic_list == False %}
+            {% if topic_list is none %}
             , archivedTopicsStart: '{{ url('forum:rest-api:v1-archived-topics-start') }}'
             {% endif %}
         },
@@ -63,12 +63,13 @@
             paginationWrapper: '.pagination-wrapper',
             paginator: 'ul.pagination',
             topicListWrapper: '.topic-list-wrapper'
-            {% if topic_list == False %}
-            , loaderTopicsArchivedWrapper: '.loader-topics-archived-wrapper'
-            , buttonTopicsArchivedLoad: '.loader-topics-archived'
-            {% endif %}
+            {%- if topic_list is none -%}
+            ,
+            loaderTopicsArchivedWrapper: '.loader-topics-archived-wrapper',
+            buttonTopicsArchivedLoad: '.loader-topics-archived'
+            {%- endif %}
         },
-        pageMax: {{ 0 if topic_list == False else topic_list.paginator.num_pages }},
+        pageMax: {{ 0 if topic_list is none else topic_list.paginator.num_pages }},
     });
 </script>
 {%- endmacro %}

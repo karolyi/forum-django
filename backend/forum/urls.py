@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf.urls import url
 from django.conf.urls.static import static
-from django.contrib import admin
+from django.contrib.admin.sites import site
 from django.urls.conf import include
 from django.views.i18n import JavaScriptCatalog
 
@@ -21,7 +21,7 @@ forum_urlpatterns = [
 ]
 
 urlpatterns = [
-    url(regex=r'^admin/', view=admin.site.urls),
+    url(regex=r'^admin/', view=site.urls),
     # JavaScript i18n
     url(regex=r'^jsi18n/$',
         view=JavaScriptCatalog.as_view(), name='javascript-catalog'),

@@ -110,45 +110,6 @@ def list_comments(
     return model_topic, paginator.page(number=page_id)
 
 
-def replies_up_recursive(
-        request: WSGIRequest, topic_slug: str,
-        comment_id: int, scroll_to_id: int) -> Tuple[Topic, QuerySet]:
-    """
-    Expand comments in a thread upwards from a given comment ID
-    recursively.
-
-    Return the :model:`forum_base.Topic` and QuerySet of expanded
-    comments (time descending)  when successfully gathered them.
-
-    Raise `HttpResponsePermanentRedirect` when the comment exists but
-    is in another topic, `Http404` when not found.
-
-    As the code flows, invisible comment won't get filtered in.
-    """
-    # Get the requested comment
-    model_comment, search_kwargs_comment = topic_comment_sanitize(
-        request=request, comment_id=comment_id)
-    if model_comment.topic.slug != topic_slug:
-        url = reverse(
-            viewname='forum:base:comments-up-recursive', kwargs=dict(
-                topic_slug=model_comment.topic.slug,
-                comment_id=model_comment.id, scroll_to_id=scroll_to_id))
-        raise HttpResponsePermanentRedirect(url=url)
-    comment_ids = set([model_comment.id])
-    iteration_ids = set([model_comment.id])
-    while True:
-        search_kwargs_comment['prev_comment__in'] = iteration_ids
-        qs_comments = Comment.objects.filter(
-            **search_kwargs_comment).only('id').order_by()
-        iteration_ids = set(x.id for x in qs_comments)
-        if len(iteration_ids) == 0:
-            # No more comments fetchable
-            break
-        comment_ids.update(iteration_ids)
-    qs_comments = COMMENTS_QS.filter(id__in=comment_ids)
-    return model_comment.topic, qs_comments
-
-
 def replies_up(
         request: WSGIRequest, topic_slug: str,
         comment_id: int, scroll_to_id: int) -> Tuple[Topic, QuerySet]:
