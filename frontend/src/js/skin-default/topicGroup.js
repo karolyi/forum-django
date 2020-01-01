@@ -1,10 +1,10 @@
-require('bootstrap/js/src/tooltip')
-const $ = require('jquery')
-const common = require('./common')
-const paginator = require('./paginator')
-const userName = require('./userName')
-const timeActualizer = require('./timeActualizer')
-const popOverHoverContent = require('./popOverHoverContent')
+import $ from 'jquery'
+import 'bootstrap/js/src/tooltip'
+import { options as commonOptions, extractTemplateHtml } from './common'
+import { init as paginatorInit } from './paginator'
+import { add as usernameAdd } from './username'
+import { add as timeActualizerAdd } from './timeActualizer'
+import { add as popOverHoverContentAdd } from './popOverHoverContent'
 
 class Instance {
   constructor(options) {
@@ -15,20 +15,18 @@ class Instance {
     const slug = jqLink.data('slug')
     const jqTipTemplate =
       this.jqRoot.find(`.forum-topic-tooltip-template[data-slug="${slug}"]`)
-    const contentHtml = common.extractTemplateHtml(jqTipTemplate[0])
+    const contentHtml = extractTemplateHtml(jqTipTemplate[0])
     jqTip.find('.popover-content').empty().append(contentHtml)
   }
 
   activateContent() {
     const jqUsers = this.jqRoot.find('[data-toggle=username]')
-    userName.add({
-      jqUsers,
-    })
+    usernameAdd(jqUsers)
     const jqTimeElements = this.jqRoot.find('.forum-time')
-    timeActualizer.add(jqTimeElements)
+    timeActualizerAdd(jqTimeElements)
     const jqTopicLinkElements = this.jqRoot.find('.topic-link')
     for (const node of jqTopicLinkElements) {
-      popOverHoverContent.add(node, {
+      popOverHoverContentAdd(node, {
         clickTakeOver: false,
         callbacks: {
           contentInit: ::this.initializePopoverContent,
@@ -83,8 +81,8 @@ class Instance {
 
   focusOnHeader() {
     $('html, body').animate({
-      scrollTop: this.jqRoot.offset().top - common.options.navbarHeight,
-    }, common.options.scrollSpeed)
+      scrollTop: this.jqRoot.offset().top - commonOptions.navbarHeight,
+    }, commonOptions.scrollSpeed)
   }
 
   /* eslint-disable class-methods-use-this, no-unused-vars */
@@ -104,7 +102,7 @@ class Instance {
 
   initUi() {
     // Init paginator
-    this.paginator = paginator.init({
+    this.paginator = paginatorInit({
       currentPageNr: 1,
       jqRoot: this.jqRoot.find(this.options.selectors.paginator),
       callbackLoadPage: ::this.loadPage,

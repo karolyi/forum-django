@@ -28,8 +28,8 @@ module.exports = {
     topicGroup: [
       '../src/js/skin-default/topicGroup',
     ],
-    userName: [
-      '../src/js/skin-default/userName',
+    username: [
+      '../src/js/skin-default/username',
     ],
     timeActualizer: [
       '../src/js/skin-default/timeActualizer',
@@ -97,9 +97,10 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
-          { loader: 'style-loader', options: { useable: true }},
+          { loader: 'style-loader', options: { useable: true } },
           { loader: 'css-loader' },
-          { loader: 'postcss-loader',
+          {
+            loader: 'postcss-loader',
             options: { config: { path: postCssConfigPath }, sourceMap: true },
           },
         ],

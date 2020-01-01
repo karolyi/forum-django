@@ -37,7 +37,7 @@
             <section class="pagination-wrapper text-center">
                 {{ paginator_generic(page=topic_list) }}
             </section>
-            {% if topic_list == False %}
+            {% if topic_list is none %}
             <section class="loader-topics-archived-wrapper text-center">
                 <button class="loader-topics-archived btn btn-primary">
                     <span class="fa fa-arrow-circle-o-down" aria-hidden="true"></span>

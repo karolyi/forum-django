@@ -1,7 +1,12 @@
-const $ = require('jquery')
-require('select2')
+import $ from 'jquery'
+import 'select2'
+import templateSettings from 'lodash/templateSettings'
+
 const select2Hu = require('select2/src/js/select2/i18n/hu')
 const select2De = require('select2/src/js/select2/i18n/de')
+
+// Python formatstring will work this way
+templateSettings.interpolate = /{([\s\S]+?)}/g
 
 // English language is self-contained in select2, others not.
 $.fn.select2.amd.define('select2/i18n/hu', select2Hu)

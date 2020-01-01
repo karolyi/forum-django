@@ -6,7 +6,6 @@
     {{ render_bundle('vendor') }}
     {{ render_bundle('runtime') }}
     {{ render_bundle('common') }}
-    {{ render_bundle('userName') }}
     <title>{% block title %}{{ django_settings.SITE_NAME }}{% endblock title %}</title>
     <script type="text/javascript" src="{{ url('javascript-catalog') }}"></script>
     <link rel="icon" href="{{ static('favicon.ico') }}" type="image/x-icon" />
@@ -22,8 +21,8 @@
             name: '{{ current_language.name|escapejs }}'
           },
           urls: {
-            user: {
-                shortData: '{{ url('forum:rest-api:v1-user-short', slug_list='example-slug') }}',
+            userShortData: {
+                backend: '{{ url('forum:rest-api:v1-user-short', slug_list='example-slug') }}',
                 exampleSlug: 'example-slug'
             },
             mdParser: '{{ url('forum:rest-api:md-parser') }}',
@@ -39,8 +38,11 @@
           },
           scrollSpeed: 300
         });
+    </script>
+    {{ render_bundle('username') }}
+    <script type="text/javascript">
         // Init the username module
-        Forum.userName.init({})
+        Forum.username.init({})
     </script>
     {% endjsmin %}
     {% block extra_scripts_head %}{% endblock extra_scripts_head %}

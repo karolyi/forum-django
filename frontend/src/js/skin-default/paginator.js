@@ -1,10 +1,6 @@
 // const $ = require('jquery')
 
 class Paginator {
-  constructor(options) {
-    this.options = options
-  }
-
   updateUi() {
     this.options.jqRoot.find('.page-numbered.active').removeClass('active')
     this.options.jqRoot
@@ -42,7 +38,7 @@ class Paginator {
     this.options.callbackLoadPage(this.currentPageNr)
   }
 
-  initialize() {
+  initVariables() {
     this.jqWrappers = {
       pageNextLink: this.options.jqRoot.find('.page-next a'),
       pagePreviousLink: this.options.jqRoot.find('.page-previous a'),
@@ -53,10 +49,14 @@ class Paginator {
     this.options.jqRoot.find('.page-numbered a')
       .click(::this.onClickPaginateNumber)
   }
+
+  constructor(options) {
+    this.options = options
+    this.initVariables()
+  }
 }
 
 export function init(options) {
   const paginator = new Paginator(options)
-  paginator.initialize()
   return paginator
 }

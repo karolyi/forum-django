@@ -1,5 +1,5 @@
-require('bootstrap/js/src/popover')
-const $ = require('jquery')
+import $ from 'jquery'
+import 'bootstrap/js/src/popover'
 
 /**
  * This module expands the bootstrap provided popover with showing the

@@ -1,13 +1,12 @@
-/* global interpolate */
+/* global interpolate  */
+import $ from 'jquery'
 import { ScrollFix } from './scrollFix'
+import { options as commonOptions, extractTemplateHtml } from './common'
+import { add as popOverHoverContentAdd } from './popOverHoverContent'
+import { add as usernameAdd } from './username'
+import { add as timeActualizerAdd } from './timeActualizer'
 
 require('bootstrap/js/src/tooltip')
-const $ = require('jquery')
-const popOverHoverContent = require('./popOverHoverContent')
-const common = require('./common')
-// const paginator = require('./paginator')
-const userName = require('./userName')
-const timeActualizer = require('./timeActualizer')
 
 export class CommentListing {
   constructor(options) {
@@ -87,7 +86,7 @@ export class CommentListing {
    * currently.
    */
   updateUrl() {
-    const minY = common.options.navbarHeight + window.scrollY
+    const minY = commonOptions.navbarHeight + window.scrollY
     let jqTopComment
     for (const item of this.jqWrappers.comments) {
       const jqItem = $(item)
@@ -102,8 +101,8 @@ export class CommentListing {
       jqTopComment = this.jqWrappers.comments.last()
     }
     const constructedPath = this.constructPathFromWrapper(jqTopComment)
-    if (constructedPath === location.pathname) return
-    history.replaceState({}, null, constructedPath)
+    if (constructedPath === window.location.pathname) return
+    window.history.replaceState({}, null, constructedPath)
   }
 
   getCommentWrapper(commentId) {
@@ -132,7 +131,7 @@ export class CommentListing {
     const constructedPath = this.constructPathFromData(
       this.options.topicSlugOriginal, commentIdLinked,
     )
-    history.pushState({}, null, constructedPath)
+    window.history.pushState({}, null, constructedPath)
     this.scrollFix.scrollTo(commentIdLinked)
   }
 
@@ -246,7 +245,7 @@ export class CommentListing {
     this.jqRoot = $(this.options.selectors.root)
     this.prepareUrlFormatStrings()
     this.jqTemplates = {
-      commentActions: $(common.extractTemplateHtml(
+      commentActions: $(extractTemplateHtml(
         this.jqRoot.find(this.options.selectors.template.action)[0],
       )),
     }
@@ -270,7 +269,7 @@ export class CommentListing {
     const jqButtonCommentActions =
       this.jqWrappers.comments.find(this.options.selectors.commentActions)
     for (const button of jqButtonCommentActions) {
-      popOverHoverContent.add(button, {
+      popOverHoverContentAdd(button, {
         clickTakeOver: true,
         callbacks: {
           contentInit: ::this.initializeCommentActionsContent,
@@ -278,11 +277,9 @@ export class CommentListing {
       })
     }
     const jqUsers = this.jqRoot.find('[data-toggle=username]')
-    userName.add({
-      jqUsers,
-    })
+    usernameAdd(jqUsers)
     const jqTimeElements = this.jqRoot.find('.forum-time')
-    timeActualizer.add(jqTimeElements)
+    timeActualizerAdd(jqTimeElements)
     $(window).on('popstate', ::this.onPopState)
     this.scrollFix = new ScrollFix({
       callbacks: {
