@@ -1,6 +1,6 @@
 {% macro forum_username(user, is_template=False) -%}
 {% if not is_template -%}
-<a href="/{{ user.slug }}" class="forum-username {% spaceless %}
+<a href="/user/{{ user.slug }}" class="forum-username {% spaceless %}
     {% if user.is_superuser or user.is_staff %}
         is-admin
     {% endif %}

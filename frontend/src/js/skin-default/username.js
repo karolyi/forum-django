@@ -15,7 +15,7 @@ class ForumUserName {
     if (jqUsername.attr('data-is-filled') === 'true') return
     if (this.userMap.has(userSlug)) {
       this.fillTooltip()
-    } else {
+    } else if (!this.loadedSet.has(userSlug)) {
       this.loadUserData(userSlug)
     }
   }
@@ -42,6 +42,7 @@ class ForumUserName {
 
   loadUserData(userSlug) {
     // Load the user data
+    this.loadedSet.add(userSlug)
     $.when($.ajax({
       url: this.userUrl({ slug: userSlug }),
       dataType: 'json',
@@ -49,11 +50,11 @@ class ForumUserName {
   }
 
   fillTooltip() {
-    // Fill the tooltip, if any username is still hovered
+    // Fill the tooltip only if any username is still hovered
     if (!this.jqUserHovered) return
     const userSlug = this.jqUserHovered.data('slug')
-    const clonedTemplate = this.tooltipTemplate.clone()
     const userData = this.userMap.get(userSlug)
+    const clonedTemplate = this.tooltipTemplate.clone()
     const ratingAvg = parseFloat(userData.rating.avg)
     userData.rating.text = userData.rating.avg
     if (ratingAvg > 0) {
@@ -73,15 +74,12 @@ class ForumUserName {
     else if (ratingAvg < 0) jqAverage.addClass('rating-negative')
 
     // Add decoration to all the visible tr's but the first
-    clonedTemplate.find('tr').not('[style]').not(':first').addClass('decorated')
-    // this.jqUserHovered.attr('setElementContent', clonedTemplate)
+    clonedTemplate
+      .find('tr').not('[style]').not(':first').addClass('decorated')
     this.jqUserHovered
       .attr('title', clonedTemplate[0].outerHTML)
       .tooltip('_fixTitle')
       .tooltip('show')
-    // this.jqUserHovered.tooltip('dispose').tooltip({
-    //   title: clonedTemplate[0].outerHTML, html: true
-    // }).tooltip('show')
   }
 
   initVariables() {
@@ -89,6 +87,7 @@ class ForumUserName {
       document.querySelector(commonOptions.selectors.user.tooltipTemplate),
     ))
     this.userMap = new Map()
+    this.loadedSet = new Set()
     this.userUrl = template(
       commonOptions.urls.userShortData.backend
         .replace(commonOptions.urls.userShortData.exampleSlug, '{slug}'),

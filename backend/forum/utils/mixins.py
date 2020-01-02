@@ -1,6 +1,6 @@
-from django.views.generic.base import ContextMixin, View, TemplateView
-from django.http.response import JsonResponse
 from django.conf import settings
+from django.http.response import JsonResponse
+from django.views.generic.base import ContextMixin, TemplateView, View
 
 
 class JsonResponseMixin(ContextMixin, View):
