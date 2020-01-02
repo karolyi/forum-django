@@ -2,6 +2,8 @@ import $ from 'jquery'
 import 'select2'
 import templateSettings from 'lodash/templateSettings'
 
+window.$ = $
+
 const select2Hu = require('select2/src/js/select2/i18n/hu')
 const select2De = require('select2/src/js/select2/i18n/de')
 

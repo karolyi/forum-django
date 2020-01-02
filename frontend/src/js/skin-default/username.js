@@ -1,6 +1,8 @@
 import $ from 'jquery'
 import 'bootstrap/js/src/tooltip'
 import template from 'lodash/template'
+import cloneDeep from 'lodash/cloneDeep'
+import { DefaultWhitelist } from 'bootstrap/js/src/tools/sanitizer'
 import { options as commonOptions, extractTemplateHtml } from './common'
 
 let classInstance
@@ -33,7 +35,7 @@ class ForumUserName {
     // Load has failed for some reason
     if (!this.jqUserHovered) return
     this.jqUserHovered.attr(
-      'title', '<span class="fa fa-chain-broken"></span>',
+      'title', '<span class="fa fa-chain-broken" aria-hidden="true"></span>',
     )
     this.jqUserHovered.tooltip('_fixTitle').tooltip('show')
   }
@@ -72,28 +74,38 @@ class ForumUserName {
 
     // Add decoration to all the visible tr's but the first
     clonedTemplate.find('tr').not('[style]').not(':first').addClass('decorated')
-
-    this.jqUserHovered.attr('title', clonedTemplate[0].outerHTML)
-    this.jqUserHovered.tooltip('_fixTitle').tooltip('show')
-    this.jqUserHovered.attr('data-is-filled', true)
+    // this.jqUserHovered.attr('setElementContent', clonedTemplate)
+    this.jqUserHovered
+      .attr('title', clonedTemplate[0].outerHTML)
+      .tooltip('_fixTitle')
+      .tooltip('show')
+    // this.jqUserHovered.tooltip('dispose').tooltip({
+    //   title: clonedTemplate[0].outerHTML, html: true
+    // }).tooltip('show')
   }
 
   initVariables() {
-    this.tooltipTemplate = extractTemplateHtml(
+    this.tooltipTemplate = $(extractTemplateHtml(
       document.querySelector(commonOptions.selectors.user.tooltipTemplate),
-    )
+    ))
     this.userMap = new Map()
     this.userUrl = template(
       commonOptions.urls.userShortData.backend
         .replace(commonOptions.urls.userShortData.exampleSlug, '{slug}'),
     )
+    this.tooltipWhiteList = cloneDeep(DefaultWhitelist)
+    // this.tooltipWhiteList['*'].push('data-toggle', 'title')
+    this.tooltipWhiteList.table = ['class']
+    this.tooltipWhiteList.tbody = []
+    this.tooltipWhiteList.tr = ['hidden', 'class', 'style']
+    this.tooltipWhiteList.td = ['colspan', 'class', 'style']
   }
 
   addDomElements(jqUsers) {
     jqUsers
       .attr('title', '<span class="fa fa-spinner fa-pulse fa-fw"></span>')
       .attr('data-toggle', 'tooltip')
-      .tooltip({ html: true })
+      .tooltip({ html: true, whiteList: this.tooltipWhiteList })
       .hover(::this.onMouseInUsername, ::this.onMouseOutUsername)
   }
 
