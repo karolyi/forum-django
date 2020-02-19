@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Tuple
+
 from django.contrib.auth.models import AbstractUser
 from django.db.models.base import Model
 from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
@@ -9,6 +11,8 @@ from django.db.models.fields import (
 from django.db.models.fields.related import (
     ForeignKey, ManyToManyField, OneToOneField)
 from django.db.models.indexes import Index
+from django.db.models.manager import BaseManager
+from django.db.models.query import QuerySet
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
 
@@ -204,6 +208,80 @@ class Topic(Model):
         return self.name_text
 
 
+class CommentQuerySet(QuerySet):
+    'Extending the base `QuerySet` with caching capabilities.'
+
+    def _handle_prev_comment(
+            self, item: dict, user: bool, topic: bool, extra_pks: set,
+            user_pks: set, topic_pks: set):
+        'Handle the `prev_comment` part of the comment item.'
+        if not item['prev_comment']:
+            return
+        extra_pks.add(item['prev_comment'])
+        if user:
+            user_pks.add(item['prev_comment__user'])
+        if topic:
+            topic_pks.add(item['prev_comment__topic'])
+
+    def _handle_reply_set(
+            self, item: dict, user: bool, topic: bool, extra_pks: set,
+            user_pks: set, topic_pks: set):
+        'Handle the `reply_set` part of the comment item.'
+        if not item['reply_set']:
+            return
+        extra_pks.add(item['reply_set'])
+        if user:
+            user_pks.add(item['reply_set__user'])
+        if topic:
+            topic_pks.add(item['reply_set__topic'])
+
+    def _get_pksets(
+        self, qs: CommentQuerySet, user: bool, topic: bool, prev_comment: bool,
+        reply_set: bool
+    ) -> Tuple[set, set, set, set]:
+        'Return the filled PK sets for fetching.'
+        my_pks = set()
+        extra_pks = set()
+        user_pks = set()
+        topic_pks = set()
+        for item in qs:
+            my_pks.add(item['pk'])
+            if user:
+                user_pks.add(item['user'])
+            if topic:
+                topic_pks.add(item['topic'])
+            if prev_comment:
+                self._handle_prev_comment(
+                    item=item, user=user, topic=topic, extra_pks=extra_pks,
+                    user_pks=user_pks, topic_pks=topic_pks)
+            if reply_set:
+                self._handle_reply_set(
+                    item=item, user=user, topic=topic, extra_pks=extra_pks,
+                    user_pks=user_pks, topic_pks=topic_pks)
+        return my_pks, extra_pks, user_pks, topic_pks
+
+    def with_cache(
+        self, user: bool = True, topic: bool = True, prev_comment: bool = True,
+        reply_set: bool = True
+    ) -> CommentQuerySet:
+        """
+        Return a `QuerySet` loaded with the requested related relations
+        on the `Comment`s. Use this as the last part of your query.
+        """
+        qs = self.values(
+            'pk', 'user', 'topic', 'prev_comment', 'prev_comment__user',
+            'prev_comment__topic', 'reply_set', 'reply_set__user',
+            'reply_set__topic')
+        my_pks, extra_pks, user_pks, topic_pks = self._get_pksets(
+            qs=qs, user=user, topic=topic, prev_comment=prev_comment,
+            reply_set=reply_set)
+        users = User.objects.filter(pk__in=user_pks)
+        topics = Topic.objects.filter(pk__in=topic_pks)
+        comments = Comment.objects.filter(pk__in=my_pks + extra_pks)
+        # TODO: Continue here
+
+
+
 class Comment(Model):
     """
     Essential comment class.
@@ -243,6 +321,8 @@ class Comment(Model):
         max_length=20, unique=True)
     images = ManyToManyField(
         'forum_cdn.Image', verbose_name=_('Images in this comment'))
+
+    objects = BaseManager.from_queryset(queryset_class=CommentQuerySet)()
 
     class Meta(object):
         verbose_name = _('Comment')
@@ -338,7 +418,9 @@ class CommentBookmark(Model):
         })
 
 
-COMMENTS_QS = Comment.objects.select_related(
-    'topic', 'user', 'prev_comment', 'prev_comment__user',
-    'prev_comment__topic'
-).prefetch_related('reply_set', 'reply_set__user', 'reply_set__topic')
+# COMMENTS_QS = Comment.objects.select_related(
+#     'topic', 'user', 'prev_comment', 'prev_comment__user',
+#     'prev_comment__topic'
+# ).prefetch_related('reply_set', 'reply_set__user', 'reply_set__topic')
+
+COMMENTS_QS = Comment.objects

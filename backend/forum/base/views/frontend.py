@@ -14,8 +14,8 @@ from ..choices import (
     TOPIC_TYPE_ARCHIVED, TOPIC_TYPE_HIGHLIGHTED, TOPIC_TYPE_NORMAL)
 from ..exceptions import HttpResponsePermanentRedirect
 from ..models import COMMENTS_QS, Comment, Topic
+from ..utils.comment import CommentListViewBase
 from ..utils.home import collect_topic_page
-from ..utils.topic import CommentListViewBase
 
 
 class TopicListView(TemplateView):
