@@ -2,8 +2,8 @@ from django.conf.urls import url
 from django.urls.conf import path
 
 from .views.frontend import (
-    TopicCommentListingView, TopicExpandRepliesUpRecursive, TopicListView,
-    expand_comments_down, expand_comments_up)
+    TopicCommentListingView, TopicExpandCommentsDownView,
+    TopicExpandCommentsUpView, TopicExpandRepliesUpRecursive, TopicListView)
 
 urlpatterns = [
     path(route=r'', view=TopicListView.as_view(), name='topic-listing'),
@@ -19,8 +19,8 @@ urlpatterns = [
         name='comments-up-recursive'),
     url(regex=r'^comments-up/(?P<topic_slug>[a-z0-9-]+)/'
         r'(?P<comment_id>\d+)/(?P<scroll_to_id>\d+)/$',
-        view=expand_comments_up, name='comments-up'),
+        view=TopicExpandCommentsUpView.as_view(), name='comments-up'),
     url(regex=r'^comments-down/(?P<topic_slug>[a-z0-9-]+)/'
         r'(?P<comment_id>\d+)/(?P<scroll_to_id>\d+)/$',
-        view=expand_comments_down, name='comments-down'),
+        view=TopicExpandCommentsDownView.as_view(), name='comments-down'),
 ]

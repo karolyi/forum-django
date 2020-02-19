@@ -121,50 +121,69 @@ class TopicExpandRepliesUpRecursive(TemplateView):
             return exc.get_httpresponse()
 
 
-def expand_comments_up(
-    request: WSGIRequest, topic_slug: str, comment_id: int, scroll_to_id: int
-) -> Union[HttpResponse, DjangoHttpResponsePermanentRedirect]:
+class TopicExpandCommentsUpView(TemplateView):
     """
     Expand replies to a given comment in a non-recursive way. That is,
     only expand the replies to the passed comment ID.
     """
-    try:
-        model_topic, qs_comments = replies_up(
-            request=request, topic_slug=topic_slug, comment_id=comment_id,
+    template_name = 'default/base/comments-expansion.html'
+
+    def get_context_data(
+            self, topic_slug: str, comment_id: int, scroll_to_id: int) -> dict:
+        'Add data for the template.'
+        context = super().get_context_data(
+            topic_slug=topic_slug, comment_id=comment_id,
             scroll_to_id=scroll_to_id)
-    except HttpResponsePermanentRedirect as exc:
-        return exc.http_response()
-    return render(
-        request=request, template_name='default/base/comments-expansion.html',
-        context={
-            'model_topic': model_topic,
-            'comment_id': comment_id,
-            'qs_comments': qs_comments,
-            'scroll_to_id': scroll_to_id,
-            'listing_mode': 'expandCommentsUp',
-        })
+        model_topic, qs_comments = replies_up(
+            request=self.request, topic_slug=topic_slug, comment_id=comment_id,
+            scroll_to_id=scroll_to_id)
+        context.update(
+            model_topic=model_topic, comment_id=comment_id,
+            qs_comments=qs_comments, scroll_to_id=scroll_to_id,
+            listing_mode='expandCommentsUp')
+        return context
+
+    def get(
+            self, request: WSGIRequest, topic_slug: str,
+            comment_id: int, scroll_to_id: int) -> HttpResponse:
+        'Watch for a redirect exception, redirect when caught.'
+        try:
+            return super().get(
+                request=request, topic_slug=topic_slug, comment_id=comment_id,
+                scroll_to_id=scroll_to_id)
+        except HttpResponsePermanentRedirect as exc:
+            return exc.get_httpresponse()
 
 
-def expand_comments_down(
-    request: WSGIRequest, topic_slug: str, comment_id: int,
-    scroll_to_id: int
-) -> Union[HttpResponse, DjangoHttpResponsePermanentRedirect]:
+class TopicExpandCommentsDownView(TemplateView):
     """
     Expand previous replies to a given comment in a recursive way. That
     is, expand all the previous replies until the passed comment ID.
     """
-    try:
-        model_topic, qs_comments = prev_comments_down(
-            request=request, topic_slug=topic_slug, comment_id=comment_id,
+    template_name = 'default/base/comments-expansion.html'
+
+    def get_context_data(
+            self, topic_slug: str, comment_id: int, scroll_to_id: int) -> dict:
+        'Add data for the template.'
+        context = super().get_context_data(
+            topic_slug=topic_slug, comment_id=comment_id,
             scroll_to_id=scroll_to_id)
-    except HttpResponsePermanentRedirect as exc:
-        return exc.http_response()
-    return render(
-        request=request, template_name='default/base/comments-expansion.html',
-        context={
-            'model_topic': model_topic,
-            'comment_id': comment_id,
-            'qs_comments': qs_comments,
-            'scroll_to_id': scroll_to_id,
-            'listing_mode': 'expandCommentsDown',
-        })
+        model_topic, qs_comments = prev_comments_down(
+            request=self.request, topic_slug=topic_slug, comment_id=comment_id,
+            scroll_to_id=scroll_to_id)
+        context.update(
+            model_topic=model_topic, comment_id=comment_id,
+            qs_comments=qs_comments, scroll_to_id=scroll_to_id,
+            listing_mode='expandCommentsDown')
+        return context
+
+    def get(
+            self, request: WSGIRequest, topic_slug: str,
+            comment_id: int, scroll_to_id: int) -> HttpResponse:
+        'Watch for a redirect exception, redirect when caught.'
+        try:
+            return super().get(
+                request=request, topic_slug=topic_slug, comment_id=comment_id,
+                scroll_to_id=scroll_to_id)
+        except HttpResponsePermanentRedirect as exc:
+            return exc.get_httpresponse()
