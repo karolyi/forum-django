@@ -1,11 +1,8 @@
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models.query import QuerySet
 from django.http.response import HttpResponse
-from django.http.response import \
-    HttpResponseRedirect as DjangoHttpResponsePermanentRedirect
-from django.shortcuts import render
 from django.urls.base import reverse
 from django.views.generic.base import TemplateView
 
