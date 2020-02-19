@@ -2,7 +2,7 @@ from django.conf import settings
 from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib.admin.sites import site
-from django.urls.conf import include
+from django.urls.conf import include, path
 from django.views.i18n import JavaScriptCatalog
 
 from forum.account import urls as urls_account
@@ -33,6 +33,6 @@ if settings.DEBUG:
     # Add debug toolbar
     import debug_toolbar
     urlpatterns += [
-        url(regex=r'^__debug__/', view=include(arg=debug_toolbar.urls))]
+        path(route='__debug__/', view=include(arg=debug_toolbar.urls))]
     urlpatterns += static(
         settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

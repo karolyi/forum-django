@@ -18,7 +18,7 @@ from django_jinja.builtins import DEFAULT_EXTENSIONS
 # Keep this at the beginning, after module imports
 try:
     from forum.settings_override import *  # NOQA
-except ImportError as e:
+except ImportError:
     pass
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -217,10 +217,11 @@ if DEBUG:
         'debug_toolbar',
         # 'debug_panel',
     )
-    MIDDLEWARE += (
+    INTERNAL_IPS = ['127.0.0.1']
+    MIDDLEWARE = (
         'debug_toolbar.middleware.DebugToolbarMiddleware',
         # 'debug_panel.middleware.DebugPanelMiddleware',
-    )
+    ) + MIDDLEWARE
     DEBUG_TOOLBAR_PANELS = [
         'debug_toolbar.panels.versions.VersionsPanel',
         'debug_toolbar.panels.timer.TimerPanel',
@@ -283,5 +284,5 @@ CRXFORUM_CONNECTION = {
 # Keep this at the very bottom of settings.py
 try:
     from forum.settings_override import *  # NOQA
-except ImportError as e:
+except ImportError:
     pass
