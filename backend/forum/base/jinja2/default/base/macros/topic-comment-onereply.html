@@ -11,7 +11,7 @@
         #<span class="comment-number"></span>
     </a>
     {%- else -%}
-    <a href="{{ url('forum:base:topic-comment-listing', topic_slug=comment.topic.slug, comment_id=comment.id) }}" class="to-reply-comment" data-link-to="{{ comment.id }}">
+    <a href="{{ url('forum:base:topic-comment-listing', topic_slug=comment.topic.slug, comment_pk=comment.pk) }}" class="to-reply-comment" data-link-to="{{ comment.pk }}">
         #<span class="comment-number">{{ comment.number }}</span>
     </a>
     {%- endif %}

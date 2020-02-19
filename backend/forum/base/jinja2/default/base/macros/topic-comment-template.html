@@ -3,12 +3,12 @@
 {% from 'default/base/macros/topic-comment-onereply.html' import topic_comment_onereply %}
 
 {% macro topic_comment_template(comment=None, is_template=False, show_invisible=False) -%}
-<section class="card topic-comment-wrapper" data-comment-id="{{ comment.id if not is_template else ''}}" data-topic-slug="{{ comment.topic.slug if not is_template else '' }}">
+<section class="card topic-comment-wrapper" data-comment-id="{{ comment.pk if not is_template else ''}}" data-topic-slug="{{ comment.topic.slug if not is_template else '' }}">
     <div class="card-header">
         <div class="row">
             <div class="col-xs-2 col-sm-1 comment-number-wrapper">
                 {% if not is_template -%}
-                    <a href="{{ url('forum:base:topic-comment-listing', topic_slug=comment.topic.slug, comment_id=comment.id) }}" data-link-to="{{ comment.id }}" class="comment-number">
+                    <a href="{{ url('forum:base:topic-comment-listing', topic_slug=comment.topic.slug, comment_pk=comment.pk) }}" data-link-to="{{ comment.pk }}" class="comment-number">
                         #<span class="comment-number-inside">{{ comment.number }}</span>
                     </a>
                 {%- else -%}
@@ -27,7 +27,7 @@
             {% if not is_template and comment.prev_comment -%}
                 {% set is_prev_comment_visible = is_topic_comment_visible(comment=comment.prev_comment, show_invisible=show_invisible, request=request, cache_key='topic-comment-listing') -%}
                 {% if is_prev_comment_visible -%}
-                    <a href="{{ url('forum:base:topic-comment-listing', topic_slug=comment.prev_comment.topic.slug, comment_id=comment.prev_comment_id) }}" data-link-to="{{ comment.prev_comment_id }}">
+                    <a href="{{ url('forum:base:topic-comment-listing', topic_slug=comment.prev_comment.topic.slug, comment_pk=comment.prev_comment_id) }}" data-link-to="{{ comment.prev_comment_id }}">
                         {{- _('re:&nbsp;#') -}}
                         {{- comment.prev_comment.number -}}
                     </a>

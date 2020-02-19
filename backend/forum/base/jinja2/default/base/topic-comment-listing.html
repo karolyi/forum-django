@@ -22,10 +22,10 @@
             {{ _('Back to topic listing') }}
         </a>
     </section>
-    {% if model_topic.description %}
+    {% if topic.description %}
     <section class="card card-block card-outline-primary" aria-label="{{ _('Topic description') }}">
         <div class="card-text">
-            {{ model_topic.description }}
+            {{ topic.description }}
         </div>
     </section>
     {% endif %}
@@ -37,7 +37,7 @@
 {% jsmin %}
 <script type="text/javascript">
 Forum.topicCommentListing.init({
-    {{ js_config_topic_comment(listing_mode='commentListing', root='.topic-comment-listing-wrapper', comment_id=comment_id, scroll_to_id=scroll_to_id, model_topic=model_topic) }}
+    {{ js_config_topic_comment(listing_mode='commentListing', root='.topic-comment-listing-wrapper', comment_pk=comment_pk, scroll_to_pk=scroll_to_pk, topic=topic) }}
 })
 </script>
 {% endjsmin %}

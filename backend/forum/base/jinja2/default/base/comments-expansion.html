@@ -51,7 +51,7 @@
 {% jsmin %}
 <script type="text/javascript">
 Forum.topicCommentsExpansion.init({
-    {{ js_config_topic_comment(listing_mode=listing_mode, root='.topic-comment-expansion-wrapper', comment_id=comment_id, scroll_to_id=scroll_to_id, model_topic=model_topic) }}
+    {{ js_config_topic_comment(listing_mode=listing_mode, root='.topic-comment-expansion-wrapper', comment_pk=comment_pk, scroll_to_pk=scroll_to_pk, topic=topic) }}
 })
 </script>
 {% endjsmin %}

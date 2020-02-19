@@ -1,4 +1,4 @@
-{% macro js_config_topic_comment(listing_mode='commentListing', root='', comment_id=None, scroll_to_id=None, model_topic=None) -%}
+{% macro js_config_topic_comment(listing_mode='commentListing', root='', comment_pk=None, scroll_to_pk=None, topic=None) -%}
     selectors: {
         root: '{{ root }}',
         template: {
@@ -20,30 +20,30 @@
         }
     },
     highlightedClass: 'is-highlighted',
-    topicSlugOriginal: '{{ model_topic.slug }}',
-    commentId: {{ comment_id|default('null') }},
-    scrollToId: {{ scroll_to_id|default('null') }},
+    topicSlugOriginal: '{{ topic.slug }}',
+    commentId: {{ comment_pk|default('null') }},
+    scrollToId: {{ scroll_to_pk|default('null') }},
     listingMode: '{{ listing_mode|default('commentListing') }}',
     urls: {
         commentListing: {
-            backend: '{{ url('forum:base:topic-comment-listing', topic_slug='example-slug', comment_id=12345) }}',
+            backend: '{{ url('forum:base:topic-comment-listing', topic_slug='example-slug', comment_pk=12345) }}',
             exampleSlug: 'example-slug',
             commentId: '12345'
         },
         expandCommentsUpRecursive: {
-            backend: '{{ url('forum:base:comments-up-recursive', topic_slug='example-slug', comment_id=12345, scroll_to_id=67890) }}',
+            backend: '{{ url('forum:base:comments-up-recursive', topic_slug='example-slug', comment_pk=12345, scroll_to_pk=67890) }}',
             exampleSlug: 'example-slug',
             commentId: '12345',
             scrollToId: '67890'
         },
         expandCommentsUp: {
-            backend: '{{ url('forum:base:comments-up', topic_slug='example-slug', comment_id=12345, scroll_to_id=67890) }}',
+            backend: '{{ url('forum:base:comments-up', topic_slug='example-slug', comment_pk=12345, scroll_to_pk=67890) }}',
             exampleSlug: 'example-slug',
             commentId: '12345',
             scrollToId: '67890'
         },
         expandCommentsDown: {
-            backend: '{{ url('forum:base:comments-down', topic_slug='example-slug', comment_id=12345, scroll_to_id=67890) }}',
+            backend: '{{ url('forum:base:comments-down', topic_slug='example-slug', comment_pk=12345, scroll_to_pk=67890) }}',
             exampleSlug: 'example-slug',
             commentId: '12345',
             scrollToId: '67890'

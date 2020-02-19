@@ -8,8 +8,10 @@ from django.db.models.fields import (
     IntegerField, PositiveIntegerField, SmallIntegerField, TextField)
 from django.db.models.fields.related import (
     ForeignKey, ManyToManyField, OneToOneField)
+from django.db.models.indexes import Index
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
+
 from forum.utils import slugify
 
 from .choices import COMMENT_VOTE_HIDE_CHOICES, TOPIC_TYPE_CHOICES
@@ -19,11 +21,6 @@ class User(AbstractUser):
     """
     An object representing the user's settings.
     """
-
-    class Meta:
-        verbose_name = _('User setting')
-        verbose_name_plural = _('User settings')
-        ordering = ['username']
 
     slug = AutoSlugField(
         verbose_name=_('Slug of the user'), max_length=50, unique=True,
@@ -150,6 +147,11 @@ class User(AbstractUser):
         'forum_cdn.Image',
         verbose_name=_('Images in this user\'s descriptions'))
 
+    class Meta:
+        verbose_name = _('User setting')
+        verbose_name_plural = _('User settings')
+        ordering = ['username']
+
 
 User.ignored_users.through.__str__ = \
     lambda x: '{from_u} ignores {to_u}'.format(
@@ -161,12 +163,6 @@ User.friended_users.through.__str__ = \
 
 class Topic(Model):
     'Essential topic class.'
-
-    class Meta(object):
-        ordering = ['-last_comment__time', 'name_text']
-
-    def __str__(self):
-        return self.name_text
 
     slug = AutoSlugField(
         verbose_name=_('Slug'), null=False, max_length=100,
@@ -199,6 +195,14 @@ class Topic(Model):
     images = ManyToManyField(
         'forum_cdn.Image', verbose_name=_('Images in this topic description'))
 
+    class Meta(object):
+        verbose_name = _('Topic')
+        verbose_name_plural = _('Topics')
+        ordering = ['-last_comment__time', 'name_text']
+
+    def __str__(self):
+        return self.name_text
+
 
 class Comment(Model):
     """
@@ -208,17 +212,6 @@ class Comment(Model):
     IPs from hostnames, we store it. It was stored in the previous
     version like that.
     """
-
-    class Meta(object):
-        ordering = ('-time',)
-        index_together = (
-            ('topic', 'time'),
-        )
-
-    def __str__(self):
-        return str(_(
-            '#{number} of \'{topic}\' (ID {id})'.format(
-                number=self.number, topic=self.topic, id=self.id)))
 
     user = ForeignKey(
         to=User, on_delete=CASCADE, verbose_name=_('The commenter user'))
@@ -251,6 +244,19 @@ class Comment(Model):
     images = ManyToManyField(
         'forum_cdn.Image', verbose_name=_('Images in this comment'))
 
+    class Meta(object):
+        verbose_name = _('Comment')
+        verbose_name_plural = _('Comments')
+        ordering = ('-time',)
+        indexes = [
+            Index(fields=('topic', 'time'), name='topic-time'),
+        ]
+
+    def __str__(self):
+        return str(_(
+            '#{number} of \'{topic}\' (ID {id})'.format(
+                number=self.number, topic=self.topic, id=self.id)))
+
 
 class Edit(Model):
     'Comment edits.'
@@ -278,13 +284,6 @@ class IntroductionModification(Model):
     Until that happens, this model stores the changes.
     """
 
-    class Meta:
-        verbose_name = _('Settings modification')
-        verbose_name_plural = _('Settings modifications')
-
-    def __str__(self):
-        return str(self.user)
-
     user = OneToOneField(
         to=User, on_delete=CASCADE, verbose_name=_('Respective user'))
     quote = CharField(
@@ -305,13 +304,26 @@ class IntroductionModification(Model):
         'forum_cdn.Image',
         verbose_name=_('Images in this user\'s descriptions'))
 
+    class Meta:
+        verbose_name = _('Introduction modification')
+        verbose_name_plural = _('Introduction modifications')
+
+    def __str__(self):
+        return str(self.user)
+
 
 class CommentBookmark(Model):
-
     """
     A set bookmark for a comment object. A bookmark notes where the user
     left off reading comments the last time.
     """
+
+    user = ForeignKey(to=User, on_delete=CASCADE, verbose_name=_('User'))
+    topic = ForeignKey(to=Topic, on_delete=CASCADE, verbose_name=_('Topic'))
+    comment = ForeignKey(
+        to=Comment, on_delete=CASCADE, verbose_name=_('Comment'))
+    last_updated_at = DateTimeField(
+        auto_now=True, verbose_name=_('Last updated at'))
 
     class Meta(object):
         verbose_name = _('Comment bookmark')
@@ -324,13 +336,6 @@ class CommentBookmark(Model):
             'topic': self.topic,
             'user': self.user
         })
-
-    user = ForeignKey(to=User, on_delete=CASCADE, verbose_name=_('User'))
-    topic = ForeignKey(to=Topic, on_delete=CASCADE, verbose_name=_('Topic'))
-    comment = ForeignKey(
-        to=Comment, on_delete=CASCADE, verbose_name=_('Comment'))
-    last_updated_at = DateTimeField(
-        auto_now=True, verbose_name=_('Last updated at'))
 
 
 COMMENTS_QS = Comment.objects.select_related(
