@@ -8,10 +8,10 @@
         <div class="row">
             <div class="col-xs-2 col-sm-1 comment-number-wrapper">
                 {% if not is_template -%}
-{#                     <a href="{{ url('forum:base:topic-comment-listing', topic_slug=comment.topic.slug, comment_pk=comment.pk) }}" data-link-to="{{ comment.pk }}" class="comment-number">
+                    <a href="{{ url('forum:base:topic-comment-listing', topic_slug=comment.topic.slug, comment_pk=comment.pk) }}" data-link-to="{{ comment.pk }}" class="comment-number">
                         #<span class="comment-number-inside">{{ comment.number }}</span>
                     </a>
- #}                {%- else -%}
+                {%- else -%}
                     <a href="" data-link-to="" class="comment-number">
                         #<span class="comment-number-inside"></span>
                     </a>

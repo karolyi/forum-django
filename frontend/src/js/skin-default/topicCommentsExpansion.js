@@ -1,4 +1,3 @@
-/* global interpolate */
 import { CommentListing } from './topicCommentListing'
 
 const $ = require('jquery')
@@ -22,7 +21,7 @@ class CommentsExpansion extends CommentListing {
     const constructedPath = this.constructPathFromData(
       this.options.topicSlugOriginal, this.options.commentId, commentIdLinked,
     )
-    history.pushState({}, null, constructedPath)
+    window.history.pushState({}, null, constructedPath)
     this.scrollFix.scrollTo(commentIdLinked)
   }
 

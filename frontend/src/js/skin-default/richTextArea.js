@@ -121,7 +121,8 @@ export class Instance {
     if (data.responseJSON && data.responseJSON.message) {
       errorText = data.responseJSON.message
     }
-    const errorStrFormatted = interpolate(errorStr, { errorText: escapeHtml(errorText) }, true)
+    const errorStrFormatted =
+      interpolate(errorStr, { errorText: escapeHtml(errorText) }, true)
     this.jqPreviewWrapper.html(
       '<span class="text-danger">' +
       '<i class="fa fa-exclamation-triangle"></i> ' +

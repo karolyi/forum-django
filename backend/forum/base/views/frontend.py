@@ -68,7 +68,7 @@ class TopicCommentListingView(CommentListViewBase):
         if not self.request.user.is_staff and \
                 not self.request.user.is_superuser:
             search_kwargs_topic['is_staff_only'] = False
-        if not Topic.objects.get(**search_kwargs_topic).exists():
+        if not Topic.objects.filter(**search_kwargs_topic).exists():
             raise Http404
 
     @cached_property
@@ -81,7 +81,7 @@ class TopicCommentListingView(CommentListViewBase):
             settings.PAGINATOR_MAX_COMMENTS_LISTED
         return settings.PAGINATOR_MAX_COMMENTS_LISTED
 
-    def _get_comment_pageid(self, qs_comments: QuerySet) -> int:
+    def _get_pageid(self, qs_comments: QuerySet) -> int:
         """
         Get a page number for a given comment ID, so that we can display
         it on the right page.
@@ -91,7 +91,10 @@ class TopicCommentListingView(CommentListViewBase):
         """
         comment_pk = self.kwargs.get('comment_pk')
         if not comment_pk:
-            return 1
+            try:
+                return int(self.request.GET.get('page'))
+            except (TypeError, ValueError):
+                return 1
         try:
             comment = \
                 qs_comments.only('time').get(id=comment_pk)  # type: Comment
@@ -115,9 +118,9 @@ class TopicCommentListingView(CommentListViewBase):
             kwargs_comment.update(topic__slug=comment.topic.slug)
         else:
             self._check_topic_readable()
-            kwargs_comment = dict(topic__slug=self.kwargs['topic__slug'])
+            kwargs_comment = dict(topic__slug=self.kwargs['topic_slug'])
         qs_comments = COMMENTS_QS.with_cache().filter(**kwargs_comment)
-        page_id = self._get_comment_pageid(qs_comments=qs_comments)
+        page_id = self._get_pageid(qs_comments=qs_comments)
         paginator = Paginator(
             object_list=qs_comments, per_page=self.comments_per_page)
         return paginator.page(number=page_id)

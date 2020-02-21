@@ -291,7 +291,7 @@ class CommentQuerySet(QuerySet):
                 comment.user = users_by_pk[comment.user_id]
             if self._fetch_cache.do_topic:
                 comment.topic = topics_by_pk[comment.topic_id]
-            if comment.pk in self._reply_pks:
+            if self._fetch_cache.do_reply_set:
                 self._set_replyset(comment=comment)
             if comment.pk not in self._my_pks:
                 continue
