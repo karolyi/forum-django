@@ -238,6 +238,10 @@ if DEBUG:
         'debug_toolbar.panels.redirects.RedirectsPanel',
     ]
 
+SHELL_PLUS_PYGMENTS_FORMATTER_KWARGS = dict(bg='dark')
+# Truncate sql queries to this number of characters
+SHELL_PLUS_PRINT_SQL_TRUNCATE = 10000
+
 TMP_DIR = os.path.realpath(os.path.join(DIR_BACKEND, 'tmp'))
 if not os.path.exists(TMP_DIR):
     os.mkdir(TMP_DIR)

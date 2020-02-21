@@ -58,22 +58,18 @@ class TopicCommentListingView(CommentListViewBase):
             raise HttpResponsePermanentRedirect(url=url)
         return comment, search_kwargs_comment
 
-    def _get_qs_comment_kwargs(self) -> Dict:
+    def _check_topic_readable(self):
         """
-        Return the `Comment` filter `QuerySet` keyword arguments when a
-        `comment_pk` is not specified, with checking the topic.
+        Check if the requested `Topic` exists and is readable to the
+        requesting user, raise `Http404` if not.
         """
         search_kwargs_topic = \
             dict(slug=self.kwargs['topic_slug'], is_enabled=True)
         if not self.request.user.is_staff and \
                 not self.request.user.is_superuser:
             search_kwargs_topic['is_staff_only'] = False
-        try:
-            topic = Topic.objects.get(**search_kwargs_topic)
-        except Topic.DoesNotExist:
+        if not Topic.objects.get(**search_kwargs_topic).exists():
             raise Http404
-        search_kwargs_comment = dict(topic=topic)
-        return search_kwargs_comment
 
     @cached_property
     def comments_per_page(self):
@@ -93,9 +89,12 @@ class TopicCommentListingView(CommentListViewBase):
         Return the page ID, raise `Http404` if the comment doesn't
         exist.
         """
+        comment_pk = self.kwargs.get('comment_pk')
+        if not comment_pk:
+            return 1
         try:
             comment = \
-                qs_comments.get(id=self.kwargs['comment_pk'])  # type: Comment
+                qs_comments.only('time').get(id=comment_pk)  # type: Comment
         except Comment.DoesNotExist:
             # This comment does not exist here
             raise Http404
@@ -103,7 +102,7 @@ class TopicCommentListingView(CommentListViewBase):
         page_id = amount_newer // self.comments_per_page + 1
         return page_id
 
-    def _list_comments(self) -> Tuple[Topic, Page]:
+    def _list_comments(self) -> Page:
         """
         List a topic page with comments.
 
@@ -112,32 +111,26 @@ class TopicCommentListingView(CommentListViewBase):
         """
         comment_pk = self.kwargs.get('comment_pk')
         if comment_pk:
-            comment, search_kwargs_comment = self._sanitize_topicname()
-            search_kwargs_comment.update(topic=comment.topic)
-            topic = comment.topic
+            comment, kwargs_comment = self._sanitize_topicname()
+            kwargs_comment.update(topic__slug=comment.topic.slug)
         else:
-            search_kwargs_comment = self._get_qs_comment_kwargs()
-            topic = search_kwargs_comment['topic']
-        qs_comments = COMMENTS_QS.filter(
-            **search_kwargs_comment).order_by('-time')
-        page_id = 1
-        if comment_pk:
-            page_id = self._get_comment_pageid(qs_comments=qs_comments)
-        if not qs_comments.exists():
-            raise Http404
+            self._check_topic_readable()
+            kwargs_comment = dict(topic__slug=self.kwargs['topic__slug'])
+        qs_comments = COMMENTS_QS.with_cache().filter(**kwargs_comment)
+        page_id = self._get_comment_pageid(qs_comments=qs_comments)
         paginator = Paginator(
             object_list=qs_comments, per_page=self.comments_per_page)
-        return topic, paginator.page(number=page_id)
+        return paginator.page(number=page_id)
 
     def get_context_data(
             self, topic_slug: str, comment_pk: Optional[int] = None) -> dict:
-        'Fill the context fit topic data.'
+        'Fill the context with the topic data.'
         context = super().get_context_data(
             topic_slug=topic_slug, comment_pk=comment_pk)
-        topic, page_comments = self._list_comments()
+        page_comments = self._list_comments()
         context.update(
-            page_comments=page_comments, topic=topic,
-            comment_pk=comment_pk)
+            page_comments=page_comments,
+            topic=page_comments.object_list[0].topic, comment_pk=comment_pk)
         return context
 
     def get(

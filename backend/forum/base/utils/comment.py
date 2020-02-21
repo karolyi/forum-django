@@ -16,9 +16,10 @@ class CommentListViewBase(TemplateView):
 
         Raise Http404 if not.
 
-        Return the :model:`forum_base.Comment` for further evaluation,
-        and the extra kwargs for the comment selection query (don't
-        display comments that are in a topic not visible to the user).
+        Return the :model:`forum_base.Comment` for further evaluation
+        with only `topic.slug`(!) set, and the extra kwargs for the
+        comment selection query (don't display comments that are in a
+        topic not visible to the user).
         """
         search_kwargs_comment = dict(pk=comment_pk, topic__is_enabled=True)
         if not self.request.user.is_staff and \
@@ -26,9 +27,9 @@ class CommentListViewBase(TemplateView):
             # Filter for only non-staff topics
             search_kwargs_comment['topic__is_staff_only'] = False
         try:
-            model_comment = Comment.objects.select_related(
-                'topic').only('pk', 'topic__slug').get(**search_kwargs_comment)
+            comment = Comment.objects.only(
+                'pk', 'topic__slug').get(**search_kwargs_comment)
         except Comment.DoesNotExist:
             raise Http404
         del search_kwargs_comment['pk']
-        return model_comment, search_kwargs_comment
+        return comment, search_kwargs_comment

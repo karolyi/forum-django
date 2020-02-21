@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Tuple
+from collections import defaultdict, namedtuple
+from operator import attrgetter
 
 from django.contrib.auth.models import AbstractUser
 from django.db.models.base import Model
@@ -13,12 +14,18 @@ from django.db.models.fields.related import (
 from django.db.models.indexes import Index
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
 
 from forum.utils import slugify
+from forum.utils.djtools.query_cache import (
+    is_queryresult_loaded, set_prefetch_cache, set_queryresult)
 
 from .choices import COMMENT_VOTE_HIDE_CHOICES, TOPIC_TYPE_CHOICES
+
+CommentFetchCache = namedtuple(typename='CommentFetchCache', field_names=[
+    'do_user', 'do_topic', 'do_prev_comment', 'do_reply_set'])
 
 
 class User(AbstractUser):
@@ -210,55 +217,133 @@ class Topic(Model):
 
 class CommentQuerySet(QuerySet):
     'Extending the base `QuerySet` with caching capabilities.'
+    _comment_default_sort_key = attrgetter('time')
+    _fetch_cache = CommentFetchCache(
+        do_user=False, do_topic=False, do_prev_comment=False,
+        do_reply_set=False)
 
-    def _handle_prev_comment(
-            self, item: dict, user: bool, topic: bool, extra_pks: set,
-            user_pks: set, topic_pks: set):
+    def _handle_prev_comment(self, item: dict):
         'Handle the `prev_comment` part of the comment item.'
         if not item['prev_comment']:
             return
-        extra_pks.add(item['prev_comment'])
-        if user:
-            user_pks.add(item['prev_comment__user'])
-        if topic:
-            topic_pks.add(item['prev_comment__topic'])
+        self._extra_pks.add(item['prev_comment'])
+        if self._fetch_cache.do_user:
+            self._user_pks.add(item['prev_comment__user'])
+        if self._fetch_cache.do_topic:
+            self._topic_pks.add(item['prev_comment__topic'])
 
-    def _handle_reply_set(
-            self, item: dict, user: bool, topic: bool, extra_pks: set,
-            user_pks: set, topic_pks: set):
+    def _handle_reply_set(self, item: dict):
         'Handle the `reply_set` part of the comment item.'
         if not item['reply_set']:
             return
-        extra_pks.add(item['reply_set'])
-        if user:
-            user_pks.add(item['reply_set__user'])
-        if topic:
-            topic_pks.add(item['reply_set__topic'])
+        self._extra_pks.add(item['reply_set'])
+        self._reply_pks[item['pk']].add(item['reply_set'])
+        if self._fetch_cache.do_user:
+            self._user_pks.add(item['reply_set__user'])
+        if self._fetch_cache.do_topic:
+            self._topic_pks.add(item['reply_set__topic'])
 
-    def _get_pksets(
-        self, qs: CommentQuerySet, user: bool, topic: bool, prev_comment: bool,
-        reply_set: bool
-    ) -> Tuple[set, set, set, set]:
-        'Return the filled PK sets for fetching.'
-        my_pks = set()
-        extra_pks = set()
-        user_pks = set()
-        topic_pks = set()
-        for item in qs:
-            my_pks.add(item['pk'])
-            if user:
-                user_pks.add(item['user'])
-            if topic:
-                topic_pks.add(item['topic'])
-            if prev_comment:
-                self._handle_prev_comment(
-                    item=item, user=user, topic=topic, extra_pks=extra_pks,
-                    user_pks=user_pks, topic_pks=topic_pks)
-            if reply_set:
-                self._handle_reply_set(
-                    item=item, user=user, topic=topic, extra_pks=extra_pks,
-                    user_pks=user_pks, topic_pks=topic_pks)
-        return my_pks, extra_pks, user_pks, topic_pks
+    def _set_pksets(self):
+        'Set & fill the PK sets for fetching.'
+        qs1 = self.values_list('pk', flat=True)
+        self._my_pks = set(qs1._iterable_class(qs1))
+        qs = Comment.objects.filter(pk__in=self._my_pks).values(
+            'pk', 'user', 'topic', 'prev_comment', 'prev_comment__user',
+            'prev_comment__topic', 'reply_set', 'reply_set__user',
+            'reply_set__topic')
+        self._extra_pks = set()
+        self._user_pks = set()
+        self._topic_pks = set()
+        self._reply_pks = defaultdict(set)
+        for item in qs._iterable_class(qs):
+            if self._fetch_cache.do_user:
+                self._user_pks.add(item['user'])
+            if self._fetch_cache.do_topic:
+                self._topic_pks.add(item['topic'])
+            if self._fetch_cache.do_prev_comment:
+                self._handle_prev_comment(item=item)
+            if self._fetch_cache.do_reply_set:
+                self._handle_reply_set(item=item)
+        self._all_pks = self._my_pks | self._extra_pks
+
+    def _set_replyset(self, comment: Comment):
+        'Set replies on the `Comment` from cached data when it has any.'
+        reply_qs = comment.reply_set.all()
+        reply_set_result = sorted(
+            (self._comments_by_pk[x] for x in self._reply_pks[comment.pk]),
+            key=self._comment_default_sort_key, reverse=True)
+        set_queryresult(
+            qs=reply_qs, result=reply_set_result, override=True)
+        set_prefetch_cache(
+            relation=comment.reply_set, queryset=reply_qs, override=True)
+
+    def _set_comment_caches(self):
+        'Prefill the caches on the `CommentQuerySet`.'
+        self._comments_by_pk = {x.pk: x for x in self._comments}
+        users_by_pk = {x.pk: x for x in self._users}
+        topics_by_pk = {x.pk: x for x in self._topics}
+        self._result_cache = list()
+        for comment in self._comments:  # type: Comment
+            if comment.prev_comment_id in self._all_pks:
+                comment.prev_comment = \
+                    self._comments_by_pk[comment.prev_comment_id]
+            if self._fetch_cache.do_user:
+                comment.user = users_by_pk[comment.user_id]
+            if self._fetch_cache.do_topic:
+                comment.topic = topics_by_pk[comment.topic_id]
+            if comment.pk in self._reply_pks:
+                self._set_replyset(comment=comment)
+            if comment.pk not in self._my_pks:
+                continue
+            self._result_cache.append(comment)
+
+    @cached_property
+    def _prefetch_ignores(self) -> set:
+        'Return a set of prefetch values that will need to be ignored.'
+        result = set()
+        if self._fetch_cache.do_prev_comment:
+            result.add('prev_comment')
+            if self._fetch_cache.do_user:
+                result.add('prev_comment__user')
+            if self._fetch_cache.do_topic:
+                result.add('prev_comment__topic')
+        if self._fetch_cache.do_reply_set:
+            result.add('reply_set')
+            if self._fetch_cache.do_user:
+                result.add('reply_set__user')
+            if self._fetch_cache.do_topic:
+                result.add('reply_set__topic')
+        if self._fetch_cache.do_user:
+            result.add('user')
+        if self._fetch_cache.do_topic:
+            result.add('topic')
+        return result
+
+    def _fetch_all(self):
+        'Fetch and cache the results when requested.'
+        if not any(self._fetch_cache):
+            return super()._fetch_all()
+        elif is_queryresult_loaded(qs=self):
+            # In case the iterator arrives here from _set_pksets()
+            return
+        self._set_pksets()
+        self._users = User.objects.filter(pk__in=self._user_pks)
+        self._topics = Topic.objects.filter(pk__in=self._topic_pks)
+        self._comments = Comment.objects.filter(
+            pk__in=self._all_pks).order_by(*self.query.order_by)
+        self._set_comment_caches()
+        if self._prefetch_related_lookups and not self._prefetch_done:
+            self._prefetch_related_lookups = tuple(
+                x for x in self._prefetch_related_lookups
+                if x not in self._prefetch_ignores)
+            if self._prefetch_related_lookups:
+                self._prefetch_related_objects()
+
+    def _chain(self, **kwargs) -> CommentQuerySet:
+        'Return a new `CommentQuerySet` with the copied cache settings.'
+        if '_fetch_cache' not in kwargs:
+            kwargs.update(_fetch_cache=self._fetch_cache)
+        return super()._chain(**kwargs)
 
     def with_cache(
         self, user: bool = True, topic: bool = True, prev_comment: bool = True,
@@ -268,18 +353,14 @@ class CommentQuerySet(QuerySet):
         Return a `QuerySet` loaded with the requested related relations
         on the `Comment`s. Use this as the last part of your query.
         """
-        qs = self.values(
-            'pk', 'user', 'topic', 'prev_comment', 'prev_comment__user',
-            'prev_comment__topic', 'reply_set', 'reply_set__user',
-            'reply_set__topic')
-        my_pks, extra_pks, user_pks, topic_pks = self._get_pksets(
-            qs=qs, user=user, topic=topic, prev_comment=prev_comment,
-            reply_set=reply_set)
-        users = User.objects.filter(pk__in=user_pks)
-        topics = Topic.objects.filter(pk__in=topic_pks)
-        comments = Comment.objects.filter(pk__in=my_pks + extra_pks)
-        # TODO: Continue here
-
+        return self._chain(_fetch_cache=CommentFetchCache(
+            do_user=user if user is not None else self._fetch_cache.do_user,
+            do_topic=(
+                topic if topic is not None else self._fetch_cache.do_topic),
+            do_prev_comment=prev_comment if prev_comment is not None
+            else self._fetch_cache.do_prev_comment,
+            do_reply_set=reply_set if reply_set is not None
+            else self._fetch_cache.do_reply_set))
 
 
 class Comment(Model):
