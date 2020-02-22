@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import defaultdict, namedtuple
 from operator import attrgetter
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, AnonymousUser
 from django.db.models.base import Model
 from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
 from django.db.models.fields import (
@@ -163,6 +163,11 @@ class User(AbstractUser):
         verbose_name_plural = _('User settings')
         ordering = ['username']
 
+    @cached_property
+    def can_view_staff_topic(self) -> bool:
+        'Return `True` if the user can view staff only `Topic`s.'
+        return self.is_staff or self.is_superuser
+
 
 User.ignored_users.through.__str__ = \
     lambda x: '{from_u} ignores {to_u}'.format(
@@ -247,7 +252,7 @@ class CommentQuerySet(QuerySet):
         'Set & fill the PK sets for fetching.'
         qs1 = self.values_list('pk', flat=True)
         self._my_pks = set(qs1._iterable_class(qs1))
-        qs = Comment.objects.filter(pk__in=self._my_pks).values(
+        qs = Comment.objects.filter(pk__in=self._my_pks).order_by().values(
             'pk', 'user', 'topic', 'prev_comment', 'prev_comment__user',
             'prev_comment__topic', 'reply_set', 'reply_set__user',
             'reply_set__topic')
@@ -269,9 +274,8 @@ class CommentQuerySet(QuerySet):
     def _set_replyset(self, comment: Comment):
         'Set replies on the `Comment` from cached data when it has any.'
         reply_qs = comment.reply_set.all()
-        reply_set_result = sorted(
-            (self._comments_by_pk[x] for x in self._reply_pks[comment.pk]),
-            key=self._comment_default_sort_key, reverse=True)
+        reply_set_result = list(
+            self._comments_by_pk[x] for x in self._reply_pks[comment.pk])
         set_queryresult(
             qs=reply_qs, result=reply_set_result, override=True)
         set_prefetch_cache(
@@ -280,8 +284,8 @@ class CommentQuerySet(QuerySet):
     def _set_comment_caches(self):
         'Prefill the caches on the `CommentQuerySet`.'
         self._comments_by_pk = {x.pk: x for x in self._comments}
-        users_by_pk = {x.pk: x for x in self._users}
-        topics_by_pk = {x.pk: x for x in self._topics}
+        self._users_by_pk = users_by_pk = {x.pk: x for x in self._users}
+        self._topics_by_pk = topics_by_pk = {x.pk: x for x in self._topics}
         self._result_cache = list()
         for comment in self._comments:  # type: Comment
             if comment.prev_comment_id in self._all_pks:
@@ -327,10 +331,9 @@ class CommentQuerySet(QuerySet):
             # In case the iterator arrives here from _set_pksets()
             return
         self._set_pksets()
-        self._users = User.objects.filter(pk__in=self._user_pks)
-        self._topics = Topic.objects.filter(pk__in=self._topic_pks)
-        self._comments = Comment.objects.filter(
-            pk__in=self._all_pks)
+        self._users = User.objects.filter(pk__in=self._user_pks).order_by()
+        self._topics = Topic.objects.filter(pk__in=self._topic_pks).order_by()
+        self._comments = Comment.objects.filter(pk__in=self._all_pks)
         if self.query.order_by:
             self._comments = self._comments.order_by(*self.query.order_by)
         self._set_comment_caches()
@@ -517,3 +520,4 @@ class CommentBookmark(Model):
 # ).prefetch_related('reply_set', 'reply_set__user', 'reply_set__topic')
 
 COMMENTS_QS = Comment.objects
+AnonymousUser.can_view_staff_topic = False

@@ -2,7 +2,7 @@ from typing import Dict, Optional, Tuple
 
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
-from django.core.paginator import Page, Paginator, EmptyPage
+from django.core.paginator import EmptyPage, Page, Paginator
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.http.response import Http404, HttpResponse
@@ -41,34 +41,40 @@ class TopicListView(TemplateView):
 class TopicCommentListingView(CommentListViewBase):
     'List comments in a certain topic.'
 
+    _referred_topic_pk: int = None
     template_name = 'default/base/topic-comment-listing.html'
 
-    def _sanitize_topicname(self) -> Tuple[Comment, Dict]:
+    def _sanitize_comment(self) -> Dict:
         """
         Call the `super()` of this and redirect the browser to the
-        `Comment`'s current topic if it has changed meanwhile.
+        `Comment`'s current `Topic` if it has changed meanwhile.
         """
-        comment, search_kwargs_comment = \
-            super()._sanitize_topicname(comment_pk=self.kwargs['comment_pk'])
-        if comment.topic.slug != self.kwargs['topic_slug']:
+        kwargs_comment = \
+            super()._sanitize_comment(pk=self.kwargs['comment_pk'])
+        if self._referred_comment.topic.slug != self.kwargs['topic_slug']:
             url = reverse(
                 viewname='forum:base:topic-comment-listing', kwargs=dict(
-                    topic_slug=comment.topic.slug,
-                    comment_id=comment.pk))
+                    topic_slug=self._referred_comment.topic.slug,
+                    comment_pk=self._referred_comment.pk))
             raise HttpResponsePermanentRedirect(url=url)
-        return comment, search_kwargs_comment
+        self._referred_topic_pk = self._referred_comment.topic_id
+        return kwargs_comment
 
-    def _check_topic_readable(self):
+    def _check_topic_readable(self) -> dict:
         """
         Check if the requested `Topic` exists and is readable to the
         requesting user, raise `Http404` if not.
+
+        Return the keyword arguments for `Comment` filtering.
         """
-        search_kwargs_topic = \
-            dict(slug=self.kwargs['topic_slug'], is_enabled=True)
-        if not self.request.user.is_staff and \
-                not self.request.user.is_superuser:
-            search_kwargs_topic['is_staff_only'] = False
-        if not Topic.objects.filter(**search_kwargs_topic).exists():
+        kwargs_topic = dict(slug=self.kwargs['topic_slug'], is_enabled=True)
+        if not self.request.user.can_view_staff_topic:
+            kwargs_topic['is_staff_only'] = False
+        try:
+            self._referred_topic_pk = \
+                Topic.objects.filter(**kwargs_topic).values('pk')[0]['pk']
+            return dict(topic_id=self._referred_topic_pk)
+        except IndexError:
             raise Http404
 
     @cached_property
@@ -95,13 +101,8 @@ class TopicCommentListingView(CommentListViewBase):
             except (TypeError, ValueError):
                 self._page_id = 1
             return
-        try:
-            comment = \
-                qs_comments.only('time').get(id=comment_pk)  # type: Comment
-        except Comment.DoesNotExist:
-            # This comment does not exist here
-            raise Http404
-        amount_newer = qs_comments.filter(time__gt=comment.time).count()
+        amount_newer = \
+            qs_comments.filter(time__gt=self._referred_comment.time).count()
         self._page_id = amount_newer // self.comments_per_page + 1
 
     def _list_comments(self) -> Page:
@@ -112,12 +113,8 @@ class TopicCommentListingView(CommentListViewBase):
         `comment_id`.
         """
         comment_pk = self.kwargs.get('comment_pk')
-        if comment_pk:
-            comment, kwargs_comment = self._sanitize_topicname()
-            kwargs_comment.update(topic__slug=comment.topic.slug)
-        else:
-            self._check_topic_readable()
-            kwargs_comment = dict(topic__slug=self.kwargs['topic_slug'])
+        kwargs_comment = self._sanitize_comment() \
+            if comment_pk else self._check_topic_readable()
         qs_comments = COMMENTS_QS.with_cache().filter(**kwargs_comment)
         self._set_pageid(qs_comments=qs_comments)
         paginator = Paginator(
@@ -125,7 +122,7 @@ class TopicCommentListingView(CommentListViewBase):
         try:
             return paginator.page(number=self._page_id)
         except EmptyPage:
-            return paginator.page(number=1)
+            raise Http404
 
     def get_context_data(
             self, topic_slug: str, comment_pk: Optional[int] = None) -> dict:
@@ -135,9 +132,11 @@ class TopicCommentListingView(CommentListViewBase):
         page_comments = self._list_comments()
         # Load the CommentQuerySet
         bool(page_comments.object_list)
+        topic = \
+            page_comments.object_list._topics_by_pk[self._referred_topic_pk]
         context.update(
             page_comments=page_comments, page_id=self._page_id,
-            topic=page_comments.object_list[0].topic, comment_pk=comment_pk)
+            topic=topic, comment_pk=comment_pk)
         return context
 
     def get(
@@ -154,13 +153,13 @@ class TopicCommentListingView(CommentListViewBase):
 class TopicExpandRepliesUpRecursive(CommentListViewBase):
     'Expand replies in a topic from a starting comment upwards.'
 
-    def _sanitize_topicname(self) -> Tuple[Comment, Dict]:
+    def _sanitize_comment(self) -> Tuple[Comment, Dict]:
         """
         Call the `super()` of this and redirect the browser to the
         `Comment`'s current topic if it has changed meanwhile.
         """
-        comment, search_kwargs_comment = super()._sanitize_topicname(
-            comment_pk=self.kwargs['comment_pk'])
+        comment, search_kwargs_comment = super()._sanitize_comment(
+            pk=self.kwargs['comment_pk'])
         if comment.topic.slug != self.kwargs['topic_slug']:
             raise HttpResponsePermanentRedirect(url=reverse(
                 viewname='forum:base:comments-up-recursive', kwargs=dict(
@@ -170,7 +169,7 @@ class TopicExpandRepliesUpRecursive(CommentListViewBase):
 
     def _collect_expanded_comments(self) -> Tuple[Topic, QuerySet]:
         'Collect and return expanded comments.'
-        comment, search_kwargs_comment = self._sanitize_topicname()
+        comment, search_kwargs_comment = self._sanitize_comment()
         comment_pks = set([comment.pk])
         iteration_pks = set([comment.pk])
         while True:
@@ -217,13 +216,13 @@ class TopicExpandCommentsUpView(CommentListViewBase):
     """
     template_name = 'default/base/comments-expansion.html'
 
-    def _sanitize_topicname(self) -> Tuple[Comment, Dict]:
+    def _sanitize_comment(self) -> Tuple[Comment, Dict]:
         """
         Call the `super()` of this and redirect the browser to the
         `Comment`'s current topic if it has changed meanwhile.
         """
         comment, search_kwargs_comment = \
-            super()._sanitize_topicname(comment_pk=self.kwargs['comment_pk'])
+            super()._sanitize_comment(pk=self.kwargs['comment_pk'])
         if comment.topic.slug != self.kwargs['topic_slug']:
             url = reverse(
                 viewname='forum:base:comments-up', kwargs=dict(
@@ -242,7 +241,7 @@ class TopicExpandCommentsUpView(CommentListViewBase):
         Raise `HttpResponsePermanentRedirect` when the comment exists but
         is in another topic, `Http404` when not found.
         """
-        comment, search_kwargs_comment = self._sanitize_topicname()
+        comment, search_kwargs_comment = self._sanitize_comment()
         qs_comments = COMMENTS_QS.filter(
             Q(pk=comment.pk) | Q(prev_comment_id=comment.pk),
             **search_kwargs_comment)
@@ -280,13 +279,13 @@ class TopicExpandCommentsDownView(CommentListViewBase):
     """
     template_name = 'default/base/comments-expansion.html'
 
-    def _sanitize_topicname(self) -> Tuple[Comment, Dict]:
+    def _sanitize_comment(self) -> Tuple[Comment, Dict]:
         """
         Call the `super()` of this and redirect the browser to the
         `Comment`'s current topic if it has changed meanwhile.
         """
-        comment, search_kwargs_comment = super()._sanitize_topicname(
-            comment_pk=self.kwargs['comment_pk'])
+        comment, search_kwargs_comment = super()._sanitize_comment(
+            pk=self.kwargs['comment_pk'])
         if comment.topic.slug != self.kwargs['topic_slug']:
             url = reverse(
                 viewname='forum:base:comments-down', kwargs=dict(
@@ -307,7 +306,7 @@ class TopicExpandCommentsDownView(CommentListViewBase):
         but is in another topic, `Http404` when not found.
         """
         # Get the requested comment
-        comment, search_kwargs_comment = self._sanitize_topicname()
+        comment, search_kwargs_comment = self._sanitize_comment()
         comment_original = comment
         set_comment_pks = set([comment.id])
         while True:
