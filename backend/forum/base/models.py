@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from collections import defaultdict, namedtuple
-from operator import attrgetter
 
 from django.contrib.auth.models import AbstractUser, AnonymousUser
 from django.db.models.base import Model
@@ -21,6 +20,7 @@ from django_extensions.db.fields import AutoSlugField
 from forum.utils import slugify
 from forum.utils.djtools.query_cache import (
     is_queryresult_loaded, set_prefetch_cache, set_queryresult)
+from forum.utils.wsgi import ForumWSGIRequest
 
 from .choices import COMMENT_VOTE_HIDE_CHOICES, TOPIC_TYPE_CHOICES
 
@@ -222,10 +222,10 @@ class Topic(Model):
 
 class CommentQuerySet(QuerySet):
     'Extending the base `QuerySet` with caching capabilities.'
-    _comment_default_sort_key = attrgetter('time')
-    _fetch_cache = CommentFetchCache(
+    _fetch_cache: CommentFetchCache = CommentFetchCache(
         do_user=False, do_topic=False, do_prev_comment=False,
         do_reply_set=False)
+    _wsgi_request: ForumWSGIRequest = None
 
     def _handle_prev_comment(self, item: dict):
         'Handle the `prev_comment` part of the comment item.'
@@ -284,8 +284,12 @@ class CommentQuerySet(QuerySet):
     def _set_comment_caches(self):
         'Prefill the caches on the `CommentQuerySet`.'
         self._comments_by_pk = {x.pk: x for x in self._comments}
-        self._users_by_pk = users_by_pk = {x.pk: x for x in self._users}
-        self._topics_by_pk = topics_by_pk = {x.pk: x for x in self._topics}
+        users_by_pk = {x.pk: x for x in self._users}
+        topics_by_pk = {x.pk: x for x in self._topics}
+        obj_cache = self._wsgi_request.obj_cache
+        obj_cache.comment.update(self._comments_by_pk)
+        obj_cache.user.update(users_by_pk)
+        obj_cache.topic.update(topics_by_pk)
         self._result_cache = list()
         for comment in self._comments:  # type: Comment
             if comment.prev_comment_id in self._all_pks:
@@ -348,6 +352,8 @@ class CommentQuerySet(QuerySet):
         'Return a new `CommentQuerySet` with the copied cache settings.'
         if '_fetch_cache' not in kwargs:
             kwargs.update(_fetch_cache=self._fetch_cache)
+        if '_wsgi_request' not in kwargs:
+            kwargs.update(_wsgi_request=self._wsgi_request)
         return super()._chain(**kwargs)
 
     def only(self, *fields) -> CommentQuerySet:
@@ -361,21 +367,23 @@ class CommentQuerySet(QuerySet):
         return qs
 
     def with_cache(
-        self, user: bool = True, topic: bool = True, prev_comment: bool = True,
-        reply_set: bool = True
+        self, request: ForumWSGIRequest, user: bool = True, topic: bool = True,
+        prev_comment: bool = True, reply_set: bool = True
     ) -> CommentQuerySet:
         """
         Return a `QuerySet` loaded with the requested related relations
         on the `Comment`s. Use this as the last part of your query.
         """
-        return self._chain(_fetch_cache=CommentFetchCache(
+        _fetch_cache = CommentFetchCache(
             do_user=user if user is not None else self._fetch_cache.do_user,
             do_topic=(
                 topic if topic is not None else self._fetch_cache.do_topic),
             do_prev_comment=prev_comment if prev_comment is not None
             else self._fetch_cache.do_prev_comment,
             do_reply_set=reply_set if reply_set is not None
-            else self._fetch_cache.do_reply_set))
+            else self._fetch_cache.do_reply_set)
+        return self._chain(
+            _fetch_cache=_fetch_cache, _wsgi_request=request)
 
 
 class Comment(Model):

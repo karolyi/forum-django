@@ -1,7 +1,6 @@
 from typing import Dict, Optional, Tuple
 
 from django.conf import settings
-from django.core.handlers.wsgi import WSGIRequest
 from django.core.paginator import EmptyPage, Page, Paginator
 from django.db.models import Q
 from django.db.models.query import QuerySet
@@ -9,6 +8,8 @@ from django.http.response import Http404, HttpResponse
 from django.urls.base import reverse
 from django.utils.functional import cached_property
 from django.views.generic.base import TemplateView
+
+from forum.utils.wsgi import ForumWSGIRequest, ObjectCache
 
 from ..choices import (
     TOPIC_TYPE_ARCHIVED, TOPIC_TYPE_HIGHLIGHTED, TOPIC_TYPE_NORMAL)
@@ -115,7 +116,8 @@ class TopicCommentListingView(CommentListViewBase):
         comment_pk = self.kwargs.get('comment_pk')
         kwargs_comment = self._sanitize_comment() \
             if comment_pk else self._check_topic_readable()
-        qs_comments = COMMENTS_QS.with_cache().filter(**kwargs_comment)
+        qs_comments = COMMENTS_QS.with_cache(
+            request=self.request).filter(**kwargs_comment)
         self._set_pageid(qs_comments=qs_comments)
         paginator = Paginator(
             object_list=qs_comments, per_page=self.comments_per_page)
@@ -130,17 +132,17 @@ class TopicCommentListingView(CommentListViewBase):
         context = super().get_context_data(
             topic_slug=topic_slug, comment_pk=comment_pk)
         page_comments = self._list_comments()
-        # Load the CommentQuerySet
+        # Load the CommentQuerySet, this fills the caches
         bool(page_comments.object_list)
-        topic = \
-            page_comments.object_list._topics_by_pk[self._referred_topic_pk]
+        cache = self.request.obj_cache  # type: ObjectCache
+        topic = cache.topic[self._referred_topic_pk]
         context.update(
             page_comments=page_comments, page_id=self._page_id,
             topic=topic, comment_pk=comment_pk)
         return context
 
     def get(
-            self, request: WSGIRequest, topic_slug: str,
+            self, request: ForumWSGIRequest, topic_slug: str,
             comment_pk: Optional[int] = None) -> HttpResponse:
         'Watch for a redirect exception, redirect when caught.'
         try:
@@ -198,7 +200,7 @@ class TopicExpandRepliesUpRecursive(CommentListViewBase):
         return context
 
     def get(
-            self, request: WSGIRequest, topic_slug: str,
+            self, request: ForumWSGIRequest, topic_slug: str,
             comment_pk: int, scroll_to_pk: int) -> HttpResponse:
         'Watch for a redirect exception, redirect when caught.'
         try:
@@ -261,7 +263,7 @@ class TopicExpandCommentsUpView(CommentListViewBase):
         return context
 
     def get(
-            self, request: WSGIRequest, topic_slug: str,
+            self, request: ForumWSGIRequest, topic_slug: str,
             comment_pk: int, scroll_to_pk: int) -> HttpResponse:
         'Watch for a redirect exception, redirect when caught.'
         try:
@@ -337,7 +339,7 @@ class TopicExpandCommentsDownView(CommentListViewBase):
         return context
 
     def get(
-            self, request: WSGIRequest, topic_slug: str,
+            self, request: ForumWSGIRequest, topic_slug: str,
             comment_pk: int, scroll_to_pk: int) -> HttpResponse:
         'Watch for a redirect exception, redirect when caught.'
         try:
