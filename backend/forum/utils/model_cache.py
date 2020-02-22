@@ -19,6 +19,7 @@ class ModelCacheBase(UserDict):
             raise NotImplementedError('No cache_getter set!')
         if not self.cache_updater:
             raise NotImplementedError('No cache_updater set!')
+        self._errored_keys = set()
         super().__init__(*args, **kwargs)
 
     def __getitem__(self, key: int):
@@ -39,12 +40,16 @@ class ModelCacheBase(UserDict):
 
     def fetch_keys(self, keys: Iterable[int]):
         'Update with the passed `keys`, fetch them if necessary.'
-        keys = set(keys)
-        my_keys = set(self)
-        missing_keys = keys - my_keys
+        keys = keys if type(keys) is set else set(keys)
+        self_keys = set(self)
+        already_errored_keys = self._errored_keys.intersection(keys)
+        missing_keys = keys - self_keys - already_errored_keys
         if not missing_keys:
-            return self
+            if already_errored_keys:
+                raise KeyError(already_errored_keys)
+            return
         self.update({x.pk: x for x in self.cache_updater(pk__in=missing_keys)})
-        missing_keys = set(self) - keys
+        missing_keys = keys - set(self)
         if missing_keys:
-            raise KeyError(f'The following keys are not found: {missing_keys}')
+            self._errored_keys.update(missing_keys - already_errored_keys)
+            raise KeyError(missing_keys)
