@@ -264,7 +264,7 @@ class CommentQuerySet(QuerySet):
                 self._handle_prev_comment(item=item)
             if self._fetch_cache.do_reply_set:
                 self._handle_reply_set(item=item)
-        self._all_pks = self._my_pks | self._extra_pks
+        self._all_pks = self._my_pks.union(self._extra_pks)
 
     def _set_replyset(self, comment: Comment):
         'Set replies on the `Comment` from cached data when it has any.'
@@ -330,7 +330,9 @@ class CommentQuerySet(QuerySet):
         self._users = User.objects.filter(pk__in=self._user_pks)
         self._topics = Topic.objects.filter(pk__in=self._topic_pks)
         self._comments = Comment.objects.filter(
-            pk__in=self._all_pks).order_by(*self.query.order_by)
+            pk__in=self._all_pks)
+        if self.query.order_by:
+            self._comments = self._comments.order_by(*self.query.order_by)
         self._set_comment_caches()
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_lookups = tuple(
@@ -344,6 +346,16 @@ class CommentQuerySet(QuerySet):
         if '_fetch_cache' not in kwargs:
             kwargs.update(_fetch_cache=self._fetch_cache)
         return super()._chain(**kwargs)
+
+    def only(self, *fields) -> CommentQuerySet:
+        """
+        Return a `CommentQuerySet` that only return the requested fields
+        and resets internal caching.
+        """
+        qs = super().only(*fields)  # type: CommentQuerySet
+        # Reset caching if only() is used
+        qs._fetch_cache = CommentQuerySet._fetch_cache
+        return qs
 
     def with_cache(
         self, user: bool = True, topic: bool = True, prev_comment: bool = True,

@@ -131,6 +131,8 @@ class TopicCommentListingView(CommentListViewBase):
         context = super().get_context_data(
             topic_slug=topic_slug, comment_pk=comment_pk)
         page_comments = self._list_comments()
+        # Load the CommentQuerySet
+        bool(page_comments.object_list)
         context.update(
             page_comments=page_comments,
             topic=page_comments.object_list[0].topic, comment_pk=comment_pk)
