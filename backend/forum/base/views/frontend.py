@@ -2,7 +2,7 @@ from typing import Dict, Optional, Tuple
 
 from django.conf import settings
 from django.core.handlers.wsgi import WSGIRequest
-from django.core.paginator import Page, Paginator
+from django.core.paginator import Page, Paginator, EmptyPage
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.http.response import Http404, HttpResponse
@@ -81,20 +81,20 @@ class TopicCommentListingView(CommentListViewBase):
             settings.PAGINATOR_MAX_COMMENTS_LISTED
         return settings.PAGINATOR_MAX_COMMENTS_LISTED
 
-    def _get_pageid(self, qs_comments: QuerySet) -> int:
+    def _set_pageid(self, qs_comments: QuerySet):
         """
-        Get a page number for a given comment ID, so that we can display
+        Set a page number for a given comment ID, so that we can display
         it on the right page.
 
-        Return the page ID, raise `Http404` if the comment doesn't
-        exist.
+        Raise `Http404` if the comment doesn't exist.
         """
         comment_pk = self.kwargs.get('comment_pk')
         if not comment_pk:
             try:
-                return int(self.request.GET.get('page'))
+                self._page_id = int(self.request.GET.get('page'))
             except (TypeError, ValueError):
-                return 1
+                self._page_id = 1
+            return
         try:
             comment = \
                 qs_comments.only('time').get(id=comment_pk)  # type: Comment
@@ -102,8 +102,7 @@ class TopicCommentListingView(CommentListViewBase):
             # This comment does not exist here
             raise Http404
         amount_newer = qs_comments.filter(time__gt=comment.time).count()
-        page_id = amount_newer // self.comments_per_page + 1
-        return page_id
+        self._page_id = amount_newer // self.comments_per_page + 1
 
     def _list_comments(self) -> Page:
         """
@@ -120,10 +119,13 @@ class TopicCommentListingView(CommentListViewBase):
             self._check_topic_readable()
             kwargs_comment = dict(topic__slug=self.kwargs['topic_slug'])
         qs_comments = COMMENTS_QS.with_cache().filter(**kwargs_comment)
-        page_id = self._get_pageid(qs_comments=qs_comments)
+        self._set_pageid(qs_comments=qs_comments)
         paginator = Paginator(
             object_list=qs_comments, per_page=self.comments_per_page)
-        return paginator.page(number=page_id)
+        try:
+            return paginator.page(number=self._page_id)
+        except EmptyPage:
+            return paginator.page(number=1)
 
     def get_context_data(
             self, topic_slug: str, comment_pk: Optional[int] = None) -> dict:
@@ -134,7 +136,7 @@ class TopicCommentListingView(CommentListViewBase):
         # Load the CommentQuerySet
         bool(page_comments.object_list)
         context.update(
-            page_comments=page_comments,
+            page_comments=page_comments, page_id=self._page_id,
             topic=page_comments.object_list[0].topic, comment_pk=comment_pk)
         return context
 
