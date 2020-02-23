@@ -17,7 +17,7 @@ pytz==2019.3
 PyYAML==5.3
 requests==2.23.0
 rjsmin==1.1.0
-soupsieve==1.9.5
+soupsieve==2.0
 sqlparse==0.3.0
 Unidecode==1.1.1
 urllib3==1.25.8
