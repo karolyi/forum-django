@@ -3,6 +3,6 @@
 <section class="topic-list-wrapper">
     {{ topic_group_page(topic_list=topic_list) }}
 </section>
-<section class="pagination-wrapper text-center" data-max-pages="{{ topic_list.paginator.num_pages|default(0) }}">
+<section class="pagination-topicgroup text-center" data-max-pages="{{ topic_list.paginator.num_pages|default(0) }}">
     {{ paginator_generic(page=topic_list) }}
 </section>

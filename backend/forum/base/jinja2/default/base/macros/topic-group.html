@@ -2,7 +2,7 @@
 {% from 'default/macros/paginator-generic.html' import paginator_generic %}
 
 {% macro topic_group(topic_list, topic_type) -%}
-<div class="card topic-group-wrapper topic-type-{{ topic_type }}">
+<div class="card topicgroup-wrapper topic-type-{{ topic_type }}">
     <div class="card-header">
         <h4 class="card-title">
             {% if topic_type == 'highlighted' %}
@@ -14,38 +14,36 @@
             {% endif %}
         </h4>
     </div>
-    <div class="card-block">
-        <div class="card-text">
-            <div class="row topic-header-row">
-                <div class="col-xs-6 col-sm-6">
-                    {{ _('Topic') }}
-                </div>
-                <div class="col-xs-6 col-sm-2 text-center">
-                    {{ _('Last commented at') }}
-                </div>
-                <div class="clearfix visible-xs-block"></div>
-                <div class="col-xs-6 col-sm-2 text-center">
-                    {{ _('Last commented by') }}
-                </div>
-                <div class="col-xs-6 col-sm-2 text-center">
-                    {{ _('Total comments') }}
-                </div>
+    <div class="card-block container-fluid">
+        <div class="row topic-header-row">
+            <div class="col-xs-6 col-sm-6">
+                {{ _('Topic') }}
             </div>
-            <section class="topic-list-wrapper">
-                {{ topic_group_page(topic_list=topic_list) }}
-            </section>
-            <section class="pagination-wrapper text-center">
-                {{ paginator_generic(page=topic_list) }}
-            </section>
-            {% if topic_list is none %}
-            <section class="loader-topics-archived-wrapper text-center">
-                <button class="loader-topics-archived btn btn-primary">
-                    <span class="fa fa-arrow-circle-o-down" aria-hidden="true"></span>
-                    {{ _('Load archived topics') }}
-                </button>
-            </section>
-            {% endif %}
+            <div class="col-xs-6 col-sm-2 text-center">
+                {{ _('Last commented at') }}
+            </div>
+            <div class="clearfix visible-xs-block"></div>
+            <div class="col-xs-6 col-sm-2 text-center">
+                {{ _('Last commented by') }}
+            </div>
+            <div class="col-xs-6 col-sm-2 text-center">
+                {{ _('Total comments') }}
+            </div>
         </div>
+        <section class="topic-list-wrapper container-fluid">
+            {{ topic_group_page(topic_list=topic_list) }}
+        </section>
+        <section class="pagination-topicgroup text-center">
+            {{ paginator_generic(page=topic_list) }}
+        </section>
+        {% if topic_list is none %}
+        <section class="loader-topics-archived-wrapper text-center">
+            <button class="loader-topics-archived btn btn-primary">
+                <span class="fa fa-arrow-circle-o-down" aria-hidden="true"></span>
+                {{ _('Load archived topics') }}
+            </button>
+        </section>
+        {% endif %}
     </div>
 </div>
 <script type="text/javascript">
@@ -58,9 +56,9 @@
             {% endif %}
         },
         selectors: {
-            root: '.topic-group-wrapper.topic-type-{{ topic_type }}',
+            root: '.topicgroup-wrapper.topic-type-{{ topic_type }}',
             username: '.topic-list-item-row .username',
-            paginationWrapper: '.pagination-wrapper',
+            paginationWrapper: '.pagination-topicgroup',
             paginator: 'ul.pagination',
             topicListWrapper: '.topic-list-wrapper'
             {%- if topic_list is none -%}

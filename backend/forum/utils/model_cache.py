@@ -13,8 +13,7 @@ class ModelCacheBase(UserDict):
     cache_updater = None
 
     def __init__(self, *args, **kwargs):
-        self._request = kwargs.pop('request') if 'request' in kwargs \
-            else random()
+        self._request = kwargs.pop('request', None) or random()
         if not self.cache_getter:
             raise NotImplementedError('No cache_getter set!')
         if not self.cache_updater:

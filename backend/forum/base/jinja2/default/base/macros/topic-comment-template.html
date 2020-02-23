@@ -61,8 +61,9 @@
         </div>
     </div>
     <div class="card-block">
-        <div class="card-text comment-content">
+        <div class="comment-content">
             {{ (comment.content_html if not is_template else '')|safe }}
+        </div>
         {% if is_template -%}
             {{ topic_comment_onereply(is_template=is_template) }}
         {%- elif comment.reply_set.all() -%}
@@ -73,7 +74,6 @@
             {%- endif %}
             {%- endfor %}
         {%- endif %}
-        </div>
     </div>
 </section>
 {%- endmacro %}

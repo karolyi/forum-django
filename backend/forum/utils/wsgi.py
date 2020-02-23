@@ -5,6 +5,8 @@ from random import random
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest
 from django.utils.functional import cached_property
 
+UserCache = TopicCache = CommentCache = None
+
 
 class ObjectCache(object):
     'Data class for cache containment, loaded lazily.'
@@ -14,17 +16,23 @@ class ObjectCache(object):
 
     @cached_property
     def user(self):
-        from forum.base.utils.cache import UserCache
+        global UserCache
+        if not UserCache:
+            from forum.base.utils.cache import UserCache
         return UserCache(request=self._request)
 
     @cached_property
     def topic(self):
-        from forum.base.utils.cache import TopicCache
+        global TopicCache
+        if not TopicCache:
+            from forum.base.utils.cache import TopicCache
         return TopicCache(request=self._request)
 
     @cached_property
     def comment(self):
-        from forum.base.utils.cache import CommentCache
+        global CommentCache
+        if not CommentCache:
+            from forum.base.utils.cache import CommentCache
         return CommentCache(request=self._request)
 
 

@@ -2,7 +2,6 @@ import datetime
 import logging
 import os
 
-import phpserialize
 import requests
 from bs4 import BeautifulSoup as bs
 from django.contrib.auth import get_user_model
@@ -10,6 +9,7 @@ from django.contrib.auth.hashers import make_password  # NOQA
 from django.db import connection as django_connection
 from django.db import transaction
 
+import phpserialize
 import variables
 from commentparser import build_comment
 from forum.base.choices import TOPIC_TYPE_CHOICES
@@ -287,7 +287,7 @@ def parse_users():
 def fix_topiclogo_img(topic: Topic):
     'Fix an `[/]?images/topiclogo` prefix.'
     html = bs(markup=topic.name_html, features='lxml')
-    for tagname in ['b', 'font', 'i']:
+    for tagname in ['b', 'font', 'i', 'p']:
         found = html.select(selector=tagname)
         for item in found:
             item.unwrap()
