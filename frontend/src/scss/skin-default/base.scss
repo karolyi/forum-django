@@ -69,6 +69,7 @@
 
       .topic-list-wrapper {
         margin-bottom: 1rem;
+        width: 100%;
         .topic-list-item-row {
           @include transition(background-color 0.2s linear);
 
