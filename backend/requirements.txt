@@ -1,13 +1,12 @@
 beautifulsoup4==4.8.2
 blessings==1.7
 certifi==2019.11.28
-chardet==3.0.4
 colour-runner==0.1.1
 Django==2.2.10
 django-debug-toolbar==2.2
 django-extensions==2.2.8
 django-jinja==2.6.0
-django-webpack-loader==0.6.0
+django-webpack-loader==0.7.0
 django-widget-tweaks==1.4.5
 idna==2.9
 Jinja2==2.11.1
