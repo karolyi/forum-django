@@ -1,16 +1,15 @@
 from typing import Optional
 
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
-from django.core.handlers.wsgi import WSGIRequest
 from django.core.paginator import Page, Paginator
 
 from forum.base.models import Topic
+from forum.utils.wsgi import ForumWSGIRequest
 
 from ..choices import TOPIC_TYPE_ARCHIVED
 
 
-def _get_topics_per_page(request: WSGIRequest) -> int:
+def _get_topics_per_page(request: ForumWSGIRequest) -> int:
     """
     Return the shown topics per page for a user.
     """
@@ -22,7 +21,7 @@ def _get_topics_per_page(request: WSGIRequest) -> int:
 
 
 def collect_topic_page(
-        request: WSGIRequest, topic_type: str, page_id: int = 1,
+        request: ForumWSGIRequest, topic_type: str, page_id: int = 1,
         force: bool = False) -> Optional[Page]:
     """
     Collect and return topic list for the home view, `None` when nothing
@@ -33,13 +32,10 @@ def collect_topic_page(
     those.
     """
     if topic_type == TOPIC_TYPE_ARCHIVED and not force:
-        if isinstance(request.user, AnonymousUser):
-            # AnonymousUser does not have settings, return empty
+        if request.user.is_anonymous or not request.user.expand_archived:
+            # AnonymousUser does not have settings, return empty,
+            # or doesn't expand archived topics
             return
-        if not request.user.expand_archived:
-            # Return empty
-            return
-
     search_kwargs = dict(is_enabled=True, type=topic_type)
     if not request.user.is_staff and not request.user.is_superuser:
         # Only list topics that are visible to the user
