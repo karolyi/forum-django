@@ -2,6 +2,11 @@
 import os
 import sys
 
+if sys.platform == 'darwin':
+    # VERY IMPORTANT FOR OSX, SET PYTHONEXECUTABLE:
+    # https://stackoverflow.com/a/53190037/1067833
+    sys.executable = sys._base_executable
+
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "forum.settings")
 
