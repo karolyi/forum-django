@@ -20,7 +20,7 @@ from django_extensions.db.fields import AutoSlugField
 from forum.utils import slugify
 from forum.utils.djtools.query_cache import (
     is_queryresult_loaded, set_prefetch_cache, set_queryresult)
-from forum.utils.wsgi import ForumWSGIRequest
+from forum.utils.wsgi import ForumWSGIRequest, ObjectCache
 
 from .choices import COMMENT_VOTE_HIDE_CHOICES, TOPIC_TYPE_CHOICES
 
@@ -248,18 +248,12 @@ class CommentQuerySet(QuerySet):
         if self._fetch_cache.do_topic:
             self._topic_pks.add(item['reply_set__topic'])
 
-    def _set_pksets(self):
-        'Set & fill the PK sets for fetching.'
-        qs1 = self.values_list('pk', flat=True)
-        self._my_pks = set(qs1._iterable_class(qs1))
+    def _iterate_extended_query(self):
+        'Prepare one result of the extended select.'
         qs = Comment.objects.filter(pk__in=self._my_pks).order_by().values(
             'pk', 'user', 'topic', 'prev_comment', 'prev_comment__user',
             'prev_comment__topic', 'reply_set', 'reply_set__user',
             'reply_set__topic')
-        self._extra_pks = set()
-        self._user_pks = set()
-        self._topic_pks = set()
-        self._reply_pks = defaultdict(set)
         for item in qs._iterable_class(qs):
             if self._fetch_cache.do_user:
                 self._user_pks.add(item['user'])
@@ -269,13 +263,28 @@ class CommentQuerySet(QuerySet):
                 self._handle_prev_comment(item=item)
             if self._fetch_cache.do_reply_set:
                 self._handle_reply_set(item=item)
-        self._all_pks = self._my_pks.union(self._extra_pks)
+
+    def _set_pksets(self):
+        'Set & fill the PK sets for fetching.'
+        qs1 = self.values_list('pk', flat=True)
+        self._my_pks = set(qs1._iterable_class(qs1))
+        self._extra_pks = set()
+        self._user_pks = set()
+        self._topic_pks = set()
+        self._reply_pks = defaultdict(set)
+        self._iterate_extended_query()
+        caches = self._wsgi_request.obj_cache  # type: ObjectCache
+        self._user_pks -= set(caches.user)
+        self._topic_pks -= set(caches.topic)
+        self._all_pks = \
+            self._my_pks.union(self._extra_pks) - set(caches.comment)
 
     def _set_replyset(self, comment: Comment):
         'Set replies on the `Comment` from cached data when it has any.'
         reply_qs = comment.reply_set.all()
+        comments_by_pk = self._wsgi_request.obj_cache.comment
         reply_set_result = list(
-            self._comments_by_pk[x] for x in self._reply_pks[comment.pk])
+            comments_by_pk[x] for x in self._reply_pks[comment.pk])
         set_queryresult(
             qs=reply_qs, result=reply_set_result, override=True)
         set_prefetch_cache(
@@ -283,21 +292,19 @@ class CommentQuerySet(QuerySet):
 
     def _set_comment_caches(self):
         'Prefill the caches on the `CommentQuerySet`.'
-        self._comments_by_pk = {x.pk: x for x in self._comments}
-        users_by_pk = {x.pk: x for x in self._users}
-        topics_by_pk = {x.pk: x for x in self._topics}
-        obj_cache = self._wsgi_request.obj_cache
-        obj_cache.comment.update(self._comments_by_pk)
-        obj_cache.user.update(users_by_pk)
-        obj_cache.topic.update(topics_by_pk)
+        users_by_pk = self._wsgi_request.obj_cache.user
+        users_by_pk.update({x.pk: x for x in self._users})
+        topics_by_pk = self._wsgi_request.obj_cache.topic
+        topics_by_pk.update({x.pk: x for x in self._topics})
+        comments_by_pk = self._wsgi_request.obj_cache.comment
+        comments_by_pk.update({x.pk: x for x in self._comments})
         self._result_cache = list()
         for comment in self._comments:  # type: Comment
-            if comment.prev_comment_id in self._all_pks:
-                comment.prev_comment = \
-                    self._comments_by_pk[comment.prev_comment_id]
-            if self._fetch_cache.do_user:
+            if comment.prev_comment_id in comments_by_pk:
+                comment.prev_comment = comments_by_pk[comment.prev_comment_id]
+            if comment.user_id in users_by_pk:
                 comment.user = users_by_pk[comment.user_id]
-            if self._fetch_cache.do_topic:
+            if comment.topic_id in topics_by_pk:
                 comment.topic = topics_by_pk[comment.topic_id]
             if self._fetch_cache.do_reply_set:
                 self._set_replyset(comment=comment)
@@ -337,9 +344,8 @@ class CommentQuerySet(QuerySet):
         self._set_pksets()
         self._users = User.objects.filter(pk__in=self._user_pks).order_by()
         self._topics = Topic.objects.filter(pk__in=self._topic_pks).order_by()
-        self._comments = Comment.objects.filter(pk__in=self._all_pks)
-        if self.query.order_by:
-            self._comments = self._comments.order_by(*self.query.order_by)
+        self._comments = Comment.objects.filter(
+            pk__in=self._all_pks).order_by(*self.query.order_by)
         self._set_comment_caches()
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_lookups = tuple(
