@@ -29,13 +29,13 @@ class TopicListView(TemplateView):
         context = super().get_context_data()
         context.update(
             topics_highlighted=collect_topic_page(
-                request=self.request,
-                topic_type=TOPIC_TYPE_HIGHLIGHTED, page_id=1),
+                request=self.request, topic_type=TOPIC_TYPE_HIGHLIGHTED,
+                page_id=1),
             topics_normal=collect_topic_page(
                 request=self.request, topic_type=TOPIC_TYPE_NORMAL, page_id=1),
             topics_archived=collect_topic_page(
-                request=self.request,
-                topic_type=TOPIC_TYPE_ARCHIVED, page_id=1))
+                request=self.request, topic_type=TOPIC_TYPE_ARCHIVED,
+                page_id=1))
         return context
 
 

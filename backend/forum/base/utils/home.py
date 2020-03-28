@@ -44,4 +44,5 @@ def collect_topic_page(
         'last_comment__user')
     topics_per_page = _get_topics_per_page(request)
     paginator = Paginator(object_list=qs_topics, per_page=topics_per_page)
-    return paginator.page(number=page_id)
+    page = paginator.page(number=page_id)
+    return page
