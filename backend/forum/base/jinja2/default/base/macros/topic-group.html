@@ -15,6 +15,7 @@
         </h4>
     </div>
     <div class="card-block container-fluid">
+        {% if topic_list is not none %}
         <div class="row topic-header-row">
             <div class="col-xs-6 col-sm-6">
                 {{ _('Topic') }}
@@ -36,7 +37,7 @@
         <section class="pagination-topicgroup">
             {{ paginator_generic(page=topic_list, adjacent_pages=django_settings.PAGINATOR_DEFAULT_ADJACENT_PAGES) }}
         </section>
-        {% if topic_list is none %}
+        {% elif topic_list is none %}
         <section class="loader-topics-archived-wrapper text-center">
             <button class="loader-topics-archived btn btn-primary">
                 <span class="fa fa-arrow-circle-o-down" aria-hidden="true"></span>

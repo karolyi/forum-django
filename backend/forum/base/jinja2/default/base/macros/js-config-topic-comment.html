@@ -1,6 +1,6 @@
 {% macro js_config_topic_comment(listing_mode='commentListing', root='', comment_pk=None, scroll_to_pk=None, topic=None) -%}
     selectors: {
-        root: '{{ root }}',
+        root: '{{ root|escapejs }}',
         template: {
             comment:'.topic-comment-template',
             action: '.topic-comment-action-template'
@@ -10,6 +10,7 @@
         replyLinks: '.to-reply-comment',
         selfLinks: '.comment-number-wrapper .comment-number',
         commentActions: '.comment-actions',
+        paginator: '.pagination-comments .pagination',
         action: {
             voteUp: '.vote-up',
             voteDown: '.vote-down',
@@ -20,7 +21,7 @@
         }
     },
     highlightedClass: 'is-highlighted',
-    topicSlugOriginal: '{{ topic.slug }}',
+    topicSlugOriginal: '{{ topic.slug|escapejs }}',
     commentId: {{ comment_pk|default('null') }},
     scrollToId: {{ scroll_to_pk|default('null') }},
     listingMode: '{{ listing_mode|default('commentListing') }}',
@@ -30,6 +31,13 @@
             exampleSlug: 'example-slug',
             commentId: '12345'
         },
+    {%- if listing_mode == 'commentListing' -%}
+        commentListingPageNo: {
+            backend: '{{ url('forum:base:topic-comment-listing', topic_slug='example-slug') }}?page=12345',
+            exampleSlug: 'example-slug',
+            pageId: '12345'
+        },
+    {%- endif %}
         expandCommentsUpRecursive: {
             backend: '{{ url('forum:base:comments-up-recursive', topic_slug='example-slug', comment_pk=12345, scroll_to_pk=67890) }}',
             exampleSlug: 'example-slug',

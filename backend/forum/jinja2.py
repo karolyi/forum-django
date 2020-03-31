@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
 from django.core.handlers.wsgi import WSGIRequest
-from django.core.paginator import Page
 from django.utils.html import strip_spaces_between_tags
 from django.utils.translation import (
     get_language_from_request, get_language_info)
@@ -125,29 +124,26 @@ class TemplatesPanel(BaseTemplatesPanel):
 
 @lru_cache(maxsize=20)
 def paginator_generic_get_list(
-    page: Page = None,
+    current_no: int, num_pages: int,
     adjacent_pages: int = settings.PAGINATOR_DEFAULT_ADJACENT_PAGES
 ) -> Optional[List[Dict]]:
     'Generate a paginator list with ellipsis.'
-    if type(page) is not Page or page.paginator.count == 0:
-        return None
     result = []
-    start_idx = max(page.number - adjacent_pages, 1)
+    start_idx = max(current_no - adjacent_pages, 1)
     if start_idx <= 3:
         start_idx = 1
     else:
         result.extend([dict(number=1, type='number'), dict(type='ellipsis')])
-    end_idx = page.number + adjacent_pages + 1
+    end_idx = current_no + adjacent_pages + 1
     do_end_ellipsis = True
-    if end_idx >= page.paginator.num_pages - 1:
-        end_idx = page.paginator.num_pages + 1
+    if end_idx >= num_pages - 1:
+        end_idx = num_pages + 1
         do_end_ellipsis = False
     result.extend([
         dict(number=x, type='number') for x in range(start_idx, end_idx)])
     if do_end_ellipsis:
         result.extend([
-            dict(type='ellipsis'),
-            dict(number=page.paginator.num_pages, type='number')])
+            dict(type='ellipsis'), dict(number=num_pages, type='number')])
     return result
 
 

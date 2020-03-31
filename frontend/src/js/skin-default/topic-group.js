@@ -47,7 +47,7 @@ class Instance {
     this.jqAjaxRequest = null
   }
 
-  loadPage(currentPageNr) {
+  loadPage(currentPageNo) {
     if (this.jqAjaxRequest) {
       // Abort the existing request
       this.jqAjaxRequest.abort()
@@ -57,7 +57,7 @@ class Instance {
       url: this.options.urls.topicListPage,
       data: {
         topic_type: this.options.topicType,
-        page_id: currentPageNr,
+        page_id: currentPageNo,
       },
       dataType: 'html',
     // https://github.com/tc39/proposal-bind-operator
@@ -103,10 +103,9 @@ class Instance {
   initUi() {
     // Init paginator
     this.paginator = paginatorInit({
-      currentPageNr: 1,
+      currentPageNo: 1,
       jqRoot: this.jqRoot.find(this.options.selectors.paginator),
       callbackLoadPage: ::this.loadPage,
-      pageMax: this.options.pageMax,
     })
     this.activateContent()
   }

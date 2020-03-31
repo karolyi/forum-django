@@ -5,10 +5,63 @@ import { options as commonOptions, extractTemplateHtml } from './common'
 import { add as popOverHoverContentAdd } from './popover-hovercontent'
 import { add as usernameAdd } from './username'
 import { add as timeActualizerAdd } from './time-actualizer'
+import { init as paginatorInit } from './paginator'
 
 require('bootstrap/js/src/tooltip')
 
 export class CommentListing {
+  onClickLinkPreviousComment(event) {
+    this.sendBrowserToComment(event)
+  }
+
+  onClickLinkReplyComment(event) {
+    this.sendBrowserToComment(event)
+  }
+
+  onClickLinkComment(event) {
+    if (this.options.listingMode !== 'commentListing') {
+      // The listing mode is not the topic comment listing page, so we
+      // send the browser to the topic comment listing page.
+      return
+    }
+    this.sendBrowserToComment(event)
+  }
+
+  onMouseEnterLinkPreviousComment(event) {
+    const commentIdLinked = event.currentTarget.dataset.linkTo
+    this.highlightCommentId(commentIdLinked)
+  }
+
+  onMouseLeaveLinkPreviousComment(event) {
+    const commentIdLinked = event.currentTarget.dataset.linkTo
+    this.deHighlightCommentId(commentIdLinked)
+  }
+
+  onMouseEnterLinkReplyComment(event) {
+    const commentIdLinked = event.currentTarget.dataset.linkTo
+    this.highlightCommentId(commentIdLinked)
+  }
+
+  onMouseLeaveLinkReplyComment(event) {
+    const commentIdLinked = event.currentTarget.dataset.linkTo
+    this.deHighlightCommentId(commentIdLinked)
+  }
+
+  onPopState() {
+    const commentId = document.location.pathname.split('/')[3]
+    if (!commentId) return
+    this.scrollFix.scrollTo(commentId)
+  }
+
+  onClickLoadPage(pageNo) {
+    document.location.href = interpolate(
+      this.urlFormatStrings.commentListingPageNo, {
+        topicSlug: this.options.topicSlugOriginal,
+        pageId: pageNo,
+      }, true,
+    )
+  }
+
   constructor(options) {
     this.options = options
   }
@@ -60,6 +113,18 @@ export class CommentListing {
             this.options.urls.expandCommentsDown.scrollToId,
             '%(scrollToId)s',
           ),
+    }
+    if (this.options.listingMode === 'commentListing') {
+      this.urlFormatStrings.commentListingPageNo =
+        this.options.urls.commentListingPageNo.backend
+          .replace(
+            this.options.urls.commentListingPageNo.exampleSlug,
+            '%(topicSlug)s',
+          )
+          .replace(
+            this.options.urls.commentListingPageNo.pageId,
+            '%(pageId)s',
+          )
     }
   }
 
@@ -135,23 +200,6 @@ export class CommentListing {
     this.scrollFix.scrollTo(commentIdLinked)
   }
 
-  onClickLinkPreviousComment(event) {
-    this.sendBrowserToComment(event)
-  }
-
-  onClickLinkReplyComment(event) {
-    this.sendBrowserToComment(event)
-  }
-
-  onClickLinkComment(event) {
-    if (this.options.listingMode !== 'commentListing') {
-      // The listing mode is not the topic comment listing page, so we
-      // send the browser to the topic comment listing page.
-      return
-    }
-    this.sendBrowserToComment(event)
-  }
-
   highlightCommentId(commentId) {
     const jqCommentWrapper = this.getCommentWrapper(commentId)
     jqCommentWrapper.addClass(this.options.highlightedClass)
@@ -160,32 +208,6 @@ export class CommentListing {
   deHighlightCommentId(commentId) {
     const jqCommentWrapper = this.getCommentWrapper(commentId)
     jqCommentWrapper.removeClass(this.options.highlightedClass)
-  }
-
-  onMouseEnterLinkPreviousComment(event) {
-    const commentIdLinked = event.currentTarget.dataset.linkTo
-    this.highlightCommentId(commentIdLinked)
-  }
-
-  onMouseLeaveLinkPreviousComment(event) {
-    const commentIdLinked = event.currentTarget.dataset.linkTo
-    this.deHighlightCommentId(commentIdLinked)
-  }
-
-  onMouseEnterLinkReplyComment(event) {
-    const commentIdLinked = event.currentTarget.dataset.linkTo
-    this.highlightCommentId(commentIdLinked)
-  }
-
-  onMouseLeaveLinkReplyComment(event) {
-    const commentIdLinked = event.currentTarget.dataset.linkTo
-    this.deHighlightCommentId(commentIdLinked)
-  }
-
-  onPopState() {
-    const commentId = document.location.pathname.split('/')[3]
-    if (!commentId) return
-    this.scrollFix.scrollTo(commentId)
   }
 
   initializeCommentActionsContent(jqButton, jqTip) {
@@ -290,6 +312,13 @@ export class CommentListing {
       scrollToInitial: this.options.scrollToId,
     })
     this.scrollFix.initialize()
+    if (this.options.listingMode === 'commentListing') {
+      this.paginator = paginatorInit({
+        currentPageNo: 1,
+        jqRoot: this.jqRoot.find(this.options.selectors.paginator),
+        callbackLoadPage: ::this.onClickLoadPage,
+      })
+    }
   }
 }
 

@@ -4,7 +4,7 @@ class Paginator {
   updateUi() {
     this.options.jqRoot.find('.page-numbered.active').removeClass('active')
     this.options.jqRoot
-      .find(`.page-numbered[data-page-id=${this.currentPageNr}]`)
+      .find(`.page-numbered[data-page-id=${this.currentPageNo}]`)
       .addClass('active')
   }
 
@@ -12,16 +12,12 @@ class Paginator {
     event.preventDefault()
     const { parentElement } = event.currentTarget
     if (parentElement.classList.contains('active')) return
-    this.currentPageNr = parseInt(parentElement.dataset.pageId, 10)
-    if (this.currentPageNr > this.options.pageMax || this.currentPageNr < 1) {
-      // Page number is out of bounds, reset it to 1
-      this.currentPageNr = 1
-    }
-    this.options.callbackLoadPage(this.currentPageNr)
+    this.currentPageNo = parseInt(parentElement.dataset.pageId, 10)
+    this.options.callbackLoadPage(this.currentPageNo)
   }
 
   initVariables() {
-    this.currentPageNr = this.options.currentPageNr
+    this.currentPageNo = this.options.currentPageNo
     this.options.jqRoot.find('.page-numbered a')
       .click(::this.onClickPaginateNumber)
   }
