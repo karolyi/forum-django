@@ -81,12 +81,12 @@ class TopicCommentListingView(CommentListViewBase):
     @cached_property
     def comments_per_page(self):
         'Return the shown topics per page for a user.'
-        comments_per_page = self.request.session.get('comments_per_page')
+        comments_per_page = self.request.session.get('comments-per-page')
         if comments_per_page is not None:
             return comments_per_page
-        self.request.session['comments_per_page'] = \
-            settings.PAGINATOR_MAX_COMMENTS_LISTED
-        return settings.PAGINATOR_MAX_COMMENTS_LISTED
+        self.request.session['comments-per-page'] = \
+            settings.PAGINATOR_MAX_COMMENTS_PER_PAGE
+        return settings.PAGINATOR_MAX_COMMENTS_PER_PAGE
 
     def _set_pageid(self, qs_comments: QuerySet):
         """

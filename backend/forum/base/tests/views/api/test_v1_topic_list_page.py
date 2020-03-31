@@ -1,6 +1,7 @@
 from django.http.response import HttpResponse
 from django.test import Client, TestCase
 from django.urls.base import reverse
+
 from forum.testutils.html_result_parser import TopicListingParser
 
 
@@ -89,7 +90,7 @@ class V1TopicListPageTestCase(TestCase):
         # variable first (because a new SessionStore is created every
         # time this property is accessed):
         session = client.session
-        session['topics_per_page'] = 2
+        session['topics-per-page'] = 2
         session.save()
         response = client.get(reverse(
             viewname='forum:rest-api:v1-topic-list-page'), data={
@@ -126,7 +127,7 @@ class V1TopicListPageTestCase(TestCase):
         # variable first (because a new SessionStore is created every
         # time this property is accessed):
         session = client.session
-        session['topics_per_page'] = 2
+        session['topics-per-page'] = 2
         session.save()
         response = client.get(reverse(
             viewname='forum:rest-api:v1-topic-list-page'), data={
@@ -163,7 +164,7 @@ class V1TopicListPageTestCase(TestCase):
         # variable first (because a new SessionStore is created every
         # time this property is accessed):
         session = client.session
-        session['topics_per_page'] = 2
+        session['topics-per-page'] = 2
         session.save()
         response = client.get(reverse(
             viewname='forum:rest-api:v1-topic-list-page'), data={
@@ -197,7 +198,7 @@ class V1TopicListPageTestCase(TestCase):
         # variable first (because a new SessionStore is created every
         # time this property is accessed):
         session = client.session
-        session['topics_per_page'] = 2
+        session['topics-per-page'] = 2
         session.save()
         response = client.get(reverse(
             viewname='forum:rest-api:v1-topic-list-page'), data={

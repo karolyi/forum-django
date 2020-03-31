@@ -2,6 +2,7 @@
 {% from 'default/base/macros/topic-comment-template.html' import topic_comment_template with context %}
 {% from 'default/base/macros/topic-comment-action-template.html' import topic_comment_action_template with context %}
 {% from 'default/base/macros/js-config-topic-comment.html' import js_config_topic_comment %}
+{% from 'default/macros/paginator-generic.html' import paginator_generic %}
 
 {% block extra_scripts_head %}
 {{ render_bundle('topicCommentListing') }}
@@ -22,6 +23,9 @@
             {{ _('Back to topic listing') }}
         </a>
     </section>
+    <section class="pagination-comments">
+        {{ paginator_generic(page=page_comments, adjacent_pages=django_settings.PAGINATOR_DEFAULT_ADJACENT_PAGES) }}
+    </section>
     {% if topic.description %}
     <section class="card card-block border-info mb-1" aria-label="{{ _('Topic description') }}">
         <div class="card-body">
@@ -33,6 +37,9 @@
     {% for comment in page_comments %}
         {{ topic_comment_template(comment=comment, is_template=False, show_invisible=False) }}
     {% endfor %}
+    <section class="pagination-comments">
+        {{ paginator_generic(page=page_comments, adjacent_pages=django_settings.PAGINATOR_DEFAULT_ADJACENT_PAGES) }}
+    </section>
 </article>
 
 {% jsmin %}

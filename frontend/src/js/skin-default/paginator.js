@@ -6,24 +6,6 @@ class Paginator {
     this.options.jqRoot
       .find(`.page-numbered[data-page-id=${this.currentPageNr}]`)
       .addClass('active')
-    this.jqWrappers.pagePreviousLink.parent()
-      .toggleClass('disabled', this.currentPageNr < 2)
-    this.jqWrappers.pageNextLink.parent()
-      .toggleClass('disabled', this.currentPageNr > this.options.pageMax - 1)
-  }
-
-  onClickPaginatePrevious(event) {
-    event.preventDefault()
-    if (this.currentPageNr <= 1) return
-    this.currentPageNr -= 1
-    this.options.callbackLoadPage(this.currentPageNr)
-  }
-
-  onClickPaginateNext(event) {
-    event.preventDefault()
-    if (this.currentPageNr >= this.options.pageMax) return
-    this.currentPageNr += 1
-    this.options.callbackLoadPage(this.currentPageNr)
   }
 
   onClickPaginateNumber(event) {
@@ -39,13 +21,7 @@ class Paginator {
   }
 
   initVariables() {
-    this.jqWrappers = {
-      pageNextLink: this.options.jqRoot.find('.page-next a'),
-      pagePreviousLink: this.options.jqRoot.find('.page-previous a'),
-    }
     this.currentPageNr = this.options.currentPageNr
-    this.jqWrappers.pagePreviousLink.click(::this.onClickPaginatePrevious)
-    this.jqWrappers.pageNextLink.click(::this.onClickPaginateNext)
     this.options.jqRoot.find('.page-numbered a')
       .click(::this.onClickPaginateNumber)
   }

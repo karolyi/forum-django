@@ -33,8 +33,8 @@
         <section class="topic-list-wrapper">
             {{ topic_group_page(topic_list=topic_list) }}
         </section>
-        <section class="pagination-topicgroup text-center">
-            {{ paginator_generic(page=topic_list) }}
+        <section class="pagination-topicgroup">
+            {{ paginator_generic(page=topic_list, adjacent_pages=django_settings.PAGINATOR_DEFAULT_ADJACENT_PAGES) }}
         </section>
         {% if topic_list is none %}
         <section class="loader-topics-archived-wrapper text-center">

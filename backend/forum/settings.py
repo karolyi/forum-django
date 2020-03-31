@@ -269,9 +269,9 @@ LANGUAGES = (
     ('hu', _('Hungarian')))
 
 # ### Forum settings ###
-# Default amount of topics to show per category
-PAGINATOR_MAX_COMMENTS_LISTED = 50
-PAGINATOR_MAX_PAGES_TOPICLIST = 10
+PAGINATOR_MAX_COMMENTS_PER_PAGE = 50
+PAGINATOR_TOPICS_PER_PAGE = 10
+PAGINATOR_DEFAULT_ADJACENT_PAGES = 2
 
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = 'forum:account:login'

@@ -160,14 +160,10 @@ const onRemoveElement = (domNode) => {
 
 export function add(jqTimeElements) {
   const currentMomentUtc = moment.utc()
-  for (const item of jqTimeElements) {
-    const domNode = item
+  for (const domNode of jqTimeElements) {
     const jqElement = $(domNode)
     const momentInstance = moment.utc(jqElement.attr('datetime'))
-    const data = {
-      jqElement,
-      momentInstance,
-    }
+    const data = { jqElement, momentInstance }
     if (!instanceMap.has(domNode)) {
       instanceMap.set(domNode, data)
       jqElement.text(calculateNatural(currentMomentUtc, momentInstance))

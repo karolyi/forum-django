@@ -10,14 +10,12 @@ from ..choices import TOPIC_TYPE_ARCHIVED
 
 
 def _get_topics_per_page(request: ForumWSGIRequest) -> int:
-    """
-    Return the shown topics per page for a user.
-    """
-    topics_per_page = request.session.get('topics_per_page')
+    'Return the shown topics per page for a user.'
+    topics_per_page = request.session.get('topics-per-page')
     if type(topics_per_page) is int:
         return topics_per_page
-    request.session['topics_per_page'] = settings.PAGINATOR_MAX_PAGES_TOPICLIST
-    return settings.PAGINATOR_MAX_PAGES_TOPICLIST
+    request.session['topics-per-page'] = settings.PAGINATOR_TOPICS_PER_PAGE
+    return settings.PAGINATOR_TOPICS_PER_PAGE
 
 
 def collect_topic_page(

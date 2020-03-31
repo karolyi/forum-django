@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Dict, List, Optional
 
 from debug_toolbar.panels.templates import TemplatesPanel as BaseTemplatesPanel
 from django.conf import settings
@@ -122,49 +123,32 @@ class TemplatesPanel(BaseTemplatesPanel):
         return super().generate_stats(*args)
 
 
+@lru_cache(maxsize=20)
 def paginator_generic_get_list(
-        page=None, max_pages=settings.PAGINATOR_MAX_PAGES_TOPICLIST):
-    """
-    Generate a paginator list with ellipsis.
-    """
-    # Sanity check
+    page: Page = None,
+    adjacent_pages: int = settings.PAGINATOR_DEFAULT_ADJACENT_PAGES
+) -> Optional[List[Dict]]:
+    'Generate a paginator list with ellipsis.'
     if type(page) is not Page or page.paginator.count == 0:
         return None
-    paginator = page.paginator
-    num_pages = paginator.num_pages
-    if num_pages == 1:
-        # Early exit, only one page
-        return ({
-            'number': 1,
-            'type': 'number'
-        },)
-    page_range = max_pages
-    if num_pages > max_pages:
-        # The page is NOT within the shown paginator page amount
-        page_range -= 1
-        if page.number > page_range:
-            # The current page cannot be shown amongst one of the the
-            # pages, make a place for it
-            page_range -= 1
-    page_number_list = []
-    for idx in range(page_range):
-        page_number_list.append({
-            'number': idx + 1,
-            'type': 'number',
-        })
-    if page.number > page_range:
-        # Append the current page
-        page_number_list.append({
-            'number': page.number,
-            'type': 'number'
-        })
-    if num_pages > max_pages:
-        # Append the last last page
-        page_number_list.append({
-            'number': paginator.num_pages,
-            'type': 'number'
-        })
-    return page_number_list
+    result = []
+    start_idx = max(page.number - adjacent_pages, 1)
+    if start_idx <= 3:
+        start_idx = 1
+    else:
+        result.extend([dict(number=1, type='number'), dict(type='ellipsis')])
+    end_idx = page.number + adjacent_pages + 1
+    do_end_ellipsis = True
+    if end_idx >= page.paginator.num_pages - 1:
+        end_idx = page.paginator.num_pages + 1
+        do_end_ellipsis = False
+    result.extend([
+        dict(number=x, type='number') for x in range(start_idx, end_idx)])
+    if do_end_ellipsis:
+        result.extend([
+            dict(type='ellipsis'),
+            dict(number=page.paginator.num_pages, type='number')])
+    return result
 
 
 def forum_auth_form():
@@ -177,7 +161,7 @@ def forum_auth_form():
 @lru_cache(maxsize=100)
 def is_topic_comment_visible(
         comment, show_invisible: bool, request: WSGIRequest,
-        cache_key: str='topic-comment-listing') -> bool:
+        cache_key: str = 'topic-comment-listing') -> bool:
     """
     Tell the templating engine if a given comment should or shouldn't be
     visible in a given user context.

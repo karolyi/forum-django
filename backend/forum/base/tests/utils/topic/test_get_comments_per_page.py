@@ -5,7 +5,7 @@ from django.test.client import RequestFactory
 
 from ....utils.topic import _get_comments_per_page
 
-MAX_COMMENTS = settings.PAGINATOR_MAX_COMMENTS_LISTED
+MAX_COMMENTS = settings.PAGINATOR_MAX_COMMENTS_PER_PAGE
 
 
 class GetCommentsPerPageTestCase(TestCase):
@@ -26,7 +26,7 @@ class GetCommentsPerPageTestCase(TestCase):
         Should return the `comments_per_page` value when set in the
         session.
         """
-        self.request.session['comments_per_page'] = 3
+        self.request.session['comments-per-page'] = 3
         self.assertEqual(_get_comments_per_page(self.request), 3)
 
     def test_sets_and_returns_default_value(self):
@@ -36,4 +36,4 @@ class GetCommentsPerPageTestCase(TestCase):
         self.assertEqual(
             _get_comments_per_page(self.request), MAX_COMMENTS)
         self.assertEqual(
-            self.request.session['comments_per_page'], MAX_COMMENTS)
+            self.request.session['comments-per-page'], MAX_COMMENTS)
