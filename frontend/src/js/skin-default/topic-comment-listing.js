@@ -1,10 +1,10 @@
 /* global interpolate  */
 import $ from 'jquery'
-import { ScrollFix } from './scrollFix'
+import { ScrollFix } from './scroll-fix'
 import { options as commonOptions, extractTemplateHtml } from './common'
-import { add as popOverHoverContentAdd } from './popOverHoverContent'
+import { add as popOverHoverContentAdd } from './popover-hovercontent'
 import { add as usernameAdd } from './username'
-import { add as timeActualizerAdd } from './timeActualizer'
+import { add as timeActualizerAdd } from './time-actualizer'
 
 require('bootstrap/js/src/tooltip')
 

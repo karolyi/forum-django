@@ -33,8 +33,8 @@ const anyCharRegex = /^\S+$/i
 
 // const paginator = require('./paginator')
 // const userName = require('./userName')
-// const timeActualizer = require('./timeActualizer')
-// const popOverHoverContent = require('./popOverHoverContent')
+// const timeActualizer = require('./time-actualizer')
+// const popOverHoverContent = require('./popover-hovercontent')
 
 export class Instance {
   constructor(options) {

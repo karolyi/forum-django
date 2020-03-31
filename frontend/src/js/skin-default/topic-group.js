@@ -3,8 +3,8 @@ import 'bootstrap/js/src/tooltip'
 import { options as commonOptions, extractTemplateHtml } from './common'
 import { init as paginatorInit } from './paginator'
 import { add as usernameAdd } from './username'
-import { add as timeActualizerAdd } from './timeActualizer'
-import { add as popOverHoverContentAdd } from './popOverHoverContent'
+import { add as timeActualizerAdd } from './time-actualizer'
+import { add as popOverHoverContentAdd } from './popover-hovercontent'
 
 class Instance {
   constructor(options) {

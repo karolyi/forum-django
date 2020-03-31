@@ -2,11 +2,11 @@
 require('bootstrap/js/src/tooltip')
 require('bootstrap/js/src/alert')
 const $ = require('jquery')
-const richTextArea = require('./richTextArea')
+const richTextArea = require('./rich-text-area')
 // const paginator = require('./paginator')
 // const userName = require('./userName')
-// const timeActualizer = require('./timeActualizer')
-// const popOverHoverContent = require('./popOverHoverContent')
+// const timeActualizer = require('./time-actualizer')
+// const popOverHoverContent = require('./popover-hovercontent')
 
 export class Instance {
   constructor(options) {

@@ -32,16 +32,16 @@ module.exports = {
       '../src/js/skin-default/username',
     ],
     timeActualizer: [
-      '../src/js/skin-default/timeActualizer',
+      '../src/js/skin-default/time-actualizer',
     ],
     topicCommentListing: [
-      '../src/js/skin-default/topicCommentListing',
+      '../src/js/skin-default/topic-comment-listing',
     ],
     topicCommentsExpansion: [
-      '../src/js/skin-default/topicCommentsExpansion',
+      '../src/js/skin-default/topic-comments-expansion',
     ],
     settingsPage: [
-      '../src/js/skin-default/settingsPage',
+      '../src/js/skin-default/settings-page',
     ],
   },
 

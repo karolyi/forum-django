@@ -3,7 +3,7 @@ require('bootstrap/js/src/tooltip')
 const $ = require('jquery')
 const moment = require('moment')
 // const momentTimezone = require('moment-timezone')
-const mutationObserver = require('./mutationObserver')
+const mutationObserver = require('./mutation-observer')
 
 const instanceMap = new Map()
 const options = {}
