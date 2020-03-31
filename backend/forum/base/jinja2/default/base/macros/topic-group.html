@@ -51,7 +51,7 @@
         topicType: '{{ topic_type|escapejs }}',
         urls: {
             topicListPage: '{{ url('forum:rest-api:v1-topic-list-page') }}'
-            {% if topic_list is none %}
+            {%- if topic_list is none %}
             , archivedTopicsStart: '{{ url('forum:rest-api:v1-archived-topics-start') }}'
             {% endif %}
         },
@@ -67,7 +67,7 @@
             buttonTopicsArchivedLoad: '.loader-topics-archived'
             {%- endif %}
         },
-        pageMax: {{ 0 if topic_list is none else topic_list.paginator.num_pages }},
+        pageMax: {{ (0 if topic_list is none else topic_list.paginator.num_pages)|tojson }},
     });
 </script>
 {%- endmacro %}

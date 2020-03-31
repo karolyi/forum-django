@@ -23,11 +23,12 @@
         </a>
     </section>
     {% if topic.description %}
-    <section class="card card-block card-outline-primary" aria-label="{{ _('Topic description') }}">
-        <div class="card-text">
+    <section class="card card-block border-info mb-1" aria-label="{{ _('Topic description') }}">
+        <div class="card-body">
             {{ topic.description }}
         </div>
     </section>
+    <hr class="mb-3">
     {% endif %}
     {% for comment in page_comments %}
         {{ topic_comment_template(comment=comment, is_template=False, show_invisible=False) }}

@@ -10,6 +10,9 @@
       padding: $grid-gutter-width / 8;
     }
   }
+  .quote .value {
+    word-break: break-word;
+  }
 
   .is-admin, .is-banned {
     color: $danger;

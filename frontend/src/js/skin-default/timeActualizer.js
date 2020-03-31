@@ -46,9 +46,7 @@ const calculateNatural = (currentMomentUtc, dateMomentUtc) => {
     partOne = interpolatedStr
     if (weeksCount === 0) {
       // No weeks applicable, return this
-      return interpolate(formatStrOnePart, {
-        partOne,
-      }, true)
+      return interpolate(formatStrOnePart, { partOne }, true)
     }
   }
   // Weeks, days have to be subtracted with the week count

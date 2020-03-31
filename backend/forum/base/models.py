@@ -254,7 +254,7 @@ class CommentQuerySet(QuerySet):
             'pk', 'user', 'topic', 'prev_comment', 'prev_comment__user',
             'prev_comment__topic', 'reply_set', 'reply_set__user',
             'reply_set__topic')
-        for item in qs._iterable_class(qs):
+        for item in qs:
             if self._fetch_cache.do_user:
                 self._user_pks.add(item['user'])
             if self._fetch_cache.do_topic:
@@ -344,8 +344,9 @@ class CommentQuerySet(QuerySet):
         self._set_pksets()
         self._users = User.objects.filter(pk__in=self._user_pks).order_by()
         self._topics = Topic.objects.filter(pk__in=self._topic_pks).order_by()
-        self._comments = Comment.objects.filter(
-            pk__in=self._all_pks).order_by(*self.query.order_by)
+        self._comments = Comment.objects.filter(pk__in=self._all_pks)
+        self._comments.query.order_by = self.query.order_by
+        self._comments.query.extra_order_by = self.query.extra_order_by
         self._set_comment_caches()
         if self._prefetch_related_lookups and not self._prefetch_done:
             self._prefetch_related_lookups = tuple(
@@ -380,16 +381,11 @@ class CommentQuerySet(QuerySet):
         Return a `QuerySet` loaded with the requested related relations
         on the `Comment`s. Use this as the last part of your query.
         """
-        _fetch_cache = CommentFetchCache(
-            do_user=user if user is not None else self._fetch_cache.do_user,
-            do_topic=(
-                topic if topic is not None else self._fetch_cache.do_topic),
-            do_prev_comment=prev_comment if prev_comment is not None
-            else self._fetch_cache.do_prev_comment,
-            do_reply_set=reply_set if reply_set is not None
-            else self._fetch_cache.do_reply_set)
         return self._chain(
-            _fetch_cache=_fetch_cache, _wsgi_request=request)
+            _fetch_cache=CommentFetchCache(
+                do_user=user, do_topic=topic, do_prev_comment=prev_comment,
+                do_reply_set=reply_set),
+            _wsgi_request=request)
 
 
 class Comment(Model):

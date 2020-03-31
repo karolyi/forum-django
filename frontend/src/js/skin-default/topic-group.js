@@ -16,7 +16,7 @@ class Instance {
     const jqTipTemplate =
       this.jqRoot.find(`.forum-topic-tooltip-template[data-slug="${slug}"]`)
     const contentHtml = extractTemplateHtml(jqTipTemplate[0])
-    jqTip.find('.popover-content').empty().append(contentHtml)
+    jqTip.find('.popover-body').html(contentHtml)
   }
 
   activateContent() {

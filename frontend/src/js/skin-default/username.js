@@ -35,7 +35,8 @@ class ForumUserName {
     // Load has failed for some reason
     if (!this.jqUserHovered) return
     this.jqUserHovered.attr(
-      'title', '<span class="fa fa-chain-broken" aria-hidden="true"></span>',
+      'title',
+      '<span class="fa fa-fw fa-chain-broken" aria-hidden="true"></span>',
     )
     this.jqUserHovered.tooltip('_fixTitle').tooltip('show')
   }
@@ -79,6 +80,7 @@ class ForumUserName {
     this.jqUserHovered
       .attr('title', clonedTemplate[0].outerHTML)
       .tooltip('_fixTitle')
+      .tooltip('update')
       .tooltip('show')
   }
 
