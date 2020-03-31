@@ -1,4 +1,4 @@
-import { CommentListing } from './topicCommentListing'
+import { CommentListing } from './topic-comment-listing'
 
 const $ = require('jquery')
 
