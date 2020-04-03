@@ -1,7 +1,9 @@
 {% from 'default/macros/forum-time.html' import forum_time %}
 {% from 'default/macros/forum-username.html' import forum_username %}
+{% from 'default/macros/paginator-generic.html' import paginator_generic %}
 
 {% macro topic_group_page(topic_list=[]) -%}
+<section class="topic-list-wrapper">
 {% if topic_list is iterable %}
     {% for model_topic in topic_list %}
     <div class="row topic-list-item-row {{ loop.cycle('odd', 'even') }}">
@@ -28,4 +30,8 @@
     </template>
     {% endfor %}
 {% endif %}
+</section>
+<section class="pagination-topicgroup">
+    {{ paginator_generic(page=topic_list, adjacent_pages=django_settings.PAGINATOR_DEFAULT_ADJACENT_PAGES) }}
+</section>
 {%- endmacro %}

@@ -1,5 +1,4 @@
 {% from 'default/base/macros/topic-group-page.html' import topic_group_page %}
-{% from 'default/macros/paginator-generic.html' import paginator_generic %}
 
 {% macro topic_group(topic_list, topic_type) -%}
 <div class="card topicgroup-wrapper topic-type-{{ topic_type }}">
@@ -15,7 +14,7 @@
         </h4>
     </div>
     <div class="card-block container-fluid">
-        {% if topic_list is not none %}
+    {% if topic_list is not none %}
         <div class="row topic-header-row">
             <div class="col-xs-6 col-sm-6">
                 {{ _('Topic') }}
@@ -31,20 +30,15 @@
                 {{ _('Total comments') }}
             </div>
         </div>
-        <section class="topic-list-wrapper">
-            {{ topic_group_page(topic_list=topic_list) }}
-        </section>
-        <section class="pagination-topicgroup">
-            {{ paginator_generic(page=topic_list, adjacent_pages=django_settings.PAGINATOR_DEFAULT_ADJACENT_PAGES) }}
-        </section>
-        {% elif topic_list is none %}
+        {{- topic_group_page(topic_list=topic_list) -}}
+    {% elif topic_list is none %}
         <section class="loader-topics-archived-wrapper text-center">
             <button class="loader-topics-archived btn btn-primary">
                 <span class="fa fa-arrow-circle-o-down" aria-hidden="true"></span>
                 {{ _('Load archived topics') }}
             </button>
         </section>
-        {% endif %}
+    {% endif %}
     </div>
 </div>
 <script type="text/javascript">
@@ -68,7 +62,7 @@
             buttonTopicsArchivedLoad: '.loader-topics-archived'
             {%- endif %}
         },
-        pageMax: {{ (0 if topic_list is none else topic_list.paginator.num_pages)|tojson }},
+        pageMax: {{ (0 if topic_list is none else topic_list.paginator.num_pages)|tojson }}
     });
 </script>
 {%- endmacro %}
