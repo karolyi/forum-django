@@ -35,6 +35,11 @@
 // awesome-bootstrap-checkbox
 // @import "fixes/awesome-bootstrap-checkbox";
 
+.navbar {
+  .navbar-brand {
+  }
+}
+
 .navbar-content-spacer {
   // Adjust when necessary
   height: 51px + $grid-gutter-width / 2;

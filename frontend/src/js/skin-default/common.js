@@ -1,6 +1,9 @@
 import $ from 'jquery'
 import 'select2'
 import templateSettings from 'lodash/templateSettings'
+// The navbar needs these on all pages
+import 'bootstrap/js/src/dropdown'
+import 'bootstrap/js/src/collapse'
 
 window.$ = $
 

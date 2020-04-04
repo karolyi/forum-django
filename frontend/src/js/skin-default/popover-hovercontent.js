@@ -7,12 +7,13 @@ import 'bootstrap/js/src/popover'
  * is hovered.
  *
  * We have element and tip. The element is the element initialized with
- * popover, and the tip is the popver tip element itself.
+ * popover, and the tip is the popover tip element itself.
  */
+const tooltipGroups = {}
 
 const initializeTipContent = (jqElement, jqTip) => {
   if (jqTip.data('isInitialized')) return
-  const options = jqElement.data('optionsPopOverHoverContent')
+  const options = jqElement.data('optionsPopoverHovercontent')
   jqTip.data('isInitialized', true)
   if (!options.callbacks.contentInit) return
   jqElement.on('inserted.bs.popover', () => {
@@ -20,10 +21,11 @@ const initializeTipContent = (jqElement, jqTip) => {
   })
 }
 
+
 const onMouseLeaveTip = (jqElement, jqTip) => {
   jqTip.data('isTipMouseEntered', false)
   setTimeout(() => {
-    if (jqElement.data('isButtonMouseEntered')) return
+    if (jqElement.data('isElementMouseEntered')) return
     jqElement.popover('hide')
     jqTip.data('isShown', false)
   })
@@ -33,15 +35,19 @@ const onMouseEnterTip = (jqElement, jqTip) => {
   jqTip.data('isTipMouseEntered', true)
 }
 
+const hideTip = (jqElement, force) => {
+  jqElement.data('isElementMouseEntered', false)
+  const popOverInstance = jqElement.data('bs.popover')
+  const jqTip = $(popOverInstance.getTipElement())
+  if (jqTip.data('isTipMouseEntered') && !force) return
+  jqElement.popover('hide')
+  jqTip.data('isShown', false)
+}
+
 const onMouseLeaveElement = (event) => {
   const jqElement = $(event.currentTarget)
-  jqElement.data('isButtonMouseEntered', false)
   setTimeout(() => {
-    const popOverInstance = jqElement.data('bs.popover')
-    const jqTip = $(popOverInstance.getTipElement())
-    if (jqTip.data('isTipMouseEntered')) return
-    jqElement.popover('hide')
-    jqTip.data('isShown', false)
+    hideTip(jqElement, false)
   })
 }
 
@@ -58,7 +64,14 @@ const bindEventsToTip = (jqElement, jqTip) => {
 
 const onMouseEnterElement = (event) => {
   const jqElement = $(event.currentTarget)
-  jqElement.data('isButtonMouseEntered', true)
+  jqElement.data('isElementMouseEntered', true)
+  const options = jqElement.data('optionsPopoverHovercontent')
+  if (options.groupName) {
+    for (const jqItem of tooltipGroups[options.groupName]) {
+      if (jqItem.is(jqElement)) continue
+      hideTip(jqItem, true)
+    }
+  }
   const popOverInstance = jqElement.data('bs.popover')
   const jqTip = $(popOverInstance.getTipElement())
   if (!jqTip.data('isShown')) {
@@ -89,18 +102,24 @@ export function add(targetNode, options) {
   const jqElement = $(targetNode)
   // Hang all the options on the element, so it doesn't need to be
   // listened for garbage collection on DOM removal
-  jqElement.data('optionsPopOverHoverContent', options)
-  const optionsPopOver = options.popover || {}
-  optionsPopOver.trigger = 'manual'
+  jqElement.data('optionsPopoverHovercontent', options)
+  const optionsPopover = options.popover || {}
+  optionsPopover.trigger = 'manual'
   jqElement
     // an empty 'data-content' has to be added, otherwise popover won't
     // initialize
     .attr('data-content', ' ')
     .mouseenter(onMouseEnterElement)
     .mouseleave(onMouseLeaveElement)
-    .popover(optionsPopOver)
+    .popover(optionsPopover)
   if (options.clickTakeOver) {
     // Assign the click action too
     jqElement.click(onClickElement)
+  }
+  if (options.groupName) {
+    if (!tooltipGroups[options.groupName]) {
+      tooltipGroups[options.groupName] = new Set()
+    }
+    tooltipGroups[options.groupName].add(jqElement)
   }
 }

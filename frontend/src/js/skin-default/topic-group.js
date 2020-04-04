@@ -4,7 +4,7 @@ import { options as commonOptions, extractTemplateHtml } from './common'
 import { init as paginatorInit } from './paginator'
 import { add as usernameAdd } from './username'
 import { add as timeActualizerAdd } from './time-actualizer'
-import { add as popOverHoverContentAdd } from './popover-hovercontent'
+import { add as popoverHovercontentAdd } from './popover-hovercontent'
 
 class Instance {
   constructor(options) {
@@ -85,8 +85,9 @@ class Instance {
     timeActualizerAdd(jqTimeElements)
     const jqTopicLinkElements = this.jqRoot.find('.topic-link')
     for (const node of jqTopicLinkElements) {
-      popOverHoverContentAdd(node, {
+      popoverHovercontentAdd(node, {
         clickTakeOver: false,
+        groupName: 'topic-tooltips',
         callbacks: {
           contentInit: ::this.initializePopoverContent,
         },

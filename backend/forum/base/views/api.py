@@ -30,12 +30,11 @@ class UserSlugsView(JsonResponseMixin):
             raise Http404
         dict_result = dict()
         for user in qs_settings:
-            dict_result[user.slug] = {
-                'quote': user.quote, 'isSuperuser': user.is_superuser,
-                'isStaff': user.is_staff, 'isBanned': user.is_banned,
+            dict_result[user.slug] = dict(
+                quote=user.quote, isSuperuser=user.is_superuser,
+                isStaff=user.is_staff, isBanned=user.is_banned,
                 # Default values here
-                'rating': dict(avg=0, count=0),
-            }
+                rating=dict(avg=0, count=0))
         return dict_result
 
     def _equip_ratings(self, dict_result: dict):

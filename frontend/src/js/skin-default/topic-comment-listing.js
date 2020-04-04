@@ -2,7 +2,7 @@
 import $ from 'jquery'
 import { ScrollFix } from './scroll-fix'
 import { options as commonOptions, extractTemplateHtml } from './common'
-import { add as popOverHoverContentAdd } from './popover-hovercontent'
+import { add as popoverHovercontentAdd } from './popover-hovercontent'
 import { add as usernameAdd } from './username'
 import { add as timeActualizerAdd } from './time-actualizer'
 import { init as paginatorInit } from './paginator'
@@ -291,7 +291,7 @@ export class CommentListing {
     const jqButtonCommentActions =
       this.jqWrappers.comments.find(this.options.selectors.commentActions)
     for (const button of jqButtonCommentActions) {
-      popOverHoverContentAdd(button, {
+      popoverHovercontentAdd(button, {
         clickTakeOver: true,
         callbacks: {
           contentInit: ::this.initializeCommentActionsContent,
