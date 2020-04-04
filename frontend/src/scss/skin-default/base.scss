@@ -64,6 +64,9 @@
 
     .card-block {
       .topic-header-row {
+        @include media-breakpoint-down(xs) {
+          text-align: center;
+        }
         font-weight: bold;
       }
 
@@ -94,6 +97,9 @@
           }
 
           .topic-link {
+            @include media-breakpoint-down(xs) {
+              text-align: center;
+            }
             margin: 0;
             padding: .5rem 0;
             display: block;

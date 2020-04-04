@@ -5,13 +5,12 @@
 {% macro topic_group_page(topic_list=[]) -%}
 <section class="topic-list-wrapper">
     <div class="row topic-header-row">
-        <div class="col-xs-6 col-sm-6">
+        <div class="col-xs-6 col-sm-6 header-topic">
             {{ _('Topic') }}
         </div>
         <div class="col-xs-6 col-sm-2 text-center">
             {{ _('Last commented at') }}
         </div>
-        <div class="clearfix visible-xs-block"></div>
         <div class="col-xs-6 col-sm-2 text-center">
             {{ _('Last commented by') }}
         </div>
@@ -29,7 +28,6 @@
         <div class="col-xs-6 col-sm-2 text-center">
             {{ forum_time(time=model_topic.last_comment.time) }}
         </div>
-        <div class="clearfix visible-xs-block"></div>
         <div class="col-xs-6 col-sm-2 text-center">
             {{ forum_username(user=model_topic.last_comment.user) }}
         </div>

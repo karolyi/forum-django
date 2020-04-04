@@ -90,6 +90,9 @@ class Instance {
         callbacks: {
           contentInit: ::this.initializePopoverContent,
         },
+        popover: {
+          placement: 'auto',
+        },
       })
     }
     this.jqWrappers.paginator =
