@@ -1,11 +1,12 @@
 from decimal import Decimal
 
 from django.core.handlers.wsgi import WSGIRequest
-from django.core.paginator import EmptyPage, InvalidPage, Paginator
+from django.core.paginator import EmptyPage, InvalidPage, Page, Paginator
 from django.db.models.aggregates import Avg, Count
-from django.http.response import Http404, HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.http.response import Http404, JsonResponse
+from django.utils.functional import cached_property
 from django.views.decorators.http import require_GET
+from django.views.generic.base import TemplateView
 
 from forum.base.utils.home import collect_topic_page
 from forum.rating.models import UserRating
@@ -60,43 +61,63 @@ class UserSlugsView(JsonResponseMixin):
         return dict_result
 
 
-def v1_topic_list_page(request: WSGIRequest) -> HttpResponse:
+class TopicListPageView(TemplateView):
     """
     Render a HTML for a topic page, requested by the paginating script.
     """
-    # Sanitize input
-    topic_type = request.GET.get('topic_type')
-    if request.GET.get('topic_type') not in LIST_TOPIC_TYPE:
-        raise Http404
-    try:
-        page_id = int(request.GET.get('page_id'))
-    except (TypeError, ValueError):
-        raise Http404
-    try:
-        topic_list = collect_topic_page(
-            request=request, topic_type=topic_type, page_id=page_id,
-            force=True)
-    except InvalidPage:
-        raise Http404
-    return render(
-        request=request,
-        template_name='default/base/render-topic-group-page-inside.html',
-        context={
-            'topic_list': topic_list
-        })
+    template_name = 'default/base/render-topic-group-page-inside.html'
+
+    @cached_property
+    def _topic_type(self) -> str:
+        'Return the topic type, raise `Http404` if invalid.'
+        topic_type = self.request.GET.get('topic_type')
+        if topic_type not in LIST_TOPIC_TYPE:
+            raise Http404
+        return topic_type
+
+    @cached_property
+    def _page_id(self) -> int:
+        'Return the page ID, raise `Http404` if invalid.'
+        try:
+            return int(self.request.GET.get('page_id'))
+        except (TypeError, ValueError):
+            raise Http404
+
+    @cached_property
+    def _topic_list(self) -> Page:
+        """
+        Return the collected topic list page, raise `Http404` if
+        anything is invalid.
+        """
+        try:
+            return collect_topic_page(
+                request=self.request, topic_type=self._topic_type,
+                page_id=self._page_id, force=True)
+        except InvalidPage:
+            raise Http404
+
+    def get_context_data(self) -> dict:
+        'Add `topic_list` to the context.'
+        context = super().get_context_data()
+        context.update(topic_list=self._topic_list)
+        return context
 
 
-def v1_archived_topics_start(request: WSGIRequest) -> HttpResponse:
+class ArchivedTopicsStartView(TemplateView):
     """
     Render the starter HTML for the archived topics, including the
     first page of the topic listing section, and the paginator wrapper.
     """
-    qs_topics_archived = collect_topic_page(
-        request=request, topic_type=TOPIC_TYPE_ARCHIVED, page_id=1, force=True)
-    return render(
-        request=request,
-        template_name='default/base/render-topic-group-page-inside.html',
-        context=dict(topic_list=qs_topics_archived))
+    template_name = 'default/base/render-topic-group-page-inside.html'
+
+    def get_context_data(self) -> dict:
+        'Add `topic_list` to the context.'
+        context = super().get_context_data()
+        qs_topics_archived = collect_topic_page(
+            request=self.request, topic_type=TOPIC_TYPE_ARCHIVED, page_id=1,
+            force=True)
+        context.update(topic_list=qs_topics_archived)
+        return context
 
 
 @require_GET  # Checked second
