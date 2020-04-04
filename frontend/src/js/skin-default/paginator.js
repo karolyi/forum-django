@@ -1,34 +1,34 @@
-// const $ = require('jquery')
+import $ from 'jquery'
 
 class Paginator {
-  updateUi() {
-    this.options.jqRoot.find('.page-numbered.active').removeClass('active')
-    this.options.jqRoot
-      .find(`.page-numbered[data-page-id=${this.currentPageNo}]`)
-      .addClass('active')
-  }
-
   onClickPaginateNumber(event) {
     event.preventDefault()
-    const { parentElement } = event.currentTarget
-    if (parentElement.classList.contains('active')) return
-    this.currentPageNo = parseInt(parentElement.dataset.pageId, 10)
-    this.options.callbackLoadPage(this.currentPageNo)
-  }
-
-  initVariables() {
-    this.currentPageNo = this.options.currentPageNo
-    this.options.jqRoot.find('.page-numbered a')
-      .click(::this.onClickPaginateNumber)
+    const jqElement = $(event.currentTarget)
+    const jqParentElement = jqElement.parent()
+    if (jqParentElement.hasClass('active')) return
+    jqElement.html($('<span/>', {
+      class: 'fa fa-spinner fa-pulse fa-fw',
+      'aria-hidden': true,
+    }))
+    this.clickedPageNo = parseInt(jqParentElement.data('pageId'), 10)
+    this.options.jqRoot.find('.page-numbered a').each((idx, node) => {
+      const jqNode = $(node)
+      if (jqNode.is(jqElement)) return
+      jqNode.replaceWith($('<span/>', {
+        class: 'page-link',
+        text: jqNode.text(),
+      }))
+    })
+    this.options.callbackLoadPage(this.clickedPageNo)
   }
 
   constructor(options) {
     this.options = options
-    this.initVariables()
+    this.options.jqRoot.find('.page-numbered a')
+      .click(::this.onClickPaginateNumber)
   }
 }
 
 export function init(options) {
-  const paginator = new Paginator(options)
-  return paginator
+  return new Paginator(options)
 }

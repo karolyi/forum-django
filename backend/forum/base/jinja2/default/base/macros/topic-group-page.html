@@ -4,7 +4,21 @@
 
 {% macro topic_group_page(topic_list=[]) -%}
 <section class="topic-list-wrapper">
-{% if topic_list is iterable %}
+    <div class="row topic-header-row">
+        <div class="col-xs-6 col-sm-6">
+            {{ _('Topic') }}
+        </div>
+        <div class="col-xs-6 col-sm-2 text-center">
+            {{ _('Last commented at') }}
+        </div>
+        <div class="clearfix visible-xs-block"></div>
+        <div class="col-xs-6 col-sm-2 text-center">
+            {{ _('Last commented by') }}
+        </div>
+        <div class="col-xs-6 col-sm-2 text-center">
+            {{ _('Total comments') }}
+        </div>
+    </div>
     {% for model_topic in topic_list %}
     <div class="row topic-list-item-row {{ loop.cycle('odd', 'even') }}">
         <div class="col-xs-6 col-sm-6">
@@ -29,9 +43,8 @@
         </div>
     </template>
     {% endfor %}
-{% endif %}
-</section>
-<section class="pagination-topicgroup">
-    {{ paginator_generic(page=topic_list, adjacent_pages=django_settings.PAGINATOR_DEFAULT_ADJACENT_PAGES) }}
+    <div class="pagination-topicgroup">
+        {{ paginator_generic(page=topic_list, adjacent_pages=django_settings.PAGINATOR_DEFAULT_ADJACENT_PAGES) }}
+    </div>
 </section>
 {%- endmacro %}

@@ -15,23 +15,8 @@
     </div>
     <div class="card-block container-fluid">
     {% if topic_list is not none %}
-        <div class="row topic-header-row">
-            <div class="col-xs-6 col-sm-6">
-                {{ _('Topic') }}
-            </div>
-            <div class="col-xs-6 col-sm-2 text-center">
-                {{ _('Last commented at') }}
-            </div>
-            <div class="clearfix visible-xs-block"></div>
-            <div class="col-xs-6 col-sm-2 text-center">
-                {{ _('Last commented by') }}
-            </div>
-            <div class="col-xs-6 col-sm-2 text-center">
-                {{ _('Total comments') }}
-            </div>
-        </div>
         {{- topic_group_page(topic_list=topic_list) -}}
-    {% elif topic_list is none %}
+    {% else %}
         <section class="loader-topics-archived-wrapper text-center">
             <button class="loader-topics-archived btn btn-primary">
                 <span class="fa fa-arrow-circle-o-down" aria-hidden="true"></span>
@@ -53,9 +38,9 @@
         selectors: {
             root: '.topicgroup-wrapper.topic-type-{{ topic_type }}',
             username: '.topic-list-item-row .username',
-            paginationWrapper: '.pagination-topicgroup',
-            paginator: 'ul.pagination',
-            topicListWrapper: '.topic-list-wrapper'
+            topicListWrapper: '.topic-list-wrapper',
+            paginationWrapper: '.topic-list-wrapper .pagination-topicgroup',
+            paginator: 'ul.pagination'
             {%- if topic_list is none -%}
             ,
             loaderTopicsArchivedWrapper: '.loader-topics-archived-wrapper',

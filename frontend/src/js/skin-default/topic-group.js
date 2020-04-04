@@ -19,30 +19,12 @@ class Instance {
     jqTip.find('.popover-body').html(contentHtml)
   }
 
-  activateContent() {
-    const jqUsers = this.jqRoot.find('[data-toggle=username]')
-    usernameAdd(jqUsers)
-    const jqTimeElements = this.jqRoot.find('.forum-time')
-    timeActualizerAdd(jqTimeElements)
-    const jqTopicLinkElements = this.jqRoot.find('.topic-link')
-    for (const node of jqTopicLinkElements) {
-      popOverHoverContentAdd(node, {
-        clickTakeOver: false,
-        callbacks: {
-          contentInit: ::this.initializePopoverContent,
-        },
-      })
-    }
-  }
-
   onXhrSuccessLoadPage(html) {
     this.jqAjaxRequest = null
     this.jqWrappers.topicList.html(html)
-    this.activateContent()
-    this.paginator.updateUi()
+    this.initUi()
   }
 
-  // onXhrErrorLoadPage(xhr) {
   onXhrErrorLoadPage() {
     this.jqAjaxRequest = null
   }
@@ -60,21 +42,15 @@ class Instance {
         page_id: currentPageNo,
       },
       dataType: 'html',
-    // https://github.com/tc39/proposal-bind-operator
     })).then(::this.onXhrSuccessLoadPage, ::this.onXhrErrorLoadPage)
   }
 
   onXhrSuccessArchivedStart(html) {
-    const jqHtml = $(html)
-    // IMPORTANT: keep the same class names in
-    // topic-archived-start.html!
-    this.jqWrappers.topicList.empty().append(
-      jqHtml.filter(this.options.selectors.topicListWrapper).contents(),
-    )
-    const jqPaginationHtml =
-      jqHtml.filter(this.options.selectors.paginationWrapper)
-    this.options.pageMax = jqPaginationHtml.data('max-pages')
-    this.jqWrappers.paginator.empty().append(jqPaginationHtml.contents())
+    this.jqWrappers.loaderTopicsArchived.replaceWith(html)
+    this.jqWrappers.topicList =
+      this.jqRoot.find(this.options.selectors.topicListWrapper)
+    delete this.jqWrappers.loaderTopicsArchived
+    delete this.jqWrappers.buttonTopicsArchivedLoad
     this.initUi()
     this.focusOnHeader()
   }
@@ -91,9 +67,11 @@ class Instance {
   /* eslint-enable class-methods-use-this, no-unused-vars */
 
   onClickButtonTopicsArchivedLoad() {
-    this.jqWrappers.loaderTopicsArchived.remove()
-    delete this.jqWrappers.loaderTopicsArchived
-    delete this.jqWrappers.buttonTopicsArchivedLoad
+    this.jqWrappers.buttonTopicsArchivedLoad
+      .prop('disabled', true)
+      .find('.fa')
+      .removeClass()
+      .addClass('fa fa-spinner fa-pulse fa-fw')
     $.when($.ajax({
       url: this.options.urls.archivedTopicsStart,
       dataType: 'html',
@@ -101,20 +79,31 @@ class Instance {
   }
 
   initUi() {
-    // Init paginator
+    const jqUsers = this.jqRoot.find('[data-toggle=username]')
+    usernameAdd(jqUsers)
+    const jqTimeElements = this.jqRoot.find('.forum-time')
+    timeActualizerAdd(jqTimeElements)
+    const jqTopicLinkElements = this.jqRoot.find('.topic-link')
+    for (const node of jqTopicLinkElements) {
+      popOverHoverContentAdd(node, {
+        clickTakeOver: false,
+        callbacks: {
+          contentInit: ::this.initializePopoverContent,
+        },
+      })
+    }
+    this.jqWrappers.paginator =
+      this.jqRoot.find(this.options.selectors.paginationWrapper)
     this.paginator = paginatorInit({
-      currentPageNo: 1,
-      jqRoot: this.jqRoot.find(this.options.selectors.paginator),
+      jqRoot: this.jqWrappers.paginator.find(this.options.selectors.paginator),
       callbackLoadPage: ::this.loadPage,
     })
-    this.activateContent()
   }
 
   initialize() {
     this.jqRoot = $(this.options.selectors.root)
     this.jqWrappers = {
       topicList: this.jqRoot.find(this.options.selectors.topicListWrapper),
-      paginator: this.jqRoot.find(this.options.selectors.paginationWrapper),
     }
     // Non archived or archived & shown topics will have a pageMax > 0
     if (this.options.pageMax > 0) {

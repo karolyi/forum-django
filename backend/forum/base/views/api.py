@@ -96,8 +96,7 @@ def v1_archived_topics_start(request: WSGIRequest) -> HttpResponse:
     return render(
         request=request,
         template_name='default/base/render-topic-group-page-inside.html',
-        context={
-            'topic_list': qs_topics_archived})
+        context=dict(topic_list=qs_topics_archived))
 
 
 @require_GET  # Checked second
