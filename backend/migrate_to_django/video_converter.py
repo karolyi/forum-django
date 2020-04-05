@@ -1,5 +1,4 @@
-import urllib
-from urllib.parse import parse_qsl, urlparse
+from urllib.parse import parse_qsl, quote, urlparse
 
 import requests
 from bs4 import BeautifulSoup as bs
@@ -90,7 +89,7 @@ def get_soundcloud_player(video_url):
     html_string = (
         '<iframe class="player-wrapper" '
         'src="https://w.soundcloud.com/player/?url=%s&show_artwork=true'
-        '&auto_play=false"></iframe>') % urllib.quote(sound_url)
+        '&auto_play=false"></iframe>') % quote(string=sound_url)
     return create_embed_obj(html_string, 'maxheight-166'), sound_url
 
 
@@ -287,7 +286,7 @@ def get_mixcloud_player(video_url):
         feed_url = get_parameter(video_url, 'feed')
         json_response = requests.get(
             url='http://www.mixcloud.com/oembed/?url=%s&format=json' %
-            urllib.quote(feed_url), verify=False, timeout=10).json()
+            quote(string=feed_url), verify=False, timeout=10).json()
         html = bs(json_response['html'])
         url = html.select('iframe')[0].get('src')
     except RequestException:
