@@ -268,7 +268,7 @@ export class CommentListing {
         afterScrollTo: ::this.afterScrollTo,
         updateUrl: ::this.updateUrl,
       },
-      scrollToInitial: this.options.scrollToId,
+      scrollToInitial: this.options.scrollToId || this.options.commentId,
     })
     this.scrollFix.initialize()
     if (this.options.listingMode === 'commentListing') {

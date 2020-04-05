@@ -32,11 +32,11 @@ export class ScrollFix {
     this.options.callbacks.afterScrollTo(jqNewScrollToElement, isScrolled)
   }
 
-  scrollTo(parameterScrollTo) {
+  scrollTo(param1) {
     // Return if we don't have a position telling callback function
     if (!this.options.callbacks.getScrollToElement) return
     const jqNewScrollToElement =
-      this.options.callbacks.getScrollToElement(parameterScrollTo)
+      this.options.callbacks.getScrollToElement(param1)
     const newScrollTop = jqNewScrollToElement.offset().top
     const jqDocument = $(document)
     const actualScrollTop = newScrollTop - common.options.navbarHeight
@@ -54,10 +54,9 @@ export class ScrollFix {
   }
 
   clearInitialScrollInterval() {
-    if (this.intervalInitialScroll) {
-      clearInterval(this.intervalInitialScroll)
-      this.intervalInitialScroll = null
-    }
+    if (!this.intervalInitialScroll) return
+    clearInterval(this.intervalInitialScroll)
+    this.intervalInitialScroll = null
   }
 
   onLoadWindow() {
