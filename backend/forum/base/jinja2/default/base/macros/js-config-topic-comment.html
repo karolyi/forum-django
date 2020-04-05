@@ -22,8 +22,8 @@
     },
     highlightedClass: 'is-highlighted',
     topicSlugOriginal: '{{ topic.slug|escapejs }}',
-    commentId: {{ comment_pk|default('null') }},
-    scrollToId: {{ scroll_to_pk|default('null') }},
+    commentId: {{ comment_pk|default(None)|tojson }},
+    scrollToId: {{ scroll_to_pk|default(None)|tojson }},
     listingMode: '{{ listing_mode|default('commentListing') }}',
     urls: {
         commentListing: {

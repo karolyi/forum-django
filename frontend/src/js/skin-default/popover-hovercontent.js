@@ -1,6 +1,6 @@
 import $ from 'jquery'
 import 'bootstrap/js/src/popover'
-
+import { observeRemoveJq } from './mutation-observer'
 /**
  * This module expands the bootstrap provided popover with showing the
  * popover until it's content is hovered or until the original element
@@ -98,8 +98,18 @@ const onClickElement = (event) => {
   bindEventsToTip(jqElement, jqTip)
 }
 
+const onRemoveObservedElement = (node) => {
+  const jqElement = $(node)
+  for (const setJqItems of Object.values(tooltipGroups)) {
+    for (const jqItem of setJqItems) {
+      if (jqElement.is(jqItem)) setJqItems.delete(jqItem)
+    }
+  }
+}
+
 export function add(targetNode, options) {
   const jqElement = $(targetNode)
+  observeRemoveJq(jqElement, onRemoveObservedElement)
   // Hang all the options on the element, so it doesn't need to be
   // listened for garbage collection on DOM removal
   jqElement.data('optionsPopoverHovercontent', options)

@@ -23,17 +23,19 @@
             {{ _('Back to topic listing') }}
         </a>
     </section>
-    <section class="pagination-comments">
-        {{ paginator_generic(page=page_comments, adjacent_pages=django_settings.PAGINATOR_DEFAULT_ADJACENT_PAGES) }}
-    </section>
-    {% if topic.description %}
-    <section class="card card-block border-info mb-1" aria-label="{{ _('Topic description') }}">
+    <section class="topic-description card card-block border-info mb-3" aria-label="{{ _('Topic description') }}">
+        <div class="card-header">
+            <h3 class="card-title topic-name text-center mb-0">{{ topic.name_html }}</h3>
+        </div>
+        {%- if topic.description %}
         <div class="card-body">
             {{ topic.description }}
         </div>
+        {% endif -%}
     </section>
-    <hr class="mb-3">
-    {% endif %}
+    <section class="pagination-comments">
+        {{ paginator_generic(page=page_comments, adjacent_pages=django_settings.PAGINATOR_DEFAULT_ADJACENT_PAGES) }}
+    </section>
     {% for comment in page_comments %}
         {{ topic_comment_template(comment=comment, is_template=False, show_invisible=False) }}
     {% endfor %}
