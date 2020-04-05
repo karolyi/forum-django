@@ -14,9 +14,6 @@ forum_urlpatterns = [
         arg=(urls_api, 'rest-api'), namespace='rest-api')),
     url(regex=r'^account/', view=include(
         arg=(urls_account, 'account'), namespace='account')),
-
-    # url(regex=r'^jsi18n/$', JavaScriptCatalog.as_view(domain='django'),
-    #     name='javascript-catalog'),
     url(regex=r'^', view=include(arg=(urls_base, 'base'), namespace='base')),
 ]
 

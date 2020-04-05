@@ -403,13 +403,9 @@ class Comment(Model):
     moved_from = ForeignKey(
         to=Topic, on_delete=SET_DEFAULT, null=True, default=None,
         related_name='moved_from', verbose_name=_('Moved from'))
-    time = DateTimeField(
-        # auto_now_add=True,
-        verbose_name=_('Commented at'))
-    number = PositiveIntegerField(
-        verbose_name=_('Comment number in topic'))
-    voting_value = SmallIntegerField(
-        verbose_name=_('Value of up/downvotes'))
+    time = DateTimeField(verbose_name=_('Commented at'))
+    number = PositiveIntegerField(verbose_name=_('Comment number in topic'))
+    voting_value = SmallIntegerField(verbose_name=_('Value of up/downvotes'))
     prev_comment = ForeignKey(
         to='self', on_delete=SET_DEFAULT, related_name='reply_set',
         verbose_name=_('Replied comment'), null=True, default=None)
@@ -422,11 +418,10 @@ class Comment(Model):
     ip = GenericIPAddressField(
         verbose_name=_('IP of the commenter'), null=False, blank=False)
     unique_id = CharField(
-        verbose_name=_('Obsolete unique ID'),
-        default=0,
-        max_length=20, unique=True)
+        verbose_name=_('Obsolete unique ID'), default=0, max_length=20,
+        unique=True)
     images = ManyToManyField(
-        'forum_cdn.Image', verbose_name=_('Images in this comment'))
+        to='forum_cdn.Image', verbose_name=_('Images in this comment'))
 
     objects = BaseManager.from_queryset(queryset_class=CommentQuerySet)()
 

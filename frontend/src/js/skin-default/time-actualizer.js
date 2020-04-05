@@ -1,9 +1,9 @@
 /* global npgettext, interpolate, pgettext, gettext */
-require('bootstrap/js/src/tooltip')
-const $ = require('jquery')
-const moment = require('moment')
+import 'bootstrap/js/src/tooltip'
+import $ from 'jquery'
+import moment from 'moment'
 // const momentTimezone = require('moment-timezone')
-const mutationObserver = require('./mutation-observer')
+import { observeRemoveJq } from './mutation-observer'
 
 const instanceMap = new Map()
 const options = {}
@@ -26,9 +26,7 @@ const calculateNatural = (currentMomentUtc, dateMomentUtc) => {
     partOne = interpolate(fmt, [yearsCount])
     if (monthsCount === 0) {
       // No months applicable, return this
-      return interpolate(formatStrOnePart, {
-        partOne,
-      }, true)
+      return interpolate(formatStrOnePart, { partOne }, true)
     }
   }
   // Months
@@ -38,10 +36,9 @@ const calculateNatural = (currentMomentUtc, dateMomentUtc) => {
       npgettext('naturaltime_js', '%s month', '%s months', monthsCount)
     const interpolatedStr = interpolate(fmt, [monthsCount])
     if (partOne) {
-      return interpolate(formatStrTwoParts, {
-        partOne,
-        partTwo: interpolatedStr,
-      }, true)
+      return interpolate(
+        formatStrTwoParts, { partOne, partTwo: interpolatedStr }, true,
+      )
     }
     partOne = interpolatedStr
     if (weeksCount === 0) {
@@ -55,16 +52,13 @@ const calculateNatural = (currentMomentUtc, dateMomentUtc) => {
     const fmt = npgettext('naturaltime_js', '%s week', '%s weeks', weeksCount)
     const interpolatedStr = interpolate(fmt, [weeksCount])
     if (partOne) {
-      return interpolate(formatStrTwoParts, {
-        partOne,
-        partTwo: interpolatedStr,
-      }, true)
+      return interpolate(
+        formatStrTwoParts, { partOne, partTwo: interpolatedStr }, true,
+      )
     }
     partOne = interpolatedStr
     if (daysCount === 0) {
-      return interpolate(formatStrOnePart, {
-        partOne,
-      }, true)
+      return interpolate(formatStrOnePart, { partOne }, true)
     }
   }
   // Days
@@ -73,16 +67,13 @@ const calculateNatural = (currentMomentUtc, dateMomentUtc) => {
     const fmt = npgettext('naturaltime_js', '%s day', '%s days', daysCount)
     const interpolatedStr = interpolate(fmt, [daysCount])
     if (partOne) {
-      return interpolate(formatStrTwoParts, {
-        partOne,
-        partTwo: interpolatedStr,
-      }, true)
+      return interpolate(
+        formatStrTwoParts, { partOne, partTwo: interpolatedStr }, true,
+      )
     }
     partOne = interpolatedStr
     if (hoursCount === 0) {
-      return interpolate(formatStrOnePart, {
-        partOne,
-      }, true)
+      return interpolate(formatStrOnePart, { partOne }, true)
     }
   }
   // Hours
@@ -91,16 +82,13 @@ const calculateNatural = (currentMomentUtc, dateMomentUtc) => {
     const fmt = npgettext('naturaltime_js', '%s hour', '%s hours', hoursCount)
     const interpolatedStr = interpolate(fmt, [hoursCount])
     if (partOne) {
-      return interpolate(formatStrTwoParts, {
-        partOne,
-        partTwo: interpolatedStr,
-      }, true)
+      return interpolate(
+        formatStrTwoParts, { partOne, partTwo: interpolatedStr }, true,
+      )
     }
     partOne = interpolatedStr
     if (minutesCount === 0) {
-      return interpolate(formatStrOnePart, {
-        partOne,
-      }, true)
+      return interpolate(formatStrOnePart, { partOne }, true)
     }
   }
   // Minutes
@@ -110,16 +98,13 @@ const calculateNatural = (currentMomentUtc, dateMomentUtc) => {
       npgettext('naturaltime_js', '%s minute', '%s minutes', minutesCount)
     const interpolatedStr = interpolate(fmt, [minutesCount])
     if (partOne) {
-      return interpolate(formatStrTwoParts, {
-        partOne,
-        partTwo: interpolatedStr,
-      }, true)
+      return interpolate(
+        formatStrTwoParts, { partOne, partTwo: interpolatedStr }, true,
+      )
     }
     partOne = interpolatedStr
     if (secondsCount === 0) {
-      return interpolate(formatStrOnePart, {
-        partOne,
-      }, true)
+      return interpolate(formatStrOnePart, { partOne }, true)
     }
   }
   // Seconds
@@ -128,15 +113,12 @@ const calculateNatural = (currentMomentUtc, dateMomentUtc) => {
       npgettext('naturaltime_js', '%s second', '%s seconds', secondsCount)
     const interpolatedStr = interpolate(fmt, [secondsCount])
     if (partOne) {
-      return interpolate(formatStrTwoParts, {
-        partOne,
-        partTwo: interpolatedStr,
-      }, true)
+      return interpolate(
+        formatStrTwoParts, { partOne, partTwo: interpolatedStr }, true,
+      )
     }
     partOne = interpolatedStr
-    return interpolate(formatStrOnePart, {
-      partOne,
-    }, true)
+    return interpolate(formatStrOnePart, { partOne }, true)
   }
 
   // This shouldn't be reached normally
@@ -163,14 +145,13 @@ export function add(jqTimeElements) {
   for (const domNode of jqTimeElements) {
     const jqElement = $(domNode)
     const momentInstance = moment.utc(jqElement.attr('datetime'))
-    const data = { jqElement, momentInstance }
     if (!instanceMap.has(domNode)) {
-      instanceMap.set(domNode, data)
+      instanceMap.set(domNode, { jqElement, momentInstance })
       jqElement.text(calculateNatural(currentMomentUtc, momentInstance))
       jqElement.tooltip()
     }
   }
-  mutationObserver.observeRemoveJq(jqTimeElements, onRemoveElement)
+  observeRemoveJq(jqTimeElements, onRemoveElement)
 }
 
 export function init(optionsPassed) {
