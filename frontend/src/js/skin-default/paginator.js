@@ -7,8 +7,7 @@ class Paginator {
     const jqParentElement = jqElement.parent()
     if (jqParentElement.hasClass('active')) return
     jqElement.html($('<span/>', {
-      class: 'fa fa-spinner fa-pulse fa-fw',
-      'aria-hidden': true,
+      class: 'fa fa-spinner fa-pulse', 'aria-hidden': true,
     }))
     this.clickedPageNo = parseInt(jqParentElement.data('pageId'), 10)
     this.options.jqRoot.find('.page-numbered a').each((idx, node) => {

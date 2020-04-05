@@ -1,5 +1,5 @@
-/* global interpolate  */
 import $ from 'jquery'
+import template from 'lodash/template'
 import { ScrollFix } from './scroll-fix'
 import { options as commonOptions, extractTemplateHtml } from './common'
 import { add as popoverHovercontentAdd } from './popover-hovercontent'
@@ -54,12 +54,9 @@ export class CommentListing {
   }
 
   onClickLoadPage(pageNo) {
-    document.location.href = interpolate(
-      this.urlFormatStrings.commentListingPageNo, {
-        topicSlug: this.options.topicSlugOriginal,
-        pageId: pageNo,
-      }, true,
-    )
+    document.location.href = this.urls.commentListingPageNo({
+      topicSlug: this.options.topicSlugOriginal, pageId: pageNo,
+    })
   }
 
   constructor(options) {
@@ -67,76 +64,50 @@ export class CommentListing {
   }
 
   prepareUrlFormatStrings() {
-    this.urlFormatStrings = {
-      commentListing: this.options.urls.commentListing.backend
-        .replace(this.options.urls.commentListing.exampleSlug, '%(topicSlug)s')
-        .replace(this.options.urls.commentListing.commentId, '%(commentId)s'),
-      expandCommentsUpRecursive:
-        this.options.urls.expandCommentsUpRecursive.backend
-          .replace(
-            this.options.urls.expandCommentsUpRecursive.exampleSlug,
-            '%(topicSlug)s',
-          )
-          .replace(
-            this.options.urls.expandCommentsUpRecursive.commentId,
-            '%(commentId)s',
-          )
-          .replace(
-            this.options.urls.expandCommentsUpRecursive.scrollToId,
-            '%(scrollToId)s',
-          ),
-      expandCommentsUp:
-        this.options.urls.expandCommentsUp.backend
-          .replace(
-            this.options.urls.expandCommentsUp.exampleSlug,
-            '%(topicSlug)s',
-          )
-          .replace(
-            this.options.urls.expandCommentsUp.commentId,
-            '%(commentId)s',
-          )
-          .replace(
-            this.options.urls.expandCommentsUp.scrollToId,
-            '%(scrollToId)s',
-          ),
-      expandCommentsDown:
-        this.options.urls.expandCommentsDown.backend
-          .replace(
-            this.options.urls.expandCommentsDown.exampleSlug,
-            '%(topicSlug)s',
-          )
-          .replace(
-            this.options.urls.expandCommentsDown.commentId,
-            '%(commentId)s',
-          )
-          .replace(
-            this.options.urls.expandCommentsDown.scrollToId,
-            '%(scrollToId)s',
-          ),
+    const { urls } = this.options
+    this.urls = {
+      commentListing: template(
+        urls.commentListing.backend
+          .replace(urls.commentListing.exampleSlug, '{topicSlug}')
+          .replace(urls.commentListing.commentId, '{commentId}'),
+      ),
+      expandCommentsUpRecursive: template(
+        urls.expandCommentsUpRecursive.backend
+          .replace(urls.expandCommentsUpRecursive.exampleSlug, '{topicSlug}')
+          .replace(urls.expandCommentsUpRecursive.commentId, '{commentId}')
+          .replace(urls.expandCommentsUpRecursive.scrollToId, '{scrollToId}'),
+      ),
+      expandCommentsUp: template(
+        urls.expandCommentsUp.backend
+          .replace(urls.expandCommentsUp.exampleSlug, '{topicSlug}')
+          .replace(urls.expandCommentsUp.commentId, '{commentId}')
+          .replace(urls.expandCommentsUp.scrollToId, '{scrollToId}'),
+      ),
+      expandCommentsDown: template(
+        urls.expandCommentsUp.backend
+          .replace(urls.expandCommentsUp.exampleSlug, '{topicSlug}')
+          .replace(urls.expandCommentsUp.commentId, '{commentId}')
+          .replace(urls.expandCommentsUp.scrollToId, '{scrollToId}'),
+      ),
     }
     if (this.options.listingMode === 'commentListing') {
-      this.urlFormatStrings.commentListingPageNo =
-        this.options.urls.commentListingPageNo.backend
-          .replace(
-            this.options.urls.commentListingPageNo.exampleSlug,
-            '%(topicSlug)s',
-          )
-          .replace(
-            this.options.urls.commentListingPageNo.pageId,
-            '%(pageId)s',
-          )
+      this.urls.commentListingPageNo = template(
+        urls.commentListingPageNo.backend
+          .replace(urls.commentListingPageNo.exampleSlug, '{topicSlug}')
+          .replace(urls.commentListingPageNo.pageId, '{pageId}'),
+      )
     }
   }
 
   constructPathFromData(topicSlug, commentId, scrollToIdPassed = null) {
     let scrollToId = scrollToIdPassed
     if (!scrollToIdPassed) scrollToId = commentId
-    const formatString = this.urlFormatStrings[this.options.listingMode]
-    return interpolate(formatString, {
+    const formatString = this.urls[this.options.listingMode]
+    return formatString({
       topicSlug,
       commentId,
       scrollToId,
-    }, true)
+    })
   }
 
   constructPathFromWrapper(jqCommentWrapper) {
@@ -231,32 +202,20 @@ export class CommentListing {
       jqTemplate.filter(this.options.selectors.action.expandCommentsUpRecursive)
     jqButtonExpandCommentsUpRecursive.prop('hidden', !hasReplies)
     if (hasReplies) {
-      const constructedPathUpRecursive = interpolate(
-        this.urlFormatStrings.expandCommentsUpRecursive, {
-          commentId,
-          topicSlug,
-          scrollToId: commentId,
-        }, true,
-      )
-      const constructedPathUp = interpolate(
-        this.urlFormatStrings.expandCommentsUp, {
-          commentId,
-          topicSlug,
-          scrollToId: commentId,
-        }, true,
-      )
+      const constructedPathUpRecursive = this.urls.expandCommentsUpRecursive({
+        commentId, topicSlug, scrollToId: commentId,
+      })
+      const constructedPathUp = this.urls.expandCommentsUp({
+        commentId, topicSlug, scrollToId: commentId,
+      })
       jqButtonExpandCommentsUpRecursive
         .prop('href', constructedPathUpRecursive)
       jqButtonExpandCommentsUp.prop('href', constructedPathUp)
     }
     if (hasPreviousComment) {
-      const constructedPathDown = interpolate(
-        this.urlFormatStrings.expandCommentsDown, {
-          commentId,
-          topicSlug,
-          scrollToId: commentId,
-        }, true,
-      )
+      const constructedPathDown = this.urls.expandCommentsDown({
+        commentId, topicSlug, scrollToId: commentId,
+      })
       jqButtonExpandCommentsDown.prop('href', constructedPathDown)
     }
     jqTip.find('.popover-content').empty().append(jqTemplate)
