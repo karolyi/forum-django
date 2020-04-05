@@ -2,7 +2,8 @@ import logging
 
 from bs4 import BeautifulSoup as bs
 
-from commentparser import download_and_replace, fix_if_link
+from commentparser import download_and_replace, fix_if_link, parse_links
+from forum.base.models import Topic
 from variables import DEAD_HOSTERS, INNER_IMAGE_URLS, NONE_SRC, OLD_SELF_URL
 from video_converter import parse_videos
 
@@ -37,12 +38,13 @@ def fix_content_image(img_tag, model_item, content):
         download_and_replace(img_tag, model_item, content)
 
 
-def parse_description(topic_item):
+def parse_description(topic_item: Topic):
     content = bs(
         markup='<html><body>%s</body></html>' % topic_item.description,
         features='lxml')
     for img_tag in content.select('img'):
         fix_content_image(img_tag, topic_item, content)
-    parse_videos(content)
+    parse_links(content=content)
+    parse_videos(html=content)
     topic_item.description = content.body.decode_contents()\
         .replace('></source>', '/>')
