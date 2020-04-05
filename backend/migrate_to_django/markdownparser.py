@@ -1,9 +1,12 @@
 import html
 
+from bs4.element import Tag
+
+from forum.base.models import Comment
 from html2text import html2text
 
 
-def markdown_smilies(img_tag):
+def markdown_smilies(img_tag: Tag):
     img_src = img_tag.get('src', '')
     if img_src.startswith('/static/images/smiliereplace/'):
         img_alt = img_tag.get('alt', '')
@@ -14,12 +17,12 @@ def markdown_smilies(img_tag):
         return
 
 
-def replace_images(content):
+def replace_images(content: Tag):
     for img_tag in content.select('img'):
         markdown_smilies(img_tag)
 
 
-def parse_to_markdown(content, comment_item, md_property):
+def parse_to_markdown(content: Tag, comment_item: Comment, md_property: str):
 
     replace_images(content)
 

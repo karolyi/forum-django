@@ -2,6 +2,7 @@ import datetime
 import logging
 
 from bs4 import BeautifulSoup as bs
+from bs4.element import Tag
 
 import variables
 from forum.base.models import Comment
@@ -161,14 +162,20 @@ def fix_comment_image(img_tag, comment_item, content):
         download_and_replace(img_tag, comment_item, content)
 
 
-def parse_content(comment_item):
+def parse_links(content: Tag):
+    'Parse and fix links in the content.'
+    for a_tag in content.select(selector='a'):
+        a_tag.attrs['rel'] = 'noreferrer noopener'
+
+
+def parse_content(comment_item: Comment):
     content = bs(
         markup='<html><body>%s</body></html>' % comment_item.content_html,
         features='lxml')
-
-    for img_tag in content.select('img'):
+    for img_tag in content.select(selector='img'):
         fix_comment_image(img_tag, comment_item, content)
-    parse_videos(content)
+    parse_links(content=content)
+    parse_videos(html=content)
     comment_item.content_html = content.body\
         .decode_contents()\
         .replace('></source>', '/>')\

@@ -1,10 +1,12 @@
 import urllib
 from urllib.parse import parse_qsl, urlparse
 
-import magic
 import requests
 from bs4 import BeautifulSoup as bs
+from bs4.element import Tag
+from requests.exceptions import RequestException
 
+import magic
 from variables import NONE_SRC
 
 mime = magic.Magic(mime=True)
@@ -13,7 +15,7 @@ mime = magic.Magic(mime=True)
 def is_not_200(video_url):
     try:
         response = requests.head(url=video_url, verify=False, timeout=10)
-    except:
+    except RequestException:
         response = None
     if not response or response.status_code != 200:
         return True
@@ -102,7 +104,7 @@ def get_youtube_player(video_url):
     """
     try:
         video_id = urlparse(video_url).path.split('/')[-1].split('&')[0]
-    except:
+    except (ValueError, TypeError, UnicodeError):
         return None, None
     # It seems that youtube starts to redirect after a certain amount
     # of requests
@@ -174,7 +176,7 @@ def get_indavideo_player(video_url):
         content = requests.get(
             'http://embed.indavideo.hu/player/video/%s/' % video_id)\
             .content.encode('utf-8')
-    except:
+    except RequestException:
         return None, None
     if "['_trackEvent', 'Player', 'Nincs ilyen video']" in content:
         return None, None
@@ -189,7 +191,7 @@ def get_indavideo_player(video_url):
 def get_dailymotion_player(video_url):
     try:
         path_last_element = urlparse(video_url).path.split('/')[-1]
-    except:
+    except (ValueError, TypeError, UnicodeError):
         return None, None
     md_url = 'http://www.dailymotion.com/video/%s' % path_last_element
     if is_not_200(md_url):
@@ -221,7 +223,7 @@ def get_liveleak_player(video_url):
         embed_code_a = page_html.select(
             'div#leftcol span a.form_button')[0].get('onclick')
         video_id = embed_code_a.split('\'')[1]
-    except:
+    except (ValueError, TypeError, UnicodeError, RequestException):
         return None, None
     html_string = (
         '<iframe class="player-wrapper" '
@@ -247,7 +249,7 @@ def get_facebook_video_embed(video_url):
 def get_facebook_player(video_url):
     try:
         path_last_element = urlparse(video_url).path.split('/')[-1]
-    except:
+    except (ValueError, TypeError, UnicodeError):
         return None, None
     html_string = (
         '<iframe src="https://www.facebook.com/video/embed?video_id=%s" '
@@ -259,7 +261,7 @@ def get_facebook_player(video_url):
 def get_metacafe_player(video_url):
     try:
         path_element = urlparse(video_url).path.split('/')[2]
-    except:
+    except (ValueError, TypeError, UnicodeError):
         return None, None
     html_string = (
         '<iframe src="http://www.metacafe.com/embed/%s/" '
@@ -271,7 +273,7 @@ def get_metacafe_player(video_url):
 def get_movieweb_player(video_url):
     try:
         path_last_element = urlparse(video_url).path.split('/')[-1]
-    except:
+    except (ValueError, TypeError, UnicodeError):
         return None, None
     html_string = (
         '<iframe src="http://www.movieweb.com/v/%s/embed_video" '
@@ -288,7 +290,7 @@ def get_mixcloud_player(video_url):
             urllib.quote(feed_url), verify=False, timeout=10).json()
         html = bs(json_response['html'])
         url = html.select('iframe')[0].get('src')
-    except:
+    except RequestException:
         return None, None
     html_string = (
         '<iframe src="%s" class="player-wrapper" frameborder="0">'
@@ -300,7 +302,7 @@ def create_player_if_flash(video_url):
     try:
         req_obj = requests.get(url=video_url, verify=False, timeout=10)
         mime_type = mime.from_buffer(buf=req_obj.content)
-    except:
+    except RequestException:
         return None, None
     if mime_type != 'application/x-shockwave-flash; charset=binary':
         return None, None
@@ -371,7 +373,7 @@ def replace_video(object_item, video_url):
     object_item.replace_with(embed_obj)
 
 
-def parse_videos(html):
+def parse_videos(html: Tag):
     # TODO: esemenyek/adatlapok markdownba, videokkal
     object_list = get_flash_objects(html)
     for object_item in object_list:
