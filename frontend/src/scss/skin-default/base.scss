@@ -79,6 +79,8 @@
         margin-bottom: 1rem;
         width: 100%;
         .topic-list-item-row {
+          padding-top: .1rem;
+          padding-bottom: .1rem;
           @include transition(background-color 0.2s linear);
 
           &.even {
@@ -102,17 +104,9 @@
           }
 
           .topic-link {
-            @include media-breakpoint-down(xs) {
-              text-align: center;
-            }
-            margin: 0;
-            padding: .5rem 0;
             display: block;
-            border: 1px solid transparent;
-            @include border-radius($card-inner-border-radius $card-inner-border-radius);
-            &:hover {
-              border-color: $gray-900;
-              border-style: dashed;
+            @include media-breakpoint-up(sm) {
+              text-align: left;
             }
           }
         }
@@ -127,6 +121,7 @@
       }
     }
     .pagination-topicgroup {
+      margin-top: $grid-gutter-width / 2;
       .pagination {
         justify-content: center;
       }
@@ -136,7 +131,7 @@
   .topic-comment-listing-wrapper,
   .topic-comment-expansion-wrapper {
     .control-buttons {
-      margin-bottom: $grid-gutter-width;
+      margin-bottom: $grid-gutter-width / 2;
     }
 
     .topic-comment-wrapper {

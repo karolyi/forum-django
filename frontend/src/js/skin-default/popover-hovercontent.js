@@ -32,6 +32,7 @@ const onMouseLeaveTip = (jqElement, jqTip) => {
 }
 
 const onMouseEnterTip = (jqElement, jqTip) => {
+  jqElement.data('isElementMouseEntered', false)
   jqTip.data('isTipMouseEntered', true)
 }
 
@@ -65,6 +66,7 @@ const bindEventsToTip = (jqElement, jqTip) => {
 const onMouseEnterElement = (event) => {
   const jqElement = $(event.currentTarget)
   jqElement.data('isElementMouseEntered', true)
+  jqElement.data('isTipMouseEntered', false)
   const options = jqElement.data('optionsPopoverHovercontent')
   if (options.groupName) {
     for (const jqItem of tooltipGroups[options.groupName]) {
@@ -132,4 +134,8 @@ export function add(targetNode, options) {
     }
     tooltipGroups[options.groupName].add(jqElement)
   }
+}
+
+export function clearGroup(groupName) {
+  for (const jqItem of tooltipGroups[groupName]) jqItem.popover('hide')
 }

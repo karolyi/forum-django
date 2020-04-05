@@ -4,7 +4,10 @@ import { options as commonOptions, extractTemplateHtml } from './common'
 import { init as paginatorInit } from './paginator'
 import { add as usernameAdd } from './username'
 import { add as timeActualizerAdd } from './time-actualizer'
-import { add as popoverHovercontentAdd } from './popover-hovercontent'
+import {
+  add as popoverHovercontentAdd,
+  clearGroup as popoverClearGroup,
+} from './popover-hovercontent'
 
 class Instance {
   constructor(options) {
@@ -30,6 +33,7 @@ class Instance {
   }
 
   loadPage(currentPageNo) {
+    popoverClearGroup('topic-tooltips')
     if (this.jqAjaxRequest) {
       // Abort the existing request
       this.jqAjaxRequest.abort()
