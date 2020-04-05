@@ -175,7 +175,7 @@ def get_indavideo_player(video_url):
     try:
         content = requests.get(
             'http://embed.indavideo.hu/player/video/%s/' % video_id)\
-            .content.encode('utf-8')
+            .content.decode('utf-8')
     except RequestException:
         return None, None
     if "['_trackEvent', 'Player', 'Nincs ilyen video']" in content:
