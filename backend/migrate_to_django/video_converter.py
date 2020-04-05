@@ -223,7 +223,7 @@ def get_liveleak_player(video_url):
         embed_code_a = page_html.select(
             'div#leftcol span a.form_button')[0].get('onclick')
         video_id = embed_code_a.split('\'')[1]
-    except (ValueError, TypeError, UnicodeError, RequestException):
+    except (IndexError, ValueError, TypeError, UnicodeError, RequestException):
         return None, None
     html_string = (
         '<iframe class="player-wrapper" '
