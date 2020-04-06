@@ -86,18 +86,18 @@ const onMouseEnterElement = (event) => {
 
 const onClickElement = (event) => {
   event.preventDefault()
-  const jqElement = $(event.currentTarget)
-  const popOverInstance = jqElement.data('bs.popover')
-  const jqTip = $(popOverInstance.getTipElement())
-  if (!jqTip.data('isShown')) {
-    initializeTipContent(jqElement, jqTip)
-    jqElement.popover('show')
-    jqTip.data('isShown', true)
-  } else {
-    jqElement.popover('hide')
-    jqTip.data('isShown', false)
-  }
-  bindEventsToTip(jqElement, jqTip)
+  // const jqElement = $(event.currentTarget)
+  // const popOverInstance = jqElement.data('bs.popover')
+  // const jqTip = $(popOverInstance.getTipElement())
+  // if (!jqTip.data('isShown')) {
+  //   initializeTipContent(jqElement, jqTip)
+  //   jqElement.popover('show')
+  //   jqTip.data('isShown', true)
+  // } else {
+  //   jqElement.popover('hide')
+  //   jqTip.data('isShown', false)
+  // }
+  // bindEventsToTip(jqElement, jqTip)
 }
 
 const onRemoveObservedElement = (node) => {

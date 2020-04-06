@@ -281,20 +281,21 @@ class TopicExpandCommentsDownView(CommentListViewBase):
     """
     template_name = 'default/base/comments-expansion.html'
 
-    def _sanitize_comment(self) -> Tuple[Comment, Dict]:
+    def _sanitize_comment(self) -> Dict:
         """
         Call the `super()` of this and redirect the browser to the
         `Comment`'s current topic if it has changed meanwhile.
         """
-        comment, search_kwargs_comment = super()._sanitize_comment(
+        search_kwargs_comment = super()._sanitize_comment(
             pk=self.kwargs['comment_pk'])
+        comment = self._referred_comment
         if comment.topic.slug != self.kwargs['topic_slug']:
             url = reverse(
                 viewname='forum:base:comments-down', kwargs=dict(
                     topic_slug=comment.topic.slug, comment_pk=comment.pk,
                     scroll_to_pk=self.kwargs['scroll_to_pk']))
             raise HttpResponsePermanentRedirect(url=url)
-        return comment, search_kwargs_comment
+        return search_kwargs_comment
 
     def _prev_comments_down(self) -> Tuple[Topic, QuerySet]:
         """
@@ -308,8 +309,8 @@ class TopicExpandCommentsDownView(CommentListViewBase):
         but is in another topic, `Http404` when not found.
         """
         # Get the requested comment
-        comment, search_kwargs_comment = self._sanitize_comment()
-        comment_original = comment
+        search_kwargs_comment = self._sanitize_comment()
+        comment_original = comment = self._referred_comment
         set_comment_pks = set([comment.id])
         while True:
             if comment.prev_comment_id is None:

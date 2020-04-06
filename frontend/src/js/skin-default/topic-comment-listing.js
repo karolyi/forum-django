@@ -84,7 +84,7 @@ export class CommentListing {
           .replace(urls.expandCommentsUp.scrollToId, '{scrollToId}'),
       ),
       expandCommentsDown: template(
-        urls.expandCommentsUp.backend
+        urls.expandCommentsDown.backend
           .replace(urls.expandCommentsUp.exampleSlug, '{topicSlug}')
           .replace(urls.expandCommentsUp.commentId, '{commentId}')
           .replace(urls.expandCommentsUp.scrollToId, '{scrollToId}'),
@@ -218,7 +218,7 @@ export class CommentListing {
       })
       jqButtonExpandCommentsDown.prop('href', constructedPathDown)
     }
-    jqTip.find('.popover-content').empty().append(jqTemplate)
+    jqTip.find('.popover-body').empty().append(jqTemplate)
     jqTip.find('[data-toggle="tooltip"]').tooltip()
   }
 

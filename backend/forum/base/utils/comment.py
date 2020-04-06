@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Dict
 
 from django.http.response import Http404
 from django.views.generic.base import TemplateView
@@ -10,7 +10,7 @@ class CommentListViewBase(TemplateView):
     'Base for comment listing views, with utility functions.'
     _referred_comment: Comment = None
 
-    def _sanitize_comment(self, pk: int) -> Tuple[Comment, Dict]:
+    def _sanitize_comment(self, pk: int) -> Dict:
         """
         Sanitize the request parameters and check if a requested topic
         is available to the requesting user.
