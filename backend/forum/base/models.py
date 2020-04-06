@@ -5,12 +5,14 @@ from collections import defaultdict, namedtuple
 from django.contrib.auth.models import AbstractUser, AnonymousUser
 from django.db.models.base import Model
 from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
+from django.db.models.expressions import Col
 from django.db.models.fields import (
     BooleanField, CharField, DateTimeField, GenericIPAddressField,
     IntegerField, PositiveIntegerField, SmallIntegerField, TextField)
 from django.db.models.fields.related import (
     ForeignKey, ManyToManyField, OneToOneField)
 from django.db.models.indexes import Index
+from django.db.models.lookups import In
 from django.db.models.manager import BaseManager
 from django.db.models.query import QuerySet
 from django.utils.functional import cached_property
@@ -226,6 +228,7 @@ class CommentQuerySet(QuerySet):
         do_user=False, do_topic=False, do_prev_comment=False,
         do_reply_set=False)
     _wsgi_request: ForumWSGIRequest = None
+    _pk_firstchild_lhs: Col = None
 
     def _handle_prev_comment(self, item: dict):
         'Handle the `prev_comment` part of the comment item.'
@@ -264,10 +267,33 @@ class CommentQuerySet(QuerySet):
             if self._fetch_cache.do_reply_set:
                 self._handle_reply_set(item=item)
 
+    def _set_my_pks(self) -> QuerySet:
+        """
+        Don't execute another query when the passed one is a `pk__in`
+        and nothing else. Do this with a deep inspection on
+        `self.query`.
+        """
+        if not CommentQuerySet._pk_firstchild_lhs:
+            CommentQuerySet._pk_firstchild_lhs = Col(
+                alias='forum_base_comment',
+                target=Comment._meta.get_field('id'))
+        qs1 = self.values_list('pk', flat=True)
+        if len(self.query.where.children) != 1 or \
+                self.query.where.connector != 'AND' or \
+                self.query.where.negated:
+            self._my_pks = set(qs1._iterable_class(qs1))
+            return
+        first_child = self.query.where.children[0]  # type: In
+        if type(first_child) is not In or \
+                first_child.lhs != CommentQuerySet._pk_firstchild_lhs or \
+                first_child.bilateral_transforms:
+            self._my_pks = set(qs1._iterable_class(qs1))
+            return
+        self._my_pks = set(first_child.rhs)
+
     def _set_pksets(self):
         'Set & fill the PK sets for fetching.'
-        qs1 = self.values_list('pk', flat=True)
-        self._my_pks = set(qs1._iterable_class(qs1))
+        self._set_my_pks()
         self._extra_pks = set()
         self._user_pks = set()
         self._topic_pks = set()

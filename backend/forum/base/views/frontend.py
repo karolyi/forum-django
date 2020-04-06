@@ -154,37 +154,39 @@ class TopicCommentListingView(CommentListViewBase):
 
 class TopicExpandRepliesUpRecursive(CommentListViewBase):
     'Expand replies in a topic from a starting comment upwards.'
+    template_name = 'default/base/comments-expansion.html'
 
-    def _sanitize_comment(self) -> Tuple[Comment, Dict]:
+    def _sanitize_comment(self):
         """
         Call the `super()` of this and redirect the browser to the
         `Comment`'s current topic if it has changed meanwhile.
         """
-        comment, search_kwargs_comment = super()._sanitize_comment(
-            pk=self.kwargs['comment_pk'])
+        super()._sanitize_comment(pk=self.kwargs['comment_pk'])
+        comment = self._referred_comment
         if comment.topic.slug != self.kwargs['topic_slug']:
             raise HttpResponsePermanentRedirect(url=reverse(
                 viewname='forum:base:comments-up-recursive', kwargs=dict(
                     topic_slug=comment.topic.slug, comment_pk=comment.pk,
                     scroll_to_pk=self.kwargs['scroll_to_pk'])))
-        return comment, search_kwargs_comment
 
     def _collect_expanded_comments(self) -> Tuple[Topic, QuerySet]:
         'Collect and return expanded comments.'
-        comment, search_kwargs_comment = self._sanitize_comment()
-        comment_pks = set([comment.pk])
-        iteration_pks = set([comment.pk])
+        self._sanitize_comment()  # set self._referred_comment
+        search_kwargs_comment = dict()
+        comment_pks = set([self._referred_comment.pk])
+        iteration_pks = set([self._referred_comment.pk])
         while True:
             search_kwargs_comment['prev_comment__in'] = iteration_pks
-            qs_comments = Comment.objects.filter(
-                **search_kwargs_comment).only('pk').order_by()
-            iteration_pks = set(x.pk for x in qs_comments)
+            qs_comments = Comment.objects.order_by().filter(
+                **search_kwargs_comment).values_list('pk', flat=True)
+            iteration_pks = set(qs_comments)
             if len(iteration_pks) == 0:
                 # No more comments fetchable
                 break
             comment_pks.update(iteration_pks)
-        qs_comments = COMMENTS_QS.filter(pk__in=comment_pks)
-        return comment.topic, qs_comments
+        qs_comments = COMMENTS_QS.filter(
+            pk__in=comment_pks).with_cache(request=self.request)
+        return self._referred_comment.topic, qs_comments
 
     def get_context_data(
             self, topic_slug: str, comment_pk: int, scroll_to_pk: int) -> dict:
@@ -218,20 +220,21 @@ class TopicExpandCommentsUpView(CommentListViewBase):
     """
     template_name = 'default/base/comments-expansion.html'
 
-    def _sanitize_comment(self) -> Tuple[Comment, Dict]:
+    def _sanitize_comment(self) -> Dict:
         """
         Call the `super()` of this and redirect the browser to the
         `Comment`'s current topic if it has changed meanwhile.
         """
-        comment, search_kwargs_comment = \
+        search_kwargs_comment = \
             super()._sanitize_comment(pk=self.kwargs['comment_pk'])
+        comment = self._referred_comment
         if comment.topic.slug != self.kwargs['topic_slug']:
             url = reverse(
                 viewname='forum:base:comments-up', kwargs=dict(
                     topic_slug=comment.topic.slug, comment_pk=comment.pk,
                     scroll_to_pk=self.kwargs['scroll_to_pk']))
             raise HttpResponsePermanentRedirect(url=url)
-        return comment, search_kwargs_comment
+        return search_kwargs_comment
 
     def _get_replies_up(self) -> Tuple[Topic, QuerySet]:
         """
@@ -243,10 +246,11 @@ class TopicExpandCommentsUpView(CommentListViewBase):
         Raise `HttpResponsePermanentRedirect` when the comment exists but
         is in another topic, `Http404` when not found.
         """
-        comment, search_kwargs_comment = self._sanitize_comment()
+        search_kwargs_comment = self._sanitize_comment()
+        comment = self._referred_comment
         qs_comments = COMMENTS_QS.filter(
             Q(pk=comment.pk) | Q(prev_comment_id=comment.pk),
-            **search_kwargs_comment)
+            **search_kwargs_comment).with_cache(request=self.request)
         return comment.topic, qs_comments
 
     def get_context_data(
@@ -255,8 +259,7 @@ class TopicExpandCommentsUpView(CommentListViewBase):
         context = super().get_context_data(
             topic_slug=topic_slug, comment_pk=comment_pk,
             scroll_to_pk=scroll_to_pk)
-        topic, qs_comments = self._get_replies_up(
-            comment_pk=comment_pk, scroll_to_pk=scroll_to_pk)
+        topic, qs_comments = self._get_replies_up()
         context.update(
             topic=topic, comment_pk=comment_pk, qs_comments=qs_comments,
             scroll_to_pk=scroll_to_pk, listing_mode='expandCommentsUp')
@@ -324,7 +327,8 @@ class TopicExpandCommentsDownView(CommentListViewBase):
                 # No such comment (or in a topic that's not visible)
                 break
             set_comment_pks.add(comment.pk)
-        qs_comments = COMMENTS_QS.filter(pk__in=set_comment_pks)
+        qs_comments = COMMENTS_QS.filter(
+            pk__in=set_comment_pks).with_cache(request=self.request)
         return comment_original.topic, qs_comments
 
     def get_context_data(
