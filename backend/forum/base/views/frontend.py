@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Tuple
+from typing import Optional, Tuple
 
 from django.conf import settings
 from django.core.paginator import EmptyPage, Page, Paginator
@@ -42,24 +42,22 @@ class TopicListView(TemplateView):
 class TopicCommentListingView(CommentListViewBase):
     'List comments in a certain topic.'
 
-    _referred_topic_pk: int = None
     template_name = 'default/base/topic-comment-listing.html'
+    _referred_topic_pk: int = None
 
-    def _sanitize_comment(self) -> Dict:
+    def _sanitize_comment(self):
         """
         Call the `super()` of this and redirect the browser to the
         `Comment`'s current `Topic` if it has changed meanwhile.
         """
-        kwargs_comment = \
-            super()._sanitize_comment(pk=self.kwargs['comment_pk'])
+        super()._sanitize_comment(pk=self.kwargs['comment_pk'])
+        self._referred_topic_pk = self._referred_comment.topic_id
         if self._referred_comment.topic.slug != self.kwargs['topic_slug']:
             url = reverse(
                 viewname='forum:base:topic-comment-listing', kwargs=dict(
                     topic_slug=self._referred_comment.topic.slug,
                     comment_pk=self._referred_comment.pk))
             raise HttpResponsePermanentRedirect(url=url)
-        self._referred_topic_pk = self._referred_comment.topic_id
-        return kwargs_comment
 
     def _check_topic_readable(self) -> dict:
         """
@@ -114,10 +112,10 @@ class TopicCommentListingView(CommentListViewBase):
         `comment_id`.
         """
         comment_pk = self.kwargs.get('comment_pk')
-        kwargs_comment = self._sanitize_comment() \
+        self._sanitize_comment() \
             if comment_pk else self._check_topic_readable()
         qs_comments = COMMENTS_QS.with_cache(
-            request=self.request).filter(**kwargs_comment)
+            request=self.request).filter(topic_id=self._referred_topic_pk)
         self._set_pageid(qs_comments=qs_comments)
         paginator = Paginator(
             object_list=qs_comments, per_page=self.comments_per_page)
@@ -152,6 +150,144 @@ class TopicCommentListingView(CommentListViewBase):
             return exc.get_httpresponse()
 
 
+class TopicExpandCommentsDownView(CommentListViewBase):
+    """
+    Expand previous replies to a given comment in a recursive way. That
+    is, expand all the previous replies until the passed comment ID.
+    """
+    template_name = 'default/base/comments-expansion.html'
+
+    def _sanitize_comment(self):
+        """
+        Call the `super()` of this and redirect the browser to the
+        `Comment`'s current topic if it has changed meanwhile.
+        """
+        super()._sanitize_comment(pk=self.kwargs['comment_pk'])
+        comment = self._referred_comment
+        if comment.topic.slug != self.kwargs['topic_slug']:
+            url = reverse(
+                viewname='forum:base:comments-down', kwargs=dict(
+                    topic_slug=comment.topic.slug, comment_pk=comment.pk,
+                    scroll_to_pk=self.kwargs['scroll_to_pk']))
+            raise HttpResponsePermanentRedirect(url=url)
+
+    def _prev_comments_down(self) -> Tuple[Topic, QuerySet]:
+        """
+        Expand the previous comments in the thread along with the
+        requested comment ID.
+
+        Return the :model:`forum_base.Topic` and QuerySet of expanded
+        comments (time descending)  when successfully gathered them.
+
+        Raise `HttpResponsePermanentRedirect` when the comment exists
+        but is in another topic, `Http404` when not found.
+        """
+        # Set the requested comment
+        self._sanitize_comment()
+        comment_original = comment = self._referred_comment
+        set_comment_pks = set([comment.id])
+        while True:
+            if comment.prev_comment_id is None:
+                # This comment is the root comment, not a previous comment
+                break
+            try:
+                comment = Comment.objects.only(
+                    'pk', 'prev_comment_id').get(pk=comment.prev_comment_id)
+            except Comment.DoesNotExist:
+                # No such comment (or in a topic that's not visible)
+                break
+            set_comment_pks.add(comment.pk)
+        qs_comments = COMMENTS_QS.filter(
+            pk__in=set_comment_pks).with_cache(request=self.request)
+        return comment_original.topic, qs_comments
+
+    def get_context_data(
+            self, topic_slug: str, comment_pk: int, scroll_to_pk: int) -> dict:
+        'Add data for the template.'
+        context = super().get_context_data(
+            topic_slug=topic_slug, comment_pk=comment_pk,
+            scroll_to_pk=scroll_to_pk)
+        topic, qs_comments = self._prev_comments_down()
+        context.update(
+            topic=topic, comment_pk=comment_pk, qs_comments=qs_comments,
+            scroll_to_pk=scroll_to_pk, listing_mode='expandCommentsDown')
+        return context
+
+    def get(
+            self, request: ForumWSGIRequest, topic_slug: str,
+            comment_pk: int, scroll_to_pk: int) -> HttpResponse:
+        'Watch for a redirect exception, redirect when caught.'
+        try:
+            return super().get(
+                request=request, topic_slug=topic_slug, comment_pk=comment_pk,
+                scroll_to_pk=scroll_to_pk)
+        except HttpResponsePermanentRedirect as exc:
+            return exc.get_httpresponse()
+            return exc.get_httpresponse()
+
+
+class TopicExpandCommentsUpView(CommentListViewBase):
+    """
+    Expand replies to a given comment in a non-recursive way. That is,
+    only expand the replies to the passed comment ID.
+    """
+    template_name = 'default/base/comments-expansion.html'
+
+    def _sanitize_comment(self):
+        """
+        Call the `super()` of this and redirect the browser to the
+        `Comment`'s current topic if it has changed meanwhile.
+        """
+        super()._sanitize_comment(pk=self.kwargs['comment_pk'])
+        comment = self._referred_comment
+        if comment.topic.slug != self.kwargs['topic_slug']:
+            url = reverse(
+                viewname='forum:base:comments-up', kwargs=dict(
+                    topic_slug=comment.topic.slug, comment_pk=comment.pk,
+                    scroll_to_pk=self.kwargs['scroll_to_pk']))
+            raise HttpResponsePermanentRedirect(url=url)
+
+    def _get_replies_up(self) -> Tuple[Topic, QuerySet]:
+        """
+        Expand comments in a thread upwards from a given comment ID.
+
+        Return the :model:`forum_base.Topic` and QuerySet of expanded
+        comments (time descending)  when successfully gathered them.
+
+        Raise `HttpResponsePermanentRedirect` when the comment exists but
+        is in another topic, `Http404` when not found.
+        """
+        self._sanitize_comment()
+        comment = self._referred_comment
+        qs_comments = COMMENTS_QS.filter(
+            Q(pk=comment.pk) | Q(prev_comment_id=comment.pk)
+        ).with_cache(request=self.request)
+        return comment.topic, qs_comments
+
+    def get_context_data(
+            self, topic_slug: str, comment_pk: int, scroll_to_pk: int) -> dict:
+        'Add data for the template.'
+        context = super().get_context_data(
+            topic_slug=topic_slug, comment_pk=comment_pk,
+            scroll_to_pk=scroll_to_pk)
+        topic, qs_comments = self._get_replies_up()
+        context.update(
+            topic=topic, comment_pk=comment_pk, qs_comments=qs_comments,
+            scroll_to_pk=scroll_to_pk, listing_mode='expandCommentsUp')
+        return context
+
+    def get(
+            self, request: ForumWSGIRequest, topic_slug: str,
+            comment_pk: int, scroll_to_pk: int) -> HttpResponse:
+        'Watch for a redirect exception, redirect when caught.'
+        try:
+            return super().get(
+                request=request, topic_slug=topic_slug, comment_pk=comment_pk,
+                scroll_to_pk=scroll_to_pk)
+        except HttpResponsePermanentRedirect as exc:
+            return exc.get_httpresponse()
+
+
 class TopicExpandRepliesUpRecursive(CommentListViewBase):
     'Expand replies in a topic from a starting comment upwards.'
     template_name = 'default/base/comments-expansion.html'
@@ -171,14 +307,12 @@ class TopicExpandRepliesUpRecursive(CommentListViewBase):
 
     def _collect_expanded_comments(self) -> Tuple[Topic, QuerySet]:
         'Collect and return expanded comments.'
-        self._sanitize_comment()  # set self._referred_comment
-        search_kwargs_comment = dict()
+        self._sanitize_comment()  # Sets self._referred_comment
         comment_pks = set([self._referred_comment.pk])
         iteration_pks = set([self._referred_comment.pk])
         while True:
-            search_kwargs_comment['prev_comment__in'] = iteration_pks
             qs_comments = Comment.objects.order_by().filter(
-                **search_kwargs_comment).values_list('pk', flat=True)
+                prev_comment__in=iteration_pks).values_list('pk', flat=True)
             iteration_pks = set(qs_comments)
             if len(iteration_pks) == 0:
                 # No more comments fetchable
@@ -210,147 +344,4 @@ class TopicExpandRepliesUpRecursive(CommentListViewBase):
                 request=request, topic_slug=topic_slug, comment_pk=comment_pk,
                 scroll_to_pk=scroll_to_pk)
         except HttpResponsePermanentRedirect as exc:
-            return exc.get_httpresponse()
-
-
-class TopicExpandCommentsUpView(CommentListViewBase):
-    """
-    Expand replies to a given comment in a non-recursive way. That is,
-    only expand the replies to the passed comment ID.
-    """
-    template_name = 'default/base/comments-expansion.html'
-
-    def _sanitize_comment(self) -> Dict:
-        """
-        Call the `super()` of this and redirect the browser to the
-        `Comment`'s current topic if it has changed meanwhile.
-        """
-        search_kwargs_comment = \
-            super()._sanitize_comment(pk=self.kwargs['comment_pk'])
-        comment = self._referred_comment
-        if comment.topic.slug != self.kwargs['topic_slug']:
-            url = reverse(
-                viewname='forum:base:comments-up', kwargs=dict(
-                    topic_slug=comment.topic.slug, comment_pk=comment.pk,
-                    scroll_to_pk=self.kwargs['scroll_to_pk']))
-            raise HttpResponsePermanentRedirect(url=url)
-        return search_kwargs_comment
-
-    def _get_replies_up(self) -> Tuple[Topic, QuerySet]:
-        """
-        Expand comments in a thread upwards from a given comment ID.
-
-        Return the :model:`forum_base.Topic` and QuerySet of expanded
-        comments (time descending)  when successfully gathered them.
-
-        Raise `HttpResponsePermanentRedirect` when the comment exists but
-        is in another topic, `Http404` when not found.
-        """
-        search_kwargs_comment = self._sanitize_comment()
-        comment = self._referred_comment
-        qs_comments = COMMENTS_QS.filter(
-            Q(pk=comment.pk) | Q(prev_comment_id=comment.pk),
-            **search_kwargs_comment).with_cache(request=self.request)
-        return comment.topic, qs_comments
-
-    def get_context_data(
-            self, topic_slug: str, comment_pk: int, scroll_to_pk: int) -> dict:
-        'Add data for the template.'
-        context = super().get_context_data(
-            topic_slug=topic_slug, comment_pk=comment_pk,
-            scroll_to_pk=scroll_to_pk)
-        topic, qs_comments = self._get_replies_up()
-        context.update(
-            topic=topic, comment_pk=comment_pk, qs_comments=qs_comments,
-            scroll_to_pk=scroll_to_pk, listing_mode='expandCommentsUp')
-        return context
-
-    def get(
-            self, request: ForumWSGIRequest, topic_slug: str,
-            comment_pk: int, scroll_to_pk: int) -> HttpResponse:
-        'Watch for a redirect exception, redirect when caught.'
-        try:
-            return super().get(
-                request=request, topic_slug=topic_slug, comment_pk=comment_pk,
-                scroll_to_pk=scroll_to_pk)
-        except HttpResponsePermanentRedirect as exc:
-            return exc.get_httpresponse()
-
-
-class TopicExpandCommentsDownView(CommentListViewBase):
-    """
-    Expand previous replies to a given comment in a recursive way. That
-    is, expand all the previous replies until the passed comment ID.
-    """
-    template_name = 'default/base/comments-expansion.html'
-
-    def _sanitize_comment(self) -> Dict:
-        """
-        Call the `super()` of this and redirect the browser to the
-        `Comment`'s current topic if it has changed meanwhile.
-        """
-        search_kwargs_comment = super()._sanitize_comment(
-            pk=self.kwargs['comment_pk'])
-        comment = self._referred_comment
-        if comment.topic.slug != self.kwargs['topic_slug']:
-            url = reverse(
-                viewname='forum:base:comments-down', kwargs=dict(
-                    topic_slug=comment.topic.slug, comment_pk=comment.pk,
-                    scroll_to_pk=self.kwargs['scroll_to_pk']))
-            raise HttpResponsePermanentRedirect(url=url)
-        return search_kwargs_comment
-
-    def _prev_comments_down(self) -> Tuple[Topic, QuerySet]:
-        """
-        Expand the previous comments in the thread along with the
-        requested comment ID.
-
-        Return the :model:`forum_base.Topic` and QuerySet of expanded
-        comments (time descending)  when successfully gathered them.
-
-        Raise `HttpResponsePermanentRedirect` when the comment exists
-        but is in another topic, `Http404` when not found.
-        """
-        # Get the requested comment
-        search_kwargs_comment = self._sanitize_comment()
-        comment_original = comment = self._referred_comment
-        set_comment_pks = set([comment.id])
-        while True:
-            if comment.prev_comment_id is None:
-                # This comment is the root comment, not a previous comment
-                break
-            search_kwargs_comment['pk'] = comment.prev_comment_id
-            try:
-                comment = Comment.objects.only(
-                    'pk', 'prev_comment_id').get(**search_kwargs_comment)
-            except Comment.DoesNotExist:
-                # No such comment (or in a topic that's not visible)
-                break
-            set_comment_pks.add(comment.pk)
-        qs_comments = COMMENTS_QS.filter(
-            pk__in=set_comment_pks).with_cache(request=self.request)
-        return comment_original.topic, qs_comments
-
-    def get_context_data(
-            self, topic_slug: str, comment_pk: int, scroll_to_pk: int) -> dict:
-        'Add data for the template.'
-        context = super().get_context_data(
-            topic_slug=topic_slug, comment_pk=comment_pk,
-            scroll_to_pk=scroll_to_pk)
-        topic, qs_comments = self._prev_comments_down()
-        context.update(
-            topic=topic, comment_pk=comment_pk, qs_comments=qs_comments,
-            scroll_to_pk=scroll_to_pk, listing_mode='expandCommentsDown')
-        return context
-
-    def get(
-            self, request: ForumWSGIRequest, topic_slug: str,
-            comment_pk: int, scroll_to_pk: int) -> HttpResponse:
-        'Watch for a redirect exception, redirect when caught.'
-        try:
-            return super().get(
-                request=request, topic_slug=topic_slug, comment_pk=comment_pk,
-                scroll_to_pk=scroll_to_pk)
-        except HttpResponsePermanentRedirect as exc:
-            return exc.get_httpresponse()
             return exc.get_httpresponse()

@@ -267,7 +267,8 @@ class CommentQuerySet(QuerySet):
             if self._fetch_cache.do_reply_set:
                 self._handle_reply_set(item=item)
 
-    def _set_my_pks(self) -> QuerySet:
+    @cached_property
+    def _my_pks(self) -> set:
         """
         Don't execute another query when the passed one is a `pk__in`
         and nothing else. Do this with a deep inspection on
@@ -275,25 +276,23 @@ class CommentQuerySet(QuerySet):
         """
         if not CommentQuerySet._pk_firstchild_lhs:
             CommentQuerySet._pk_firstchild_lhs = Col(
-                alias='forum_base_comment',
+                alias=Comment._meta.db_table,
                 target=Comment._meta.get_field('id'))
         qs1 = self.values_list('pk', flat=True)
         if len(self.query.where.children) != 1 or \
                 self.query.where.connector != 'AND' or \
-                self.query.where.negated:
-            self._my_pks = set(qs1._iterable_class(qs1))
-            return
+                self.query.where.negated or \
+                any((self.query.low_mark, self.query.high_mark)):
+            return set(qs1._iterable_class(qs1))
         first_child = self.query.where.children[0]  # type: In
         if type(first_child) is not In or \
                 first_child.lhs != CommentQuerySet._pk_firstchild_lhs or \
                 first_child.bilateral_transforms:
-            self._my_pks = set(qs1._iterable_class(qs1))
-            return
-        self._my_pks = set(first_child.rhs)
+            return set(qs1._iterable_class(qs1))
+        return set(first_child.rhs)
 
     def _set_pksets(self):
         'Set & fill the PK sets for fetching.'
-        self._set_my_pks()
         self._extra_pks = set()
         self._user_pks = set()
         self._topic_pks = set()
