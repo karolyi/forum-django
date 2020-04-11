@@ -25,7 +25,11 @@
     </section>
     <section class="topic-description card card-block border-info mb-3" aria-label="{{ _('Topic description') }}">
         <div class="card-header">
-            <h3 class="card-title topic-name text-center mb-0">{{ topic.name_html }}</h3>
+            <h3 class="card-title topic-name text-center mb-0">
+                <a href="{{ url('forum:base:topic-comment-listing', topic_slug=topic.slug) }}">
+                    {{ topic.name_html }}
+                </a>
+            </h3>
         </div>
         {%- if topic.description %}
         <div class="card-body">

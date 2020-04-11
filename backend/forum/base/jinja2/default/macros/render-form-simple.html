@@ -18,7 +18,7 @@
             {% endif %}
         {% endspaceless %}">
         {% if widget.errors -%}
-            <div class="text-danger widget-error col-form-label-sm col-xs-12" role="alert">
+            <div class="text-danger widget-error col-form-label-sm col-12" role="alert">
                 {% for error in widget.errors -%}
                     <p>
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -46,10 +46,10 @@
                 </label>
             </div>
         {%- elif widget_name in ['Select', 'SelectMultiple'] -%}
-            <label class="form-control-label col-form-label col-xs-12 col-sm-3" for="{{ widget.auto_id }}">
+            <label class="form-control-label col-form-label col-12 col-sm-3" for="{{ widget.auto_id }}">
                 {{- widget.label|escape -}}
             </label>
-            <div class="col-xs-12 col-sm-9">
+            <div class="col-12 col-sm-9">
                 {% if widget.help_text -%}
                 <small class="text-muted">
                     <i class="fa fa-info" aria-hidden="true"></i>
@@ -61,10 +61,10 @@
                 {{ widget|set_attr('style:width: 100%') }}
             </div>
         {%- else -%}
-            <label class="form-control-label col-form-label col-xs-12 col-sm-3" for="{{ widget.auto_id }}">
+            <label class="form-control-label col-form-label col-12 col-sm-3" for="{{ widget.auto_id }}">
                 {{- widget.label|escape -}}
             </label>
-            <div class="col-xs-12 col-sm-9">
+            <div class="col-12 col-sm-9">
                 {% if widget.errors -%}
                     {{- widget|add_class('form-control form-control-danger')|set_attr('placeholder:' + widget.help_text|escape) -}}
                 {%- else -%}

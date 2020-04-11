@@ -35,6 +35,10 @@
 // awesome-bootstrap-checkbox
 // @import "fixes/awesome-bootstrap-checkbox";
 
+.font-size-zero {
+  font-size: 0;
+}
+
 .navbar {
   .navbar-brand {
   }
@@ -47,8 +51,6 @@
 
 .page-content-wrapper {
   .forum-username {
-    word-wrap: break-word;
-
     &.is-admin {
       color: $success;
     }
@@ -108,6 +110,11 @@
             @include media-breakpoint-up(sm) {
               text-align: left;
             }
+            .topic-logo {
+              @include border-radius;
+              max-width: 100%;
+              margin: (-$input-btn-padding-y / 2) (-$input-btn-padding-x / 2);
+            }
           }
         }
 
@@ -135,7 +142,7 @@
     }
 
     .topic-comment-wrapper {
-      margin-bottom: $grid-gutter-width / 2;
+      margin-bottom: $grid-gutter-width * 2;
 
       &.is-highlighted {
         .card-header,
@@ -198,8 +205,15 @@ blockquote {
   background-color: $gray-200;
   padding-left: .5rem;
 }
-.popover-body .forum-topic-tooltip {
-  img {
-    max-width: 100%;
+.popover-body {
+  .forum-topic-tooltip {
+    img {
+      max-width: 100%;
+    }
+  }
+  .btn.expand-comments-down .fa,
+  .btn.expand-comments-up .fa,
+  .btn.expand-comments-up-recursive .fa {
+    transform: scale(-1, 1);
   }
 }

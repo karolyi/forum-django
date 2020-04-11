@@ -1,6 +1,6 @@
 {% macro forum_username(user, is_template=False) -%}
 {% if not is_template -%}
-<a href="/user/{{ user.slug }}" class="forum-username {% spaceless %}
+<a href="/user/{{ user.slug }}" class="forum-username text-break {% spaceless %}
     {% if user.is_superuser or user.is_staff %}
         is-admin
     {% endif %}
@@ -8,7 +8,7 @@
     {{- user.username|escape -}}
 </a>
 {%- else -%}
-<a href="" class="forum-username" data-slug="" data-toggle="username">
+<a href="" class="forum-username text-break" data-slug="" data-toggle="username">
 </a>
 {%- endif %}
 {%- endmacro %}

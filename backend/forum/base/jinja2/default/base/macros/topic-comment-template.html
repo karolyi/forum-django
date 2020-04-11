@@ -6,7 +6,7 @@
 <section class="card topic-comment-wrapper" data-comment-id="{{ comment.pk if not is_template else ''}}" data-topic-slug="{{ comment.topic.slug if not is_template else '' }}">
     <div class="card-header">
         <div class="row">
-            <div class="col-xs-2 col-sm-1 comment-number-wrapper">
+            <div class="col-4 col-sm-1 comment-number-wrapper">
                 {% if not is_template -%}
                     <a href="{{ url('forum:base:topic-comment-listing', topic_slug=comment.topic.slug, comment_pk=comment.pk) }}" data-link-to="{{ comment.pk }}" class="comment-number">
                         #<span class="comment-number-inside">{{ comment.number }}</span>
@@ -17,13 +17,13 @@
                     </a>
                 {%- endif %}
             </div>
-            <div class="col-xs-3 col-sm-2 commenter-user">
+            <div class="col-4 col-sm-2 commenter-user">
                 {{ forum_username(user=comment.user|default(None), is_template=is_template) }}
             </div>
-            <div class="col-xs-3 col-sm-2 comment-time">
+            <div class="col-4 col-sm-2 comment-time">
                 {{ forum_time(time=comment.time, is_template=is_template) }}
             </div>
-            <div class="col-xs-4 col-sm-2 comment-previous">
+            <div class="col-4 col-sm-2 comment-previous">
             {% if not is_template and comment.prev_comment -%}
                 {% set is_prev_comment_visible = is_topic_comment_visible(comment=comment.prev_comment, show_invisible=show_invisible, request=request, cache_key='topic-comment-listing') -%}
                 {% if is_prev_comment_visible -%}
@@ -37,8 +37,7 @@
                 &nbsp;
             {%- endif %}
             </div>
-            <div class="clearfix visible-xs-block"></div>
-            <div class="col-xs-2 col-sm-1 voting-value-wrapper">
+            <div class="col-2 col-sm-1 voting-value-wrapper">
                 <span class="voting-value {% spaceless %}
                     {% if not is_template %}
                         {% if comment.voting_value > 0 %}
@@ -53,7 +52,7 @@
                     {% endif %}
                 </span>
             </div>
-            <div class="col-xs-1">
+            <div class="col-1">
                 <span class="comment-actions btn-link">
                     <span class="fa fa-cog"></span>
                 </span>

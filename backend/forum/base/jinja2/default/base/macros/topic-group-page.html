@@ -5,33 +5,33 @@
 {% macro topic_group_page(topic_list=[]) -%}
 <section class="topic-list-wrapper">
     <div class="row topic-header-row">
-        <div class="col-xs-6 col-sm-6 header-topic">
+        <div class="col-6 col-sm-6 header-topic">
             {{ _('Topic') }}
         </div>
-        <div class="col-xs-6 col-sm-2 text-center">
+        <div class="col-6 col-sm-2 text-center">
             {{ _('Last commented at') }}
         </div>
-        <div class="col-xs-6 col-sm-2 text-center">
+        <div class="col-6 col-sm-2 text-center">
             {{ _('Last commented by') }}
         </div>
-        <div class="col-xs-6 col-sm-2 text-center">
+        <div class="col-6 col-sm-2 text-center">
             {{ _('Total comments') }}
         </div>
     </div>
     {% for model_topic in topic_list %}
     <div class="row topic-list-item-row {{ loop.cycle('odd', 'even') }}">
-        <div class="col-xs-6 col-sm-6">
+        <div class="col-6 col-sm-6">
             <a href="{{ url('forum:base:topic-comment-listing', topic_slug=model_topic.slug) }}" class="topic-link btn btn-outline-dark" data-slug="{{ model_topic.slug }}">
                 {{- model_topic.name_html|safe -}}
             </a>
         </div>
-        <div class="col-xs-6 col-sm-2 text-center">
+        <div class="col-6 col-sm-2 text-center">
             {{ forum_time(time=model_topic.last_comment.time) }}
         </div>
-        <div class="col-xs-6 col-sm-2 text-center">
+        <div class="col-6 col-sm-2 text-center">
             {{ forum_username(user=model_topic.last_comment.user) }}
         </div>
-        <div class="col-xs-6 col-sm-2 text-center topic-comment-count">
+        <div class="col-6 col-sm-2 text-center topic-comment-count">
             {{ model_topic.comment_count }}
         </div>
     </div>
