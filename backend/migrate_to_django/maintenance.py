@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password  # NOQA
 from django.db import connection as django_connection
 from django.db import transaction
+from markdown import markdown
 
 import phpserialize
 import variables
@@ -17,7 +18,6 @@ from forum.base.models import Topic
 from forum.cdn.models import Image
 from forum.event.models import Event, EventResponse
 from forum.rating.models import CommentVote, UserRating
-from markdown import markdown
 from markdownparser import parse_to_markdown
 from topicparser import (
     finish_assign_topic_to_image, fix_content_image, parse_description)
