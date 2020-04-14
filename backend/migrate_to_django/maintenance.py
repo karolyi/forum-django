@@ -63,7 +63,7 @@ def empty_django_db():
 
 
 def cdn_maintenance():
-    root_len = len(CDN_FILES_ROOT) + 1
+    root_len = len(str(CDN_FILES_ROOT)) + 1
     logger.info('===== * SEPARATOR * =====')
     logger.info('CDN-MODEL CHECK')
     file_images_set = set()
