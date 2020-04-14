@@ -81,9 +81,9 @@ def cdn_maintenance():
     cdn_no_model_set = file_images_set - db_images_set
     variables.CDN_NO_MODEL = len(cdn_no_model_set)
     for relative_path in cdn_no_model_set:
-        absolute_path = os.path.join(CDN_FILES_ROOT, relative_path)
+        absolute_path = CDN_FILES_ROOT.joinpath(relative_path)
         logger.info('No model for CDN file %s, deleting', relative_path)
-        os.unlink(absolute_path)
+        absolute_path.unlink()
     cdn_no_file_set = db_images_set - file_images_set
     model_list = Image.objects.filter(cdn_path__in=cdn_no_file_set)
     variables.CDN_NO_FILE = len(cdn_no_file_set)

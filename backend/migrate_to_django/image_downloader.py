@@ -7,10 +7,10 @@ import re
 import string
 from urllib.parse import unquote, urlparse
 
-import magic
 import requests
 from unidecode import unidecode
 
+import magic
 import variables
 from forum.base.models import Comment, User
 from forum.cdn.models import Image, ImageUrl, MissingImage
@@ -85,7 +85,7 @@ def remove_unnecessary_filename_parts(filename):
 def normalize_filename(filename, mime_type):
     filename = unidecode(remove_unnecessary_filename_parts(filename))
     name, extension = os.path.splitext(filename)
-    name = re.sub('[^a-zA-Z0-9\.\\-]+', '-', name)
+    name = re.sub(r'[^a-zA-Z0-9.\-]+', '-', name)
     name = re.sub('(^-|-$)', '', name)
     extension = get_extension(mime_type)
     if len(filename) > FILENAME_MAXLENGTH:
@@ -112,17 +112,15 @@ def create_cdn_file(filename, mime_type, content_data, model_item):
             model_item.date_joined.strftime('%Y'),
             model_item.date_joined.strftime('%m'),
             model_item.date_joined.strftime('%d'))
+    this_path = CDN_FILES_ROOT.joinpath(dir_path)
     while True:
         random_seed = ''.join((generate_random() for i in range(10)))
         filename = random_seed + '-' + filename
-        file_path = os.path.join(CDN_FILES_ROOT, dir_path, filename)
-        if not os.path.exists(file_path):
+        file_path = this_path.joinpath(filename)
+        if not file_path.exists():
             break
-    if not os.path.exists(os.path.join(CDN_FILES_ROOT, dir_path)):
-        os.makedirs(os.path.join(CDN_FILES_ROOT, dir_path))
-    file_descriptor = open(file_path, 'wb')
-    file_descriptor.write(content_data)
-    file_descriptor.close()
+    this_path.mkdir(exist_ok=True)
+    file_path.write_bytes(data=content_data)
     return os.path.join(dir_path, filename)
 
 
@@ -169,10 +167,7 @@ def check_right_mime_type(content_data, accepted_mimetypes=('text/html;',)):
     """
     Return False if mimetype not accepted, true when accepted.
     """
-    try:
-        mime_type = mime.from_buffer(buf=content_data)
-    except:
-        return False
+    mime_type = mime.from_buffer(buf=content_data)
     if mime_type is None:
         return False
     for accepted_mimetype in accepted_mimetypes:

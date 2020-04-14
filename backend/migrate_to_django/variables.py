@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import MySQLdb
 from django.conf import settings
 
@@ -12,7 +14,7 @@ event_dict = {}
 
 NONE_SRC = '/static/images/image-404.svg'
 CDN_ROOT_RELATIVE = 'cdn.hondaforum.hu'
-CDN_FILES_ROOT = '/home/hondaforum/cdn/original'
+CDN_FILES_ROOT = Path('~').joinpath('cdn', 'original').expanduser()
 HTTP_CDN_ROOT = 'https://%s/original' % CDN_ROOT_RELATIVE
 HTTP_CDN_ROOT_LG = 'https://%s/lg' % CDN_ROOT_RELATIVE
 HTTP_CDN_ROOT_MD = 'https://%s/md' % CDN_ROOT_RELATIVE
