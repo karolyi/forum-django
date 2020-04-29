@@ -23,7 +23,7 @@ rm -rf static/*
 echo -e ${GREEN}--- running collectstatic ---${NC}
 # Delete the old static, collect everything new
 # yes yes|./manage.py collectstatic -v0 --clear --noinput
-yes yes|backend/manage.py collectstatic -v0 --noinput
+yes yes|python -Wd backend/manage.py collectstatic -v0 --noinput
 EXIT_CODE=$?
 if [[ $EXIT_CODE -ne 0 ]]; then
     echo -e ${RED}COLLECTSTATIC EXITED WITH $EXIT_CODE${NC}

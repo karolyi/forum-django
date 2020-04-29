@@ -1,6 +1,6 @@
 - name: Updating source
   git:
-    repo: git@github.com:karolyi/forum-django.git
+    repo: https://github.com/karolyi/forum-django
     dest: '{{ project_dir }}'
     force: yes
   register: result
