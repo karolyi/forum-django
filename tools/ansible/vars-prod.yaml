@@ -1,0 +1,6 @@
+username: hondaforum-prod
+home_dir: /home/{{ username }}
+project_dir: '{{ home_dir }}/project/forum-django'
+redis_prefix: hondaforum-prod
+ansible_pipelining: true
+ansible_python_interpreter: /usr/local/bin/python3.7

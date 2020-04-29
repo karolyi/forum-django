@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 def cdn_delete_file(sender, instance, *args, **kwargs):
-    abs_path = os.path.join(settings.PATH_CDN_ROOT, instance.cdn_path)
+    abs_path = settings.PATH_CDN_ROOT.joinpath(instance.cdn_path)
     if os.path.exists(abs_path):
         os.remove(abs_path)
 

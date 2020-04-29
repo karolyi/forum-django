@@ -1,0 +1,6 @@
+- hosts: hondaforum-prod
+  # strategy: debug
+  tasks:
+    - include: deploy-tasks.yaml
+  vars_files:
+    - vars-prod.yaml

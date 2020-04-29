@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import mimetypes
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from pathlib import Path
 
 from django.utils.translation import ugettext_lazy as _
 from django_jinja.builtins import DEFAULT_EXTENSIONS
@@ -259,8 +260,7 @@ STATIC_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'static'))
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'media'))
 
-PATH_CDN_ROOT = os.path.join(
-    os.path.expanduser('~'), 'Work', 'forum-django-cdn', 'original')
+PATH_CDN_ROOT = Path('~', 'Work', 'forum-django-cdn', 'original').expanduser()
 CDN_URL_PREFIX = 'https://example.cdnhost.com/'
 
 LANGUAGES = (

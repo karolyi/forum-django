@@ -1,0 +1,78 @@
+- name: Updating source
+  git:
+    repo: git@github.com:karolyi/forum-django.git
+    dest: '{{ project_dir }}'
+    force: yes
+  register: result
+  retries: 10
+  delay: 1
+  until: result is succeeded
+
+- name: Adding wheel python (pip) module
+  pip:
+    virtualenv: '{{ project_dir }}/venv'
+    state: latest
+    name:
+      - wheel
+      - pip
+      - setuptools
+
+- name: Updating python (pip) modules
+  pip:
+    virtualenv: '{{ project_dir }}/venv'
+    requirements: '{{ project_dir }}/backend/requirements.txt'
+  register: result
+  retries: 10
+  delay: 1
+  until: result is succeeded
+
+- name: Running migrations
+  shell: /usr/bin/yes yes|venv/bin/python backend/manage.py migrate
+  args:
+    chdir: '{{ project_dir }}'
+
+- name: Running checks
+  command: venv/bin/python backend/manage.py check
+  args:
+    chdir: '{{ project_dir }}'
+
+- name: Copying new static content over
+  copy:
+    src: '{{ hostvars["localhost"]["playbook_dir"] }}/../../static.tar.gz'
+    dest: '{{ project_dir }}/static.tar.gz'
+
+- name: Extracting new static content
+  command: tar xzf static.tar.gz
+  args:
+    warn: False
+    chdir: '{{ project_dir }}'
+
+- name: Move new_static/ into place
+  shell: /bin/mv -v static/ old_static/ && mv -v new_static/ static/
+  args:
+    chdir: '{{ project_dir }}'
+
+- name: Restarting uwsgi server
+  file:
+    path: '{{ project_dir }}/backend/forum-django/wsgi.py'
+    state: touch
+
+- name: Flushing REDIS cache
+  shell: |
+    /usr/local/bin/redis-cli -h jail-redis -a (cat ~/secrets-redis-password.txt) EVAL "return redis.call('DEL', unpack(redis.call('KEYS', ARGV[1] .. '*')))" 0 {{ redis_prefix }}:
+
+# --- Other Server restarts should go here
+
+- name: Removing old_static/
+  file:
+    path: '{{ project_dir }}/old_static/'
+    state: absent
+
+- name: Removing static.tar.gz
+  file:
+    path: '{{ project_dir }}/static.tar.gz'
+    state: absent
+
+- name: Notifying through syslog
+  command: |
+    logger "=== {{ username }} done! ==="
