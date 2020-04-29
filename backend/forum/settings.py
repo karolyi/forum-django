@@ -9,8 +9,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import mimetypes
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os
+from os import environ
 from pathlib import Path
 
 from django.utils.translation import ugettext_lazy as _
@@ -22,12 +21,12 @@ try:
 except ImportError:
     pass
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = Path(__file__).absolute().parent.parent
 DIR_BACKEND = BASE_DIR
-DIR_FRONTEND = os.path.join(os.path.dirname(BASE_DIR), 'frontend')
+DIR_FRONTEND = BASE_DIR.parent.joinpath('frontend')
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
+SECRET_KEY = environ.get(
     'FORUM_SECRET_KEY', '(tfz61pc=z34-(m)t#ul3^pf%405xb+$=mwy&ozd-h$kq+^b&p')
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -152,16 +151,16 @@ STATICFILES_FINDERS = (
 )
 
 STATICFILES_DIRS = (
-    os.path.join(DIR_BACKEND, 'static'),
+    DIR_BACKEND.joinpath('static'),
     # We do this so that django's collectstatic copies or our bundles to
     # the STATIC_ROOT or syncs them to whatever storage we use.
-    os.path.join(DIR_FRONTEND, 'dist'),
+    DIR_FRONTEND.joinpath('dist'),
 )
 
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'assets/',
-        'STATS_FILE': os.path.join(DIR_FRONTEND, 'webpack', 'stats.json'),
+        'STATS_FILE': DIR_FRONTEND.joinpath('webpack', 'stats.json'),
         'CACHE': not DEBUG
     }
 }
@@ -243,22 +242,20 @@ SHELL_PLUS_PYGMENTS_FORMATTER_KWARGS = dict(bg='dark')
 # Truncate sql queries to this number of characters
 SHELL_PLUS_PRINT_SQL_TRUNCATE = 10000
 
-TMP_DIR = os.path.realpath(os.path.join(DIR_BACKEND, 'tmp'))
-if not os.path.exists(TMP_DIR):
-    os.mkdir(TMP_DIR)
+TMP_DIR = DIR_BACKEND.joinpath('tmp')
+TMP_DIR.mkdir(exist_ok=True)
 
-LOG_DIR = os.path.realpath(os.path.join(DIR_BACKEND, 'logs'))
-if not os.path.exists(LOG_DIR):
-    os.mkdir(LOG_DIR)
+LOG_DIR = DIR_BACKEND.joinpath('logs')
+LOG_DIR.mkdir(exist_ok=True)
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'static'))
+STATIC_ROOT = BASE_DIR.parent.joinpath('static')
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.realpath(os.path.join(BASE_DIR, '..', 'media'))
+MEDIA_ROOT = BASE_DIR.parent.joinpath('media')
 
 PATH_CDN_ROOT = Path('~', 'Work', 'forum-django-cdn', 'original').expanduser()
 CDN_URL_PREFIX = 'https://example.cdnhost.com/'
