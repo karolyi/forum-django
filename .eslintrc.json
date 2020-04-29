@@ -6,7 +6,6 @@
   "parser": "babel-eslint",
   "extends": ["eslint:recommended", "airbnb-base"],
   "rules": {
-    "max-classes-per-file": 0,
     "no-continue": [0],
     "no-console": [1],
     "semi": [2, "never"],
@@ -14,6 +13,7 @@
     "strict": [2, "never"],
     "max-len": [2, {"code": 80, "tabWidth": 4, "ignoreUrls": true}],
     "no-restricted-syntax": "off",
+    "max-classes-per-file": "off",
     "import/no-extraneous-dependencies": [
       "error",
       {
