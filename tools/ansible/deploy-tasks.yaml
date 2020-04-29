@@ -54,7 +54,7 @@
 
 - name: Restarting uwsgi server
   file:
-    path: '{{ project_dir }}/backend/forum-django/wsgi.py'
+    path: '{{ project_dir }}/backend/forum/wsgi.py'
     state: touch
 
 - name: Flushing REDIS cache
