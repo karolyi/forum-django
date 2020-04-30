@@ -262,7 +262,8 @@ CDN = dict(
     PATH_ROOT=Path('~', 'Work', 'forum-django-cdn', 'original').expanduser(),
     URL_PREFIX='https://example.cdnhost.com',  # Avoid the trailing slash
     # See https://getbootstrap.com/docs/4.4/layout/grid/#grid-options
-    IMAGESIZE=dict(xl=1200, md=992, sm=768, xs=576))
+    # The order is important, <picture> tag generates along this
+    IMAGESIZE=dict(xs=576, sm=768, md=992, xl=1200))
 LANGUAGES = (
     ('en', _('English')),
     ('de', _('German')),
