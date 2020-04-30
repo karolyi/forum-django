@@ -54,7 +54,7 @@ def wrap_into_picture(img_tag, cdn_path, content):
     source_orig = content.new_tag(
         name='img', src='/'.join((HTTP_CDN_SIZE_ORIGINAL, cdn_path)))
     picture_tag.extend(size_tags)
-    picture_tag.append(0, source_orig)
+    picture_tag.append(source_orig)
 
 
 def get_extension(mime_type):
