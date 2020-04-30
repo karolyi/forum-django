@@ -75,7 +75,7 @@ def build_comment(item):
 def fix_if_link(img_tag):
     if img_tag.find_parent().name == 'a' \
             and img_tag.get('name') == 'forumPicture':
-        img_tag['class'] = 'embedded-forum-picture'
+        # img_tag['class'] = 'embedded-forum-picture'
         del(img_tag['name'])
         parent_tag = img_tag.find_parent()
         parent_tag.unwrap()

@@ -47,7 +47,8 @@ def wrap_into_picture(img_tag: Tag, cdn_path: str, content: BeautifulSoup):
     https://www.w3schools.com/TAGS/tryit.asp?filename=tryhtml5_picture
     for testing.
     """
-    picture_tag = content.new_tag(name='picture')
+    picture_tag = content.new_tag(
+        name='picture', **{'class': 'embedded-forum-picture'})
     original_img = img_tag.replace_with(picture_tag)
     picture_tag.extend(content.new_tag(
         name='source',
