@@ -221,8 +221,9 @@ def parse_users():
     with transaction.atomic():
         for user_id, user_name, user_password in cursor:
             user_dict[user_id] = User(
-                # username=user_name, password=make_password(user_password))
-                username=user_name, password='')
+                username=user_name,
+                # password='')
+                password=make_password(password=user_password))
             if user_name.lower() in usernames_lower:
                 user_dict[user_id].username = f'{user_name}-1'
             usernames_lower.add(user_name.lower())
