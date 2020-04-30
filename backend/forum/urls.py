@@ -5,16 +5,17 @@ from django.contrib.admin.sites import site
 from django.urls.conf import include, path
 from django.views.i18n import JavaScriptCatalog
 
-from forum.account import urls as urls_account
-from forum.base import urls as urls_base
-from forum.rest_api import urls as urls_api
+from forum.account.urls import urlpatterns_account
+from forum.base.urls import urlpatterns_base
+from forum.rest_api.urls import urlpatterns_api
 
 forum_urlpatterns = [
-    url(regex=r'^api/', view=include(
-        arg=(urls_api, 'rest-api'), namespace='rest-api')),
-    url(regex=r'^account/', view=include(
-        arg=(urls_account, 'account'), namespace='account')),
-    url(regex=r'^', view=include(arg=(urls_base, 'base'), namespace='base')),
+    url(regex=r'^api/', view=include(arg=(urlpatterns_api, 'rest-api'),
+        namespace='rest-api')),
+    url(regex=r'^account/', view=include(arg=(urlpatterns_account, 'account'),
+        namespace='account')),
+    url(regex=r'^', view=include(arg=(urlpatterns_base, 'base'),
+        namespace='base')),
 ]
 
 urlpatterns = [

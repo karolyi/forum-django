@@ -8,6 +8,7 @@ import string
 from urllib.parse import unquote, urlparse
 
 import requests
+from django import settings
 from unidecode import unidecode
 
 import magic
@@ -16,8 +17,8 @@ from forum.base.models import Comment, User
 from forum.cdn.models import Image, ImageUrl, MissingImage
 from variables import (
     CANCEL_HASH_TUPLE, CDN_FILES_ROOT, FILE_EXTENSIONS, FILE_EXTENSIONS_KEYS,
-    FILENAME_MAXLENGTH, HTTP_CDN_ROOT, HTTP_CDN_ROOT_LG, HTTP_CDN_ROOT_MD,
-    HTTP_CDN_ROOT_SM, HTTP_CDN_ROOT_XS, NONE_SRC, UNNECESSARY_FILENAME_PARTS)
+    FILENAME_MAXLENGTH, HTTP_CDN_SIZE_ORIGINAL, HTTP_CDN_SIZEURLS, NONE_SRC,
+    UNNECESSARY_FILENAME_PARTS)
 
 mime = magic.Magic(mime=True)
 logger = logging.getLogger(__name__)
@@ -40,33 +41,20 @@ def future_assign_model_to_image(cdn_image, model_item):
 
 def wrap_into_picture(img_tag, cdn_path, content):
     """
-    Bootstrap:
-    screen-lg: 1200px
-    screen-md: 992px
-    screen-sm: 768px
-    screen-xs: 480px
+    Use
+    https://www.w3schools.com/TAGS/tryit.asp?filename=tryhtml5_picture
+    for testing.
     """
-
     picture_tag = img_tag.wrap(content.new_tag(name='picture'))
+    size_tags = [content.new_tag(
+        name='source',
+        media=f'(max-width: {settings.CDN["IMAGESIZE"][size]}px)',
+        srcset='/'.join((base_url, cdn_path)))
+        for size, base_url in HTTP_CDN_SIZEURLS.items()]
     source_orig = content.new_tag(
-        'source', media='(min-width: 1200px)',
-        srcset='/'.join((HTTP_CDN_ROOT, cdn_path)))
-    source_lg = content.new_tag(
-        'source', media='(min-width: 992px)',
-        srcset='/'.join((HTTP_CDN_ROOT_LG, cdn_path)))
-    source_md = content.new_tag(
-        'source', media='(min-width: 768px)',
-        srcset='/'.join((HTTP_CDN_ROOT_MD, cdn_path)))
-    source_sm = content.new_tag(
-        'source', media='(min-width: 480px)',
-        srcset='/'.join((HTTP_CDN_ROOT_SM, cdn_path)))
-    source_xs = content.new_tag(
-        'source', srcset='/'.join((HTTP_CDN_ROOT_XS, cdn_path)))
-    picture_tag.insert(0, source_xs)
-    picture_tag.insert(0, source_sm)
-    picture_tag.insert(0, source_md)
-    picture_tag.insert(0, source_lg)
-    picture_tag.insert(0, source_orig)
+        name='img', src='/'.join((HTTP_CDN_SIZE_ORIGINAL, cdn_path)))
+    picture_tag.extend(size_tags)
+    picture_tag.append(0, source_orig)
 
 
 def get_extension(mime_type):
@@ -132,7 +120,7 @@ def check_hash_existing(img_tag, digest_value, model_item, content):
         cdn_image = Image.objects.get(file_hash=digest_value)
     except Image.DoesNotExist:
         return False
-    existing_cdn_url = '/'.join((HTTP_CDN_ROOT, cdn_image.cdn_path))
+    existing_cdn_url = '/'.join((HTTP_CDN_SIZE_ORIGINAL, cdn_image.cdn_path))
     orig_src = img_tag.get('src')
     logger.info(
         'Object hash exists for url %s, existing_cdn_url: %s,'
@@ -229,9 +217,10 @@ def do_download(img_tag, model_item, content):
         src_hash=get_sha512_digest(orig_src))
     cdn_image_url.save()
     future_assign_model_to_image(cdn_image, model_item)
-    img_tag['src'] = '/'.join((HTTP_CDN_ROOT, cdn_relative_path))
+    img_tag['src'] = '/'.join((HTTP_CDN_SIZE_ORIGINAL, cdn_relative_path))
     img_tag['data-cdn-pk'] = '%s' % cdn_image.pk
     wrap_into_picture(img_tag, cdn_relative_path, content)
     variables.SUCCESSFULLY_DOWNLOADED += 1
-    logger.info('Object downloaded and added to cdn: %s, cdn_path: %s',
-                orig_src, '/'.join((HTTP_CDN_ROOT, cdn_relative_path)))
+    logger.info(
+        'Object downloaded and added to cdn: %s, cdn_path: %s',
+        orig_src, '/'.join((HTTP_CDN_SIZE_ORIGINAL, cdn_relative_path)))

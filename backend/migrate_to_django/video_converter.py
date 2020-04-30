@@ -287,7 +287,7 @@ def get_mixcloud_player(video_url):
         json_response = requests.get(
             url='http://www.mixcloud.com/oembed/?url=%s&format=json' %
             quote(string=feed_url), verify=False, timeout=10).json()
-        html = bs(json_response['html'])
+        html = bs(markup=json_response['html'], features='lxml')
         url = html.select('iframe')[0].get('src')
     except RequestException:
         return None, None

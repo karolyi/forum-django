@@ -14,18 +14,19 @@ event_dict = {}
 
 NONE_SRC = '/static/images/image-404.svg'
 CDN_ROOT_RELATIVE = 'cdn.hondaforum.hu'
-CDN_FILES_ROOT = Path('~').joinpath('cdn', 'original').expanduser()
-HTTP_CDN_ROOT = 'https://%s/original' % CDN_ROOT_RELATIVE
-HTTP_CDN_ROOT_LG = 'https://%s/lg' % CDN_ROOT_RELATIVE
-HTTP_CDN_ROOT_MD = 'https://%s/md' % CDN_ROOT_RELATIVE
-HTTP_CDN_ROOT_SM = 'https://%s/sm' % CDN_ROOT_RELATIVE
-HTTP_CDN_ROOT_XS = 'https://%s/xs' % CDN_ROOT_RELATIVE
+CDN_FILES_ROOT = Path('~', 'cdn', 'original').expanduser()
+HTTP_CDN_SIZE_ORIGINAL = '/'.join((settings.CDN['URL_PREFIX'], 'original'))
+HTTP_CDN_SIZEURLS = {
+    x: '/'.join([settings.CDN['URL_PREFIX'], x])
+    for x in settings.CDN['IMAGESIZE']
+}
+
 INNER_IMAGE_URLS = (
-    '/static/skins/', '/static/images/', NONE_SRC, HTTP_CDN_ROOT)
+    '/static/skins/', '/static/images/', NONE_SRC, HTTP_CDN_SIZE_ORIGINAL,
+    *HTTP_CDN_SIZEURLS.values())
 OLD_SELF_URL = 'http://crxforum.flix.hu'
 MISSING_IMAGE_COUNT = 0
 ALREADY_MISSING_IMAGE_COUNT = 0
-AJAX_LOADER_SRC = 'https://cdn.hondaforum.hu/ajax-loader.gif'
 ALREADY_DOWNLOADED_IMAGE_COUNT = 0
 FILE_EXTENSIONS = {
     'image/jpeg': 'jpg',

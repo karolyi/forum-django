@@ -13,7 +13,7 @@ from forum.utils.wsgi import ForumWSGIRequest, ObjectCache
 
 from ..choices import (
     TOPIC_TYPE_ARCHIVED, TOPIC_TYPE_HIGHLIGHTED, TOPIC_TYPE_NORMAL)
-from ..exceptions import HttpResponsePermanentRedirect
+from ..exceptions import HttpResponsePermanentRedirectException
 from ..models import COMMENTS_QS, Comment, Topic
 from ..utils.comment import CommentListViewBase
 from ..utils.home import collect_topic_page
@@ -57,7 +57,7 @@ class TopicCommentListingView(CommentListViewBase):
                 viewname='forum:base:topic-comment-listing', kwargs=dict(
                     topic_slug=self._referred_comment.topic.slug,
                     comment_pk=self._referred_comment.pk))
-            raise HttpResponsePermanentRedirect(url=url)
+            raise HttpResponsePermanentRedirectException(url=url)
 
     def _check_topic_readable(self) -> dict:
         """
@@ -146,7 +146,7 @@ class TopicCommentListingView(CommentListViewBase):
         try:
             return super().get(
                 request=request, topic_slug=topic_slug, comment_pk=comment_pk)
-        except HttpResponsePermanentRedirect as exc:
+        except HttpResponsePermanentRedirectException as exc:
             return exc.get_httpresponse()
 
 
@@ -169,7 +169,7 @@ class TopicExpandCommentsDownView(CommentListViewBase):
                 viewname='forum:base:comments-down', kwargs=dict(
                     topic_slug=comment.topic.slug, comment_pk=comment.pk,
                     scroll_to_pk=self.kwargs['scroll_to_pk']))
-            raise HttpResponsePermanentRedirect(url=url)
+            raise HttpResponsePermanentRedirectException(url=url)
 
     def _prev_comments_down(self) -> Tuple[Topic, QuerySet]:
         """
@@ -179,8 +179,8 @@ class TopicExpandCommentsDownView(CommentListViewBase):
         Return the :model:`forum_base.Topic` and QuerySet of expanded
         comments (time descending)  when successfully gathered them.
 
-        Raise `HttpResponsePermanentRedirect` when the comment exists
-        but is in another topic, `Http404` when not found.
+        Raise `HttpResponsePermanentRedirectException` when the comment
+        exists but is in another topic, `Http404` when not found.
         """
         # Set the requested comment
         self._sanitize_comment()
@@ -221,8 +221,7 @@ class TopicExpandCommentsDownView(CommentListViewBase):
             return super().get(
                 request=request, topic_slug=topic_slug, comment_pk=comment_pk,
                 scroll_to_pk=scroll_to_pk)
-        except HttpResponsePermanentRedirect as exc:
-            return exc.get_httpresponse()
+        except HttpResponsePermanentRedirectException as exc:
             return exc.get_httpresponse()
 
 
@@ -245,7 +244,7 @@ class TopicExpandCommentsUpView(CommentListViewBase):
                 viewname='forum:base:comments-up', kwargs=dict(
                     topic_slug=comment.topic.slug, comment_pk=comment.pk,
                     scroll_to_pk=self.kwargs['scroll_to_pk']))
-            raise HttpResponsePermanentRedirect(url=url)
+            raise HttpResponsePermanentRedirectException(url=url)
 
     def _get_replies_up(self) -> Tuple[Topic, QuerySet]:
         """
@@ -254,8 +253,8 @@ class TopicExpandCommentsUpView(CommentListViewBase):
         Return the :model:`forum_base.Topic` and QuerySet of expanded
         comments (time descending)  when successfully gathered them.
 
-        Raise `HttpResponsePermanentRedirect` when the comment exists but
-        is in another topic, `Http404` when not found.
+        Raise `HttpResponsePermanentRedirectException` when the comment
+        exists but is in another topic, `Http404` when not found.
         """
         self._sanitize_comment()
         comment = self._referred_comment
@@ -284,7 +283,7 @@ class TopicExpandCommentsUpView(CommentListViewBase):
             return super().get(
                 request=request, topic_slug=topic_slug, comment_pk=comment_pk,
                 scroll_to_pk=scroll_to_pk)
-        except HttpResponsePermanentRedirect as exc:
+        except HttpResponsePermanentRedirectException as exc:
             return exc.get_httpresponse()
 
 
@@ -300,7 +299,7 @@ class TopicExpandRepliesUpRecursive(CommentListViewBase):
         super()._sanitize_comment(pk=self.kwargs['comment_pk'])
         comment = self._referred_comment
         if comment.topic.slug != self.kwargs['topic_slug']:
-            raise HttpResponsePermanentRedirect(url=reverse(
+            raise HttpResponsePermanentRedirectException(url=reverse(
                 viewname='forum:base:comments-up-recursive', kwargs=dict(
                     topic_slug=comment.topic.slug, comment_pk=comment.pk,
                     scroll_to_pk=self.kwargs['scroll_to_pk'])))
@@ -343,5 +342,5 @@ class TopicExpandRepliesUpRecursive(CommentListViewBase):
             return super().get(
                 request=request, topic_slug=topic_slug, comment_pk=comment_pk,
                 scroll_to_pk=scroll_to_pk)
-        except HttpResponsePermanentRedirect as exc:
+        except HttpResponsePermanentRedirectException as exc:
             return exc.get_httpresponse()

@@ -4,7 +4,7 @@ from .views.frontend import (
     TopicCommentListingView, TopicExpandCommentsDownView,
     TopicExpandCommentsUpView, TopicExpandRepliesUpRecursive, TopicListView)
 
-urlpatterns = [
+urlpatterns_base = [
     path(route=r'', view=TopicListView.as_view(), name='topic-listing'),
     path(
         route='topic/<slug:topic_slug>/',

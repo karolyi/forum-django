@@ -257,9 +257,11 @@ STATIC_ROOT = BASE_DIR.parent.joinpath('static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR.parent.joinpath('media')
 
-PATH_CDN_ROOT = Path('~', 'Work', 'forum-django-cdn', 'original').expanduser()
-CDN_URL_PREFIX = 'https://example.cdnhost.com/'
 
+CDN = dict(
+    PATH_ROOT=Path('~', 'Work', 'forum-django-cdn', 'original').expanduser(),
+    URL_PREFIX='https://example.cdnhost.com',  # Avoid the trailing slash
+    IMAGESIZE=dict(xl=1200, md=992, sm=768, xs=576))
 LANGUAGES = (
     ('en', _('English')),
     ('de', _('German')),

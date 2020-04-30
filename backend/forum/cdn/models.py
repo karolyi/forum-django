@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 
 def cdn_delete_file(sender, instance, *args, **kwargs):
-    abs_path = settings.PATH_CDN_ROOT.joinpath(instance.cdn_path)
+    abs_path = settings.Cdn['PATH_ROOT'].joinpath(instance.cdn_path)
     if os.path.exists(abs_path):
         os.remove(abs_path)
 
@@ -24,7 +24,7 @@ class Image(Model):
 
     mime_type = CharField(verbose_name=_('Mime type'), max_length=100)
     cdn_path = FilePathField(
-        path=settings.PATH_CDN_ROOT, verbose_name=_('Path in CDN'),
+        path=settings.CDN['PATH_ROOT'], verbose_name=_('Path in CDN'),
         max_length=191, unique=True)
     file_hash = CharField(
         verbose_name=_('File SHA512 hash'), max_length=128, unique=True)

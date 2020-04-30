@@ -220,6 +220,9 @@ def parse_users():
     usernames_lower = set()
     with transaction.atomic():
         for user_id, user_name, user_password in cursor:
+            print(
+                f'passwords, id: {user_id} username: {user_name}             ',
+                end='\r')
             user_dict[user_id] = User(
                 username=user_name,
                 # password='')
