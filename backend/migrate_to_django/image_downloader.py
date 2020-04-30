@@ -8,7 +8,7 @@ import string
 from urllib.parse import unquote, urlparse
 
 import requests
-from django import settings
+from django.conf import settings
 from unidecode import unidecode
 
 import magic
