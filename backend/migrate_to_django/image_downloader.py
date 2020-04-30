@@ -8,6 +8,8 @@ import string
 from urllib.parse import unquote, urlparse
 
 import requests
+from bs4 import BeautifulSoup
+from bs4.element import Tag
 from django.conf import settings
 from unidecode import unidecode
 
@@ -39,22 +41,20 @@ def future_assign_model_to_image(cdn_image, model_item):
     model_item.temp_cdn_image_list.append(cdn_image)
 
 
-def wrap_into_picture(img_tag, cdn_path, content):
+def wrap_into_picture(img_tag: Tag, cdn_path: str, content: BeautifulSoup):
     """
     Use
     https://www.w3schools.com/TAGS/tryit.asp?filename=tryhtml5_picture
     for testing.
     """
-    picture_tag = img_tag.wrap(content.new_tag(name='picture'))
-    size_tags = [content.new_tag(
+    picture_tag = content.new_tag(name='picture')
+    original_img = img_tag.replace_with(picture_tag)
+    picture_tag.extend(content.new_tag(
         name='source',
         media=f'(max-width: {settings.CDN["IMAGESIZE"][size]}px)',
         srcset='/'.join((base_url, cdn_path)))
-        for size, base_url in HTTP_CDN_SIZEURLS.items()]
-    source_orig = content.new_tag(
-        name='img', src='/'.join((HTTP_CDN_SIZE_ORIGINAL, cdn_path)))
-    picture_tag.extend(size_tags)
-    picture_tag.append(source_orig)
+        for size, base_url in HTTP_CDN_SIZEURLS.items())
+    picture_tag.append(original_img)
 
 
 def get_extension(mime_type):
