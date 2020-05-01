@@ -69,7 +69,7 @@ def remove_unnecessary_filename_parts(filename: Path) -> str:
     changed = original = str(filename)
     for unnecessary_part in UNNECESSARY_FILENAME_PARTS:
         changed = changed.replace(unnecessary_part, '')
-    return filename if original == changed else changed
+    return original if original == changed else changed
 
 
 def normalize_filename(filename: Path, mime_type: str) -> str:
