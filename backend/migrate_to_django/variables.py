@@ -37,7 +37,8 @@ FILE_EXTENSIONS = {
     'image/webp': 'webp',
     'image/svg+xml': 'svg',
 }
-FILE_EXTENSIONS_KEYS = FILE_EXTENSIONS.keys()
+FILE_EXTENSIONS_KEYSET = set(FILE_EXTENSIONS.keys())
+
 CANCEL_HASH_TUPLE = (
     'cc2aa0e463e98c8f9a35ca3bfc244eb5c1426df254905286e34ac55956d8d02f'
     '63e0183406b6003f36096909bfcb82b8af68c6454ecf2f42cdbfaef92c9587bd',

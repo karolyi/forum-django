@@ -1,10 +1,8 @@
 import datetime
 import hashlib
 import logging
-import os
-import random
-import re
-import string
+from pathlib import Path
+from re import compile as re_compile
 from urllib.parse import unquote, urlparse
 
 import requests
@@ -17,13 +15,15 @@ import magic
 import variables
 from forum.base.models import Comment, User
 from forum.cdn.models import Image, ImageUrl, MissingImage
+from forum.utils import get_random_safestring
 from variables import (
-    CANCEL_HASH_TUPLE, CDN_FILES_ROOT, FILE_EXTENSIONS, FILE_EXTENSIONS_KEYS,
+    CANCEL_HASH_TUPLE, CDN_FILES_ROOT, FILE_EXTENSIONS, FILE_EXTENSIONS_KEYSET,
     FILENAME_MAXLENGTH, HTTP_CDN_SIZE_ORIGINAL, HTTP_CDN_SIZEURLS, NONE_SRC,
     UNNECESSARY_FILENAME_PARTS)
 
 mime = magic.Magic(mime=True)
 logger = logging.getLogger(__name__)
+FILE_SIMPLER_RE = re_compile(r'[^a-zA-Z0-9.\-]+')
 
 missing_origsrc_len = MissingImage._meta.get_field('src').max_length
 MAXLEN_IMAGEURL = ImageUrl._meta.get_field('orig_src').max_length
@@ -58,59 +58,53 @@ def wrap_into_picture(img_tag: Tag, cdn_path: str, content: BeautifulSoup):
     picture_tag.append(original_img)
 
 
-def get_extension(mime_type):
+def get_extension(mime_type) -> str:
     for mime_type_config in FILE_EXTENSIONS:
         if mime_type.startswith(mime_type_config):
             return FILE_EXTENSIONS[mime_type_config]
     return 'jpg'
 
 
-def remove_unnecessary_filename_parts(filename):
+def remove_unnecessary_filename_parts(filename: Path) -> str:
+    changed = original = str(filename)
     for unnecessary_part in UNNECESSARY_FILENAME_PARTS:
-        filename = filename.replace(unnecessary_part, '')
-    return filename
+        changed = changed.replace(unnecessary_part, '')
+    return filename if original == changed else changed
 
 
-def normalize_filename(filename, mime_type):
-    filename = unidecode(remove_unnecessary_filename_parts(filename))
-    name, extension = os.path.splitext(filename)
-    name = re.sub(r'[^a-zA-Z0-9.\-]+', '-', name)
-    name = re.sub('(^-|-$)', '', name)
+def normalize_filename(filename: Path, mime_type: str) -> str:
+    filename = Path(unidecode(
+        string=remove_unnecessary_filename_parts(filename=filename)))
+    name = FILE_SIMPLER_RE.sub('-', filename.stem).strip('-')
     extension = get_extension(mime_type)
     if len(filename) > FILENAME_MAXLENGTH:
         name = name[:FILENAME_MAXLENGTH - len(extension)]
-    filename = os.path.extsep.join((name, extension))
-    return filename
+    return '.'.join((name, extension))
 
 
-def create_cdn_file(filename, mime_type, content_data, model_item):
-    filename = normalize_filename(filename, mime_type)
+def create_cdn_file(
+    filename: Path, mime_type: str, content_data: bytes, model_item
+) -> Path:
+    filename = normalize_filename(filename=filename, mime_type=mime_type)
     # Add Y-m-d resolution
-    now = datetime.datetime.now()
-    dir_path = os.path.join(
-        now.strftime('%Y'),
-        now.strftime('%m'),
-        now.strftime('%d'))
     if isinstance(model_item, Comment):
-        dir_path = os.path.join(
-            model_item.time.strftime('%Y'),
-            model_item.time.strftime('%m'),
-            model_item.time.strftime('%d'))
-    if isinstance(model_item, User):
-        dir_path = os.path.join(
-            model_item.date_joined.strftime('%Y'),
-            model_item.date_joined.strftime('%m'),
-            model_item.date_joined.strftime('%d'))
-    this_path = CDN_FILES_ROOT.joinpath(dir_path)
+        used_time = model_item.time
+    elif isinstance(model_item, User):
+        used_time = model_item.date_joined
+    else:
+        used_time = datetime.datetime.now()
+    relative_path = Path(
+        used_time.strftime('%Y'), used_time.strftime('%m'),
+        used_time.strftime('%d'))
+    this_path = CDN_FILES_ROOT.joinpath(relative_path)
     while True:
-        random_seed = ''.join((generate_random() for i in range(10)))
-        filename = random_seed + '-' + filename
-        file_path = this_path.joinpath(filename)
-        if not file_path.exists():
+        filename = f'{get_random_safestring()}-{filename}'
+        absolute_path = this_path.joinpath(filename)
+        if not absolute_path.exists():
             break
-    this_path.mkdir(exist_ok=True)
-    file_path.write_bytes(data=content_data)
-    return os.path.join(dir_path, filename)
+    this_path.mkdir(parents=True, exist_ok=True)
+    absolute_path.write_bytes(data=content_data)
+    return relative_path.joinpath(filename)
 
 
 def check_hash_existing(img_tag, digest_value, model_item, content):
@@ -139,17 +133,13 @@ def check_hash_existing(img_tag, digest_value, model_item, content):
     return True
 
 
-def generate_random():
-    return random.choice(string.ascii_letters + string.digits)
-
-
-def get_filename_from_url(url):
+def get_filename_from_url(url: str) -> Path:
     result = urlparse(url)
     last_part = result.path.split('/')[-1:][0]
     last_part = unquote(last_part)
-    if last_part == '':
-        last_part = ''.join((generate_random() for i in range(10)))
-    return last_part
+    if not last_part:
+        last_part = get_random_safestring()
+    return Path(last_part)
 
 
 def check_right_mime_type(content_data, accepted_mimetypes=('text/html;',)):
@@ -198,17 +188,18 @@ def do_download(img_tag, model_item, content):
         add_missing_comment_image(img_tag)
         return
     mime_type = check_right_mime_type(
-        content_data, FILE_EXTENSIONS_KEYS)
+        content_data=content_data, accepted_mimetypes=FILE_EXTENSIONS_KEYSET)
     if not mime_type:
         logger.error('mime_type is %s', mime_type)
         add_missing_comment_image(img_tag)
         return
     filename = get_filename_from_url(orig_src)
-    digest_value = get_sha512_digest(content_data)
+    digest_value = get_sha512_digest(input_data=content_data)
     if check_hash_existing(img_tag, digest_value, model_item, content):
         return
     cdn_relative_path = create_cdn_file(
-        filename, mime_type, content_data, model_item)
+        filename=filename, mime_type=mime_type, content_data=content_data,
+        model_item=model_item)
     cdn_image = Image(
         mime_type=mime_type, cdn_path=cdn_relative_path,
         file_hash=digest_value)
