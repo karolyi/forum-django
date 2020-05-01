@@ -209,10 +209,10 @@ def do_download(img_tag, model_item, content):
         src_hash=get_sha512_digest(orig_src))
     cdn_image_url.save()
     future_assign_model_to_image(cdn_image, model_item)
-    img_tag['src'] = '/'.join((HTTP_CDN_SIZE_ORIGINAL, cdn_relative_path))
+    img_src = '/'.join((HTTP_CDN_SIZE_ORIGINAL, str(cdn_relative_path)))
+    img_tag['src'] = img_src
     img_tag['data-cdn-pk'] = '%s' % cdn_image.pk
     wrap_into_picture(img_tag, cdn_relative_path, content)
     variables.SUCCESSFULLY_DOWNLOADED += 1
     logger.info(
-        'Object downloaded and added to cdn: %s, cdn_path: %s',
-        orig_src, '/'.join((HTTP_CDN_SIZE_ORIGINAL, cdn_relative_path)))
+        f'Object downloaded and added to cdn: {orig_src}, cdn_path: {img_src}')
