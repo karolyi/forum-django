@@ -53,7 +53,7 @@ def wrap_into_picture(img_tag: Tag, cdn_path: str, content: BeautifulSoup):
     picture_tag.extend(content.new_tag(
         name='source',
         media=f'(max-width: {settings.CDN["IMAGESIZE"][size]}px)',
-        srcset='/'.join((base_url, str(cdn_path))))
+        srcset='/'.join((base_url, cdn_path)))
         for size, base_url in HTTP_CDN_SIZEURLS.items())
     picture_tag.append(original_img)
 
@@ -123,7 +123,8 @@ def check_hash_existing(img_tag, digest_value, model_item, content):
         orig_src, existing_cdn_url, digest_value)
     img_tag['data-cdn-pk'] = cdn_image.pk
     img_tag['src'] = existing_cdn_url
-    wrap_into_picture(img_tag, cdn_image.cdn_path, content)
+    wrap_into_picture(
+        img_tag=img_tag, cdn_path=cdn_image.cdn_path, content=content)
     variables.ALREADY_DOWNLOADED_IMAGE_COUNT += 1
     image_url = ImageUrl(
         image=cdn_image, orig_src=orig_src[:MAXLEN_IMAGEURL],
@@ -212,7 +213,8 @@ def do_download(img_tag, model_item, content):
     img_src = '/'.join((HTTP_CDN_SIZE_ORIGINAL, str(cdn_relative_path)))
     img_tag['src'] = img_src
     img_tag['data-cdn-pk'] = '%s' % cdn_image.pk
-    wrap_into_picture(img_tag, cdn_relative_path, content)
+    wrap_into_picture(
+        img_tag=img_tag, cdn_path=str(cdn_relative_path), content=content)
     variables.SUCCESSFULLY_DOWNLOADED += 1
     logger.info(
         f'Object downloaded and added to cdn: {orig_src}, cdn_path: {img_src}')
