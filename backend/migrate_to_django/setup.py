@@ -1,10 +1,12 @@
-import os
-import sys
-import django
 import logging
+import sys
+from os import environ
+from pathlib import Path
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'forum.settings')
-forum_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+import django
+
+environ.setdefault('DJANGO_SETTINGS_MODULE', 'forum.settings')
+forum_path = Path(__file__).absolute().parent.parent
 sys.path.append(forum_path)
 # http://django.readthedocs.org/en/latest/releases/1.7.html#standalone-scripts
 django.setup()
@@ -16,7 +18,7 @@ logging.config.dictConfig({
     'disable_existing_loggers': True,
 })
 logging.basicConfig(handlers=[logging.FileHandler(
-    'log_migration.log', 'w', 'utf-8')], level=logging.DEBUG)
+    Path('~', 'log_migration.log'), 'w', 'utf-8')], level=logging.DEBUG)
 
 
 def do_setup():
