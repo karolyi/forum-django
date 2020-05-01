@@ -53,7 +53,7 @@ def wrap_into_picture(img_tag: Tag, cdn_path: str, content: BeautifulSoup):
     picture_tag.extend(content.new_tag(
         name='source',
         media=f'(max-width: {settings.CDN["IMAGESIZE"][size]}px)',
-        srcset='/'.join((base_url, cdn_path)))
+        srcset='/'.join((base_url, str(cdn_path))))
         for size, base_url in HTTP_CDN_SIZEURLS.items())
     picture_tag.append(original_img)
 
