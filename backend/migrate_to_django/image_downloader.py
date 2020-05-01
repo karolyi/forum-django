@@ -77,7 +77,7 @@ def normalize_filename(filename: Path, mime_type: str) -> str:
         string=remove_unnecessary_filename_parts(filename=filename)))
     name = FILE_SIMPLER_RE.sub('-', filename.stem).strip('-')
     extension = get_extension(mime_type)
-    if len(filename) > FILENAME_MAXLENGTH:
+    if len(str(filename)) > FILENAME_MAXLENGTH:
         name = name[:FILENAME_MAXLENGTH - len(extension)]
     return '.'.join((name, extension))
 
