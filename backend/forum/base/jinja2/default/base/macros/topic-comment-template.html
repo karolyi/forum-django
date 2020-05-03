@@ -25,8 +25,7 @@
             </div>
             <div class="col-4 col-sm-2 comment-previous">
             {% if not is_template and comment.prev_comment -%}
-                {% set is_prev_comment_visible = is_topic_comment_visible(comment=comment.prev_comment, show_invisible=show_invisible, request=request) -%}
-                {% if is_prev_comment_visible -%}
+                {% if show_invisible or comment.prev_comment.is_visible(user=request.user) -%}
                     <a href="{{ url('forum:base:topic-comment-listing', topic_slug=comment.prev_comment.topic.slug, comment_pk=comment.prev_comment_id) }}" data-link-to="{{ comment.prev_comment_id }}">
                         {{- _('re:&nbsp;#') -}}
                         {{- comment.prev_comment.number -}}
@@ -67,8 +66,7 @@
             {{ topic_comment_onereply(is_template=is_template) }}
         {%- elif comment.reply_set.all() -%}
             {% for comment in comment.reply_set.all() -%}
-            {% set is_onereply_visible = is_topic_comment_visible(comment=comment, show_invisible=show_invisible, request=request) %}
-            {% if is_onereply_visible -%}
+            {% if show_invisible or comment.is_visible(user=request.user) -%}
                 {{ topic_comment_onereply(comment=comment, is_template=is_template) }}
             {%- endif %}
             {%- endfor %}

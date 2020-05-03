@@ -1,4 +1,6 @@
+from functools import lru_cache, wraps
 from pathlib import Path
+from weakref import ref
 
 from colour_runner.django_runner import ColourRunnerMixin
 from django.test.runner import DiscoverRunner
@@ -20,6 +22,27 @@ def slugify(input_data):
         .strip('-')
     pass_two = django_slugify(value=pass_one)
     return mark_safe(pass_two)
+
+
+def memoized_method(*lru_args, **lru_kwargs):
+    """
+    http://stackoverflow.com/a/33672499/1067833
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapped_func(self, *args, **kwargs):
+            # We're storing the wrapped method inside the instance. If we had
+            # a strong reference to self the instance would be never
+            # garbage collected.
+            self_weak = ref(self)
+            @wraps(func)
+            @lru_cache(*lru_args, **lru_kwargs)
+            def cached_method(*args, **kwargs):
+                return func(self_weak(), *args, **kwargs)
+            setattr(self, func.__name__, cached_method)
+            return cached_method(*args, **kwargs)
+        return wrapped_func
+    return decorator
 
 
 def get_relative_path(path_from: Path, path_to: Path) -> Path:

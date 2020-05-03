@@ -19,7 +19,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.fields import AutoSlugField
 
-from forum.utils import slugify
+from forum.utils import memoized_method, slugify
 from forum.utils.djtools.query_cache import (
     is_queryresult_loaded, set_prefetch_cache, set_queryresult)
 from forum.utils.wsgi import ForumWSGIRequest, ObjectCache
@@ -462,6 +462,17 @@ class Comment(Model):
         return str(_(
             '#{number} of \'{topic}\' (ID {id})'.format(
                 number=self.number, topic=self.topic, id=self.id)))
+
+    @memoized_method(maxsize=1000)
+    def is_visible(self, user: User) -> bool:
+        'Return `True` if this comment is visible for the `User`.'
+        if not self.topic.is_enabled:
+            return False
+        is_admin = user.is_staff or user.is_superuser
+        if self.topic.is_staff_only and not is_admin:
+            # Staff only topic, but the user is non-staff:
+            return False
+        return True
 
 
 class Edit(Model):
