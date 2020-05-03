@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 from django.conf import settings
 from django.db.models.base import Model
@@ -10,9 +10,11 @@ from django.utils.translation import ugettext_lazy as _
 
 
 def cdn_delete_file(sender, instance, *args, **kwargs):
-    abs_path = settings.Cdn['PATH_ORIG'].joinpath(instance.cdn_path)
-    if os.path.exists(abs_path):
-        os.remove(abs_path)
+    for path_item in settings.CDN['PATH_SIZES'].values():  # type: Path
+        size_path = path_item.joinpath(instance.cdn_path)
+        if size_path.exists():
+            size_path.unlink()
+        # TODO: Remove directories
 
 
 class Image(Model):
@@ -24,7 +26,7 @@ class Image(Model):
 
     mime_type = CharField(verbose_name=_('Mime type'), max_length=100)
     cdn_path = FilePathField(
-        path=settings.CDN['PATH_ORIG'], verbose_name=_('Path in CDN'),
+        path=settings.CDN['PATH_ROOT'], verbose_name=_('Path in CDN'),
         max_length=191, unique=True)
     file_hash = CharField(
         verbose_name=_('File SHA512 hash'), max_length=128, unique=True)

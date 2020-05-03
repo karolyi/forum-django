@@ -25,6 +25,8 @@ node_modules/
 frontend/dist
 frontend/webpack/stats.json
 backend/forum/settings_override.py
+backend/locks/
+backend/static/forum-django-cdn
 *.sublime*
 logs/
 venv/

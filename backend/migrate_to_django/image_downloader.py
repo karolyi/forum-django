@@ -96,7 +96,7 @@ def create_cdn_file(
     relative_path = Path(
         used_time.strftime('%Y'), used_time.strftime('%m'),
         used_time.strftime('%d'))
-    this_path = settings.CDN['PATH_ORIG'].joinpath(relative_path)
+    this_path = settings.CDN['PATH_SIZES']['original'].joinpath(relative_path)
     while True:
         filename = f'{get_random_safestring()}-{filename}'
         absolute_path = this_path.joinpath(filename)

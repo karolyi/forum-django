@@ -245,18 +245,18 @@ STATIC_ROOT = BASE_DIR.parent.joinpath('static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR.parent.joinpath('media')
 
-_path_orig = Path('~', 'Work', 'forum-django-cdn', 'original').expanduser()
+_path_cdnroot = Path('~', 'Work', 'forum-django-cdn').expanduser()
 CDN = locals().get('CDN') or dict(
-    PATH_ORIG=_path_orig,
-    URL_PREFIX='https://example.cdnhost.com',  # Avoid the trailing slash
+    PATH_ROOT=_path_cdnroot,
+    # Avoid the trailing slash
+    URL_PREFIX='http://test.localdomain:8000/static/forum-django-cdn',
     # See https://getbootstrap.com/docs/4.4/layout/grid/#grid-options
     # The order is important, <picture> tag generates along this
     IMAGESIZE=dict(xs=576, sm=768, md=992, xl=1200),
     PATH_SIZES=dict(
-        original=_path_orig, xs=_path_orig.parent.joinpath('xs'),
-        sm=_path_orig.parent.joinpath('sm'),
-        md=_path_orig.parent.joinpath('md'),
-        xl=_path_orig.parent.joinpath('xl'))
+        original=_path_cdnroot.joinpath('original'),
+        xs=_path_cdnroot.joinpath('xs'), sm=_path_cdnroot.joinpath('sm'),
+        md=_path_cdnroot.joinpath('md'), xl=_path_cdnroot.joinpath('xl'))
     )
 
 CDN['URLPREFIX_SIZE'] = dict()
@@ -279,6 +279,9 @@ PAGINATOR_DEFAULT_ADJACENT_PAGES = 2
 
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = 'forum:account:login'
+
+FORUM_LOCKROOT_PATH = \
+    locals().get('FORUM_LOCKROOT_PATH') or Path(BASE_DIR, 'locks')
 
 CRXFORUM_CONNECTION = locals().get('CRXFORUM_CONNECTION') or dict(
     db='crxforum', user='crxforum', passwd='test123', charset='utf8',
