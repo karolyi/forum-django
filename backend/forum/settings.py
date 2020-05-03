@@ -253,15 +253,16 @@ CDN = locals().get('CDN') or dict(
     # The order is important, <picture> tag generates along this
     IMAGESIZE=dict(xs=576, sm=768, md=992, xl=1200),
     PATH_SIZES=dict(
-        xs=_path_orig.parent.joinpath('xs'),
+        original=_path_orig, xs=_path_orig.parent.joinpath('xs'),
         sm=_path_orig.parent.joinpath('sm'),
         md=_path_orig.parent.joinpath('md'),
         lg=_path_orig.parent.joinpath('lg'))
     )
 
-CDN['PATH_ORIG'].mkdir(parents=True, exist_ok=True)
-for path in CDN['PATH_SIZES'].values():  # type: Path
+CDN['URLPREFIX_SIZE'] = dict()
+for size, path in CDN['PATH_SIZES'].items():  # type: str, Path
     path.mkdir(parents=True, exist_ok=True)
+    CDN['URLPREFIX_SIZE'][size] = '/'.join((CDN['URL_PREFIX'], size))
 
 LANGUAGES = locals().get('LANGUAGES') or (
     ('en', _('English')),
@@ -277,7 +278,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = 'forum:account:login'
 
 CRXFORUM_CONNECTION = locals().get('CRXFORUM_CONNECTION') or dict(
-    db='crxforum', user='crxforum', passwd='test123', charset='utf-8',
+    db='crxforum', user='crxforum', passwd='test123', charset='utf8',
     host='localhost')
 
 # Keep this at the very bottom of settings.py

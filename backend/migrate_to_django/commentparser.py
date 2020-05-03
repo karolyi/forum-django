@@ -3,6 +3,7 @@ import logging
 
 from bs4 import BeautifulSoup as bs
 from bs4.element import Tag
+from django.conf import settings
 
 import variables
 from forum.base.models import Comment
@@ -13,8 +14,8 @@ from image_downloader import (
 from markdownparser import parse_to_markdown
 from utils import non_naive_datetime_utc
 from variables import (
-    DEAD_HOSTERS, HTTP_CDN_SIZE_ORIGINAL, INNER_IMAGE_URLS, NONE_SRC,
-    OLD_SELF_URL, comment_uniqid_dict, conn, topic_dict, user_dict)
+    DEAD_HOSTERS, INNER_IMAGE_URLS, NONE_SRC, OLD_SELF_URL,
+    comment_uniqid_dict, conn, topic_dict, user_dict)
 from video_converter import parse_videos
 
 logger = logging.getLogger(__name__)
@@ -113,11 +114,13 @@ def check_already_downloaded(img_tag, comment_item, content):
 
     cdn_image = image_url.image
     future_assign_model_to_image(cdn_image, comment_item)
-    cdn_url = '/'.join((HTTP_CDN_SIZE_ORIGINAL, cdn_image.cdn_path))
+    cdn_url = '/'.join((
+        settings.CDN['URLPREFIX_SIZE']['original'], cdn_image.cdn_path))
     logger.info(
         'Object already downloaded: %s, cdn_url: %s', orig_src, cdn_url)
     img_tag['data-cdn-pk'] = cdn_image.pk
-    img_tag['src'] = '/'.join((HTTP_CDN_SIZE_ORIGINAL, cdn_image.cdn_path))
+    img_tag['src'] = '/'.join((
+        settings.CDN['URLPREFIX_SIZE']['original'], cdn_image.cdn_path))
     wrap_into_picture(img_tag, cdn_image.cdn_path, content)
     variables.ALREADY_DOWNLOADED_IMAGE_COUNT += 1
     return True

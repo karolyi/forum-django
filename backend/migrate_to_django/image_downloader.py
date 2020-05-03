@@ -18,8 +18,7 @@ from forum.cdn.models import Image, ImageUrl, MissingImage
 from forum.utils import get_random_safestring
 from variables import (
     CANCEL_HASH_TUPLE, FILE_EXTENSIONS, FILE_EXTENSIONS_KEYSET,
-    FILENAME_MAXLENGTH, HTTP_CDN_SIZE_ORIGINAL, HTTP_CDN_SIZEURLS, NONE_SRC,
-    UNNECESSARY_FILENAME_PARTS)
+    FILENAME_MAXLENGTH, NONE_SRC, UNNECESSARY_FILENAME_PARTS)
 
 mime = magic.Magic(mime=True)
 logger = logging.getLogger(__name__)
@@ -54,7 +53,8 @@ def wrap_into_picture(img_tag: Tag, cdn_path: str, content: BeautifulSoup):
         name='source',
         media=f'(max-width: {settings.CDN["IMAGESIZE"][size]}px)',
         srcset='/'.join((base_url, cdn_path)))
-        for size, base_url in HTTP_CDN_SIZEURLS.items())
+        for size, base_url in settings.CDN['URLPREFIX_SIZE'].items()
+        if size != 'original')
     picture_tag.append(original_img)
 
 
@@ -115,7 +115,8 @@ def check_hash_existing(img_tag, digest_value, model_item, content):
         cdn_image = Image.objects.get(file_hash=digest_value)
     except Image.DoesNotExist:
         return False
-    existing_cdn_url = '/'.join((HTTP_CDN_SIZE_ORIGINAL, cdn_image.cdn_path))
+    existing_cdn_url = '/'.join(
+        (settings.CDN['URLPREFIX_SIZE']['original'], cdn_image.cdn_path))
     orig_src = img_tag.get('src')
     logger.info(
         'Object hash exists for url %s, existing_cdn_url: %s,'
@@ -210,7 +211,8 @@ def do_download(img_tag, model_item, content):
         src_hash=get_sha512_digest(orig_src))
     cdn_image_url.save()
     future_assign_model_to_image(cdn_image, model_item)
-    img_src = '/'.join((HTTP_CDN_SIZE_ORIGINAL, str(cdn_relative_path)))
+    img_src = '/'.join(
+        (settings.CDN['URLPREFIX_SIZE']['original'], str(cdn_relative_path)))
     img_tag['src'] = img_src
     img_tag['data-cdn-pk'] = '%s' % cdn_image.pk
     wrap_into_picture(
