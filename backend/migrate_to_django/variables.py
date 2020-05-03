@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import MySQLdb
 from django.conf import settings
 
@@ -13,7 +11,6 @@ comment_uniqid_dict = {}
 event_dict = {}
 
 NONE_SRC = '/static/images/image-404.svg'
-CDN_FILES_ROOT = Path('~', 'cdn', 'original').expanduser()
 HTTP_CDN_SIZE_ORIGINAL = '/'.join((settings.CDN['URL_PREFIX'], 'original'))
 HTTP_CDN_SIZEURLS = {
     x: '/'.join([settings.CDN['URL_PREFIX'], x])

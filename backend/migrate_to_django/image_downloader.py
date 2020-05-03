@@ -17,7 +17,7 @@ from forum.base.models import Comment, User
 from forum.cdn.models import Image, ImageUrl, MissingImage
 from forum.utils import get_random_safestring
 from variables import (
-    CANCEL_HASH_TUPLE, CDN_FILES_ROOT, FILE_EXTENSIONS, FILE_EXTENSIONS_KEYSET,
+    CANCEL_HASH_TUPLE, FILE_EXTENSIONS, FILE_EXTENSIONS_KEYSET,
     FILENAME_MAXLENGTH, HTTP_CDN_SIZE_ORIGINAL, HTTP_CDN_SIZEURLS, NONE_SRC,
     UNNECESSARY_FILENAME_PARTS)
 
@@ -96,7 +96,7 @@ def create_cdn_file(
     relative_path = Path(
         used_time.strftime('%Y'), used_time.strftime('%m'),
         used_time.strftime('%d'))
-    this_path = CDN_FILES_ROOT.joinpath(relative_path)
+    this_path = settings.CDN['PATH_ORIG'].joinpath(relative_path)
     while True:
         filename = f'{get_random_safestring()}-{filename}'
         absolute_path = this_path.joinpath(filename)

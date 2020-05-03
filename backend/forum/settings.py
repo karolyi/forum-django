@@ -26,14 +26,11 @@ DIR_BACKEND = BASE_DIR
 DIR_FRONTEND = BASE_DIR.parent.joinpath('frontend')
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = environ.get(
+SECRET_KEY = locals().get('SECRET_KEY') or environ.get(
     'FORUM_SECRET_KEY', '(tfz61pc=z34-(m)t#ul3^pf%405xb+$=mwy&ozd-h$kq+^b&p')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-try:
-    DEBUG  # NOQA
-except NameError:
-    DEBUG = True
+DEBUG = locals().get('DEBUG', True)
 
 TEMPLATES = [
     {
@@ -105,7 +102,8 @@ TEMPLATES = [
     },
 ]
 
-ALLOWED_HOSTS = ['test.localdomain', 'localhost']
+ALLOWED_HOSTS = \
+    locals().get('ALLOWED_HOSTS') or ['test.localdomain', 'localhost']
 
 SITE_NAME = _('Forum')
 
@@ -173,20 +171,10 @@ WSGI_APPLICATION = 'forum.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'forum-django',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
-        'PORT': 3306,
-        'OPTIONS': {
-            'sql_mode': 'STRICT_ALL_TABLES',
-            'charset': 'utf8mb4'
-        }
-    }
-}
+DATABASES = locals().get('DATABASES') or dict(default=dict(
+    ENGINE='django.db.backends.mysql', NAME='forum-django', USER='root',
+    PASSWORD='', HOST='127.0.0.1', PORT=3306, OPTIONS=dict(
+        sql_mode='STRICT_ALL_TABLES', charset='utf8mb4')))
 
 AUTH_USER_MODEL = 'forum_base.User'
 AUTHENTICATION_BACKENDS = (
@@ -257,14 +245,25 @@ STATIC_ROOT = BASE_DIR.parent.joinpath('static')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR.parent.joinpath('media')
 
-
-CDN = dict(
-    PATH_ROOT=Path('~', 'Work', 'forum-django-cdn', 'original').expanduser(),
+_path_orig = Path('~', 'Work', 'forum-django-cdn', 'original').expanduser()
+CDN = locals().get('CDN') or dict(
+    PATH_ORIG=_path_orig,
     URL_PREFIX='https://example.cdnhost.com',  # Avoid the trailing slash
     # See https://getbootstrap.com/docs/4.4/layout/grid/#grid-options
     # The order is important, <picture> tag generates along this
-    IMAGESIZE=dict(xs=576, sm=768, md=992, xl=1200))
-LANGUAGES = (
+    IMAGESIZE=dict(xs=576, sm=768, md=992, xl=1200),
+    PATH_SIZES=dict(
+        xs=_path_orig.parent.joinpath('xs'),
+        sm=_path_orig.parent.joinpath('sm'),
+        md=_path_orig.parent.joinpath('md'),
+        lg=_path_orig.parent.joinpath('lg'))
+    )
+
+CDN['PATH_ORIG'].mkdir(parents=True, exist_ok=True)
+for path in CDN['PATH_SIZES'].values():  # type: Path
+    path.mkdir(parents=True, exist_ok=True)
+
+LANGUAGES = locals().get('LANGUAGES') or (
     ('en', _('English')),
     ('de', _('German')),
     ('hu', _('Hungarian')))
@@ -277,14 +276,9 @@ PAGINATOR_DEFAULT_ADJACENT_PAGES = 2
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = 'forum:account:login'
 
-CRXFORUM_CONNECTION = {
-    'db': 'crxforum',
-    'user': 'crxforum',
-    'passwd': 'test123',
-    'charset': 'utf8',
-    'host': 'localhost'
-}
-
+CRXFORUM_CONNECTION = locals().get('CRXFORUM_CONNECTION') or dict(
+    db='crxforum', user='crxforum', passwd='test123', charset='utf-8',
+    host='localhost')
 
 # Keep this at the very bottom of settings.py
 try:

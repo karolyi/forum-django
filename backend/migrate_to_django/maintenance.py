@@ -4,6 +4,7 @@ import os
 
 import requests
 from bs4 import BeautifulSoup as bs
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password  # NOQA
 from django.db import connection as django_connection
@@ -23,8 +24,7 @@ from topicparser import (
     finish_assign_topic_to_image, fix_content_image, parse_description)
 from utils import non_naive_datetime_ber, non_naive_datetime_utc
 from variables import (
-    CDN_FILES_ROOT, comment_uniqid_dict, conn, event_dict, session_dict,
-    topic_dict, user_dict)
+    comment_uniqid_dict, conn, event_dict, session_dict, topic_dict, user_dict)
 from video_converter import parse_videos
 
 logger = logging.getLogger(__name__)
@@ -63,11 +63,11 @@ def empty_django_db():
 
 
 def cdn_maintenance():
-    root_len = len(str(CDN_FILES_ROOT)) + 1
+    root_len = len(str(settings.CDN['PATH_ORIG'])) + 1
     logger.info('===== * SEPARATOR * =====')
     logger.info('CDN-MODEL CHECK')
     file_images_set = set()
-    for root, dirs, files in os.walk(CDN_FILES_ROOT):
+    for root, dirs, files in os.walk(settings.CDN['PATH_ORIG']):
         if not files:
             continue
         relative_root = root[root_len:]
@@ -81,7 +81,7 @@ def cdn_maintenance():
     cdn_no_model_set = file_images_set - db_images_set
     variables.CDN_NO_MODEL = len(cdn_no_model_set)
     for relative_path in cdn_no_model_set:
-        absolute_path = CDN_FILES_ROOT.joinpath(relative_path)
+        absolute_path = settings.CDN['PATH_ORIG'].joinpath(relative_path)
         logger.info('No model for CDN file %s, deleting', relative_path)
         absolute_path.unlink()
     cdn_no_file_set = db_images_set - file_images_set
