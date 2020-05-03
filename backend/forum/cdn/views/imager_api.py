@@ -72,6 +72,7 @@ class ResizeImageView(RedirectView):
         temp_path = Path(new_absolute_path).parent.joinpath(
             f'temp-{new_absolute_path.name}')
         image.save(fp=temp_path)
+        image.close()
         temp_path.rename(new_absolute_path)
         return new_absolute_path
 
