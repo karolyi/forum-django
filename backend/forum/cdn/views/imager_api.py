@@ -69,7 +69,10 @@ class ResizeImageView(RedirectView):
             return new_absolute_path
         new_height = int(max_width / width * height)
         image.thumbnail(size=(max_width, new_height), reducing_gap=3.0)
-        image.save(fp=new_absolute_path)
+        temp_path = Path(new_absolute_path).parent.joinpath(
+            f'temp-{new_absolute_path.name}')
+        image.save(fp=temp_path)
+        temp_path.rename(new_absolute_path)
         return new_absolute_path
 
     def _create_url_from_new_path(self, new_path: Path) -> str:
@@ -101,7 +104,7 @@ class ResizeImageView(RedirectView):
             slugify(input_data=kwargs['img_path']))[:MAX_FILENAME_SIZE]
         with TempLock(name=lock_name):
             url = self._get_resized_imageurl()
-        query_string = self.request.META.get('QUERY_STRING', '')
+        query_string = self.request.META.get('QUERY_STRING')
         if query_string:
             url = f'{url}?{query_string}'
         return url
