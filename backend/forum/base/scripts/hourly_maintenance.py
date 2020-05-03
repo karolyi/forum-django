@@ -20,18 +20,21 @@ def _clear_old_converted_cdnfiles():
     for size in settings.CDN['IMAGESIZE']:
         for path in settings.CDN['PATH_SIZES'][size].rglob(
                 pattern='*'):  # type: Path
-            if path.stat().st_mtime >= one_week_ago:
-                continue
-            if path.is_file() or path.is_symlink():
+            if path.is_symlink() and path.lstat().st_mtime <= one_week_ago:
+                print(f'Removed symlink: {path}')
                 path.unlink()
-                print(f'Removed file/symlink {path}')
                 continue
-            try:
-                path.rmdir()
-                print(f'Removed directory {path}')
-            except OSError as exc:
-                if exc.args[0] != 39:
-                    raise
+            if path.is_file() and path.stat().st_mtime <= one_week_ago:
+                print(f'Removed file: {path}')
+                path.unlink()
+                continue
+            if path.is_dir() and path.stat().st_mtime <= one_week_ago:
+                try:
+                    path.rmdir()
+                    print(f'Removed directory {path}')
+                except OSError as exc:
+                    if exc.args[0] != 39:
+                        raise
 
 
 def run():
