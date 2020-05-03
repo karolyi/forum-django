@@ -5,13 +5,13 @@ from debug_toolbar.panels.templates import TemplatesPanel as BaseTemplatesPanel
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
-from django.core.handlers.wsgi import WSGIRequest
 from django.utils.html import strip_spaces_between_tags
 from django.utils.translation import (
     get_language_from_request, get_language_info)
 from jinja2 import nodes
 from jinja2.ext import Extension
 from rjsmin import jsmin
+from forum.utils.wsgi import ForumWSGIRequest
 
 ForumAuthForm = None
 
@@ -155,8 +155,7 @@ def forum_auth_form():
 
 
 def is_topic_comment_visible(
-        comment, show_invisible: bool, request: WSGIRequest,
-        cache_key: str = 'topic-comment-listing') -> bool:
+        comment, show_invisible: bool, request: ForumWSGIRequest) -> bool:
     """
     Tell the templating engine if a given comment should or shouldn't be
     visible in a given user context.
