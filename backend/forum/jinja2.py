@@ -154,7 +154,6 @@ def forum_auth_form():
     return ForumAuthForm
 
 
-@lru_cache(maxsize=100)
 def is_topic_comment_visible(
         comment, show_invisible: bool, request: WSGIRequest,
         cache_key: str = 'topic-comment-listing') -> bool:
