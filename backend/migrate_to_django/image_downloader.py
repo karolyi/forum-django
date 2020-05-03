@@ -18,13 +18,13 @@ from forum.cdn.models import Image, ImageUrl, MissingImage
 from forum.utils import get_random_safestring
 from variables import (
     CANCEL_HASH_TUPLE, FILE_EXTENSIONS, FILE_EXTENSIONS_KEYSET,
-    FILENAME_MAXLENGTH, NONE_SRC, UNNECESSARY_FILENAME_PARTS)
+    FILENAME_MAXLENGTH, UNNECESSARY_FILENAME_PARTS)
 
 mime = magic.Magic(mime=True)
 logger = logging.getLogger(__name__)
 FILE_SIMPLER_RE = re_compile(r'[^a-zA-Z0-9.\-]+')
 
-missing_origsrc_len = MissingImage._meta.get_field('src').max_length
+MISSING_ORIGSRC_LEN = MissingImage._meta.get_field('src').max_length
 MAXLEN_IMAGEURL = ImageUrl._meta.get_field('orig_src').max_length
 
 
@@ -173,9 +173,9 @@ def download_file(url):
 def add_missing_comment_image(img_tag):
     img_src = img_tag.get('src')
     logger.info('Marking object as missing: %s', img_src)
-    missing_image = MissingImage(src=img_src[:missing_origsrc_len])
+    missing_image = MissingImage(src=img_src[:MISSING_ORIGSRC_LEN])
     missing_image.save()
-    img_tag['src'] = NONE_SRC
+    img_tag['src'] = settings.IMG_404_PATH
     img_tag['class'] = 'notfound-picture'
     img_tag['data-missing'] = '1'
     img_tag['data-cdn-pk'] = '%s' % missing_image.pk

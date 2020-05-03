@@ -1,10 +1,11 @@
 import logging
 
 from bs4 import BeautifulSoup as bs
+from django.conf import settings
 
 from commentparser import download_and_replace, fix_if_link, parse_links
 from forum.base.models import Topic
-from variables import DEAD_HOSTERS, INNER_IMAGE_URLS, NONE_SRC, OLD_SELF_URL
+from variables import DEAD_HOSTERS, INNER_IMAGE_URLS, OLD_SELF_URL
 from video_converter import parse_videos
 
 logger = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ def fix_content_image(img_tag, model_item, content):
     img_src = img_tag.get('src')
     if img_src is None or img_src.startswith('data:') or \
             img_src.startswith(DEAD_HOSTERS):
-        img_tag['src'] = NONE_SRC
+        img_tag['src'] = settings.IMG_404_PATH
         img_tag['class'] = 'notfound-picture'
         return
     if img_src.startswith(('skins/', 'images/')):

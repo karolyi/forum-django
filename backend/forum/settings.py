@@ -256,13 +256,16 @@ CDN = locals().get('CDN') or dict(
         original=_path_orig, xs=_path_orig.parent.joinpath('xs'),
         sm=_path_orig.parent.joinpath('sm'),
         md=_path_orig.parent.joinpath('md'),
-        lg=_path_orig.parent.joinpath('lg'))
+        xl=_path_orig.parent.joinpath('xl'))
     )
 
 CDN['URLPREFIX_SIZE'] = dict()
 for size, path in CDN['PATH_SIZES'].items():  # type: str, Path
     path.mkdir(parents=True, exist_ok=True)
     CDN['URLPREFIX_SIZE'][size] = '/'.join((CDN['URL_PREFIX'], size))
+
+IMG_404_PATH = '/static/images/image-404.svg'
+
 
 LANGUAGES = locals().get('LANGUAGES') or (
     ('en', _('English')),

@@ -3,10 +3,10 @@ from urllib.parse import parse_qsl, quote, urlparse
 import requests
 from bs4 import BeautifulSoup as bs
 from bs4.element import Tag
+from django.conf import settings
 from requests.exceptions import RequestException
 
 import magic
-from variables import NONE_SRC
 
 mime = magic.Magic(mime=True)
 
@@ -38,7 +38,7 @@ def filter_video_url(object_item):
 
 def make_empty(object_item):
     none_img = bs(
-        markup=f'<img src="{NONE_SRC}" class="notfound-embed">',
+        markup=f'<img src="{settings.IMG_404_PATH}" class="notfound-embed">',
         features='lxml').img
     object_item.replace_with(none_img)
 

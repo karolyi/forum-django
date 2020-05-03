@@ -10,10 +10,8 @@ message_dict = {}
 comment_uniqid_dict = {}
 event_dict = {}
 
-NONE_SRC = '/static/images/image-404.svg'
-
 INNER_IMAGE_URLS = (
-    '/static/skins/', '/static/images/', NONE_SRC,
+    '/static/skins/', '/static/images/', settings.IMG_404_PATH,
     *settings.CDN['URLPREFIX_SIZE'].values())
 OLD_SELF_URL = 'http://crxforum.flix.hu'
 MISSING_IMAGE_COUNT = 0

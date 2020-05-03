@@ -14,13 +14,13 @@ from image_downloader import (
 from markdownparser import parse_to_markdown
 from utils import non_naive_datetime_utc
 from variables import (
-    DEAD_HOSTERS, INNER_IMAGE_URLS, NONE_SRC, OLD_SELF_URL,
-    comment_uniqid_dict, conn, topic_dict, user_dict)
+    DEAD_HOSTERS, INNER_IMAGE_URLS, OLD_SELF_URL, comment_uniqid_dict, conn,
+    topic_dict, user_dict)
 from video_converter import parse_videos
 
 logger = logging.getLogger(__name__)
 orig_src_len = ImageUrl._meta.get_field('orig_src').max_length
-missing_origsrc_len = MissingImage._meta.get_field('src').max_length
+MISSING_ORIGSRC_LEN = MissingImage._meta.get_field('src').max_length
 
 
 def finish_assign_comment_to_image(comment_item):
@@ -89,12 +89,12 @@ def check_already_missing(img_tag):
 
     img_src = img_tag.get('src')
     try:
-        MissingImage.objects.get(src=img_src[:missing_origsrc_len])
+        MissingImage.objects.get(src=img_src[:MISSING_ORIGSRC_LEN])
     except MissingImage.DoesNotExist:
         return False
 
     img_tag['data-missing'] = '1'
-    img_tag['src'] = NONE_SRC
+    img_tag['src'] = settings.IMG_404_PATH
     img_tag['class'] = 'notfound-picture'
     logger.info('Object already missing: %s', img_src)
     variables.ALREADY_MISSING_IMAGE_COUNT += 1
@@ -149,7 +149,7 @@ def fix_comment_image(img_tag, comment_item, content):
     img_src = img_tag.get('src')
     if img_src is None or img_src.startswith('data:') or \
             img_src.startswith(DEAD_HOSTERS):
-        img_tag['src'] = NONE_SRC
+        img_tag['src'] = settings.IMG_404_PATH
         img_tag['class'] = 'notfound-picture'
     if img_src.startswith(('skins/', 'images/')):
         img_src = '/' + img_src
