@@ -61,14 +61,14 @@ terminfo xterm-256color 'is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l'
 
 # default windows
 screen -t django fish -li
-#stuff "env PYTHONASYNCIODEBUG=1 python -Wd backend/manage.py runserver 0.0.0.0:8000 --http_timeout 30000\n"
-stuff "env PYTHONASYNCIODEBUG=1 python -Wd backend/manage.py runserver\n"
+#stuff "env PYTHONASYNCIODEBUG=1 python -Wa backend/manage.py runserver 0.0.0.0:8000 --http_timeout 30000\n"
+stuff "env PYTHONASYNCIODEBUG=1 python -Wa backend/manage.py runserver\n"
 screen -t webpack fish -li
 stuff "gulp webpack-dev-server\n"
 screen -t coverage fish -li
-stuff "python -Wd -m http.server 8001\n"
+stuff "python -Wa -m http.server 8001\n"
 screen -t shell-plus fish -li
-stuff "python -Wd backend/manage.py shell_plus --print-sql\n"
+stuff "python -Wa backend/manage.py shell_plus --print-sql\n"
 screen -t fish fish -li
 #stuff "code\n"
 stuff "subl\n"

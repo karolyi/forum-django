@@ -1,10 +1,12 @@
 from pathlib import Path
+from typing import Tuple
 
 from django.conf import settings
 from django.views.generic.base import RedirectView
 from hyperlink._url import URL
 from PIL.Image import Image
 from PIL.Image import open as image_open
+from PIL.ImageSequence import Iterator as SeqIterator
 
 from forum.utils import get_relative_path, slugify
 from forum.utils.locking import MAX_FILENAME_SIZE, TempLock
@@ -51,29 +53,60 @@ class ResizeImageView(RedirectView):
             raise FileNotFoundError
         return file_path
 
-    def _get_thumbnail_path(
-            self, path_elements: list, orig_path: Path) -> Path:
-        'Create the thumbnail and return its CDN absolute `Path`.'
-        image = image_open(fp=orig_path)  # type: Image
+    def _create_animated_thumbnail(
+            self, image: Image, size: tuple) -> Tuple[Image, dict]:
+        'If the image is animated, create an animated thumbnail.'
+
+        def _thumbnails() -> Image:
+            'Inner iterator for frames.'
+            for frame in frames:  # type: Image
+                thumbnail = frame.copy()
+                thumbnail.thumbnail(size=size, reducing_gap=3.0)
+                yield thumbnail
+
+        frames = SeqIterator(im=image)
+        output_image = next(_thumbnails())
+        output_image.info = image.info.copy()
+        save_kwargs = dict(
+            save_all=True, optimize=True, append_images=list(_thumbnails()),
+            disposal=3)
+        return output_image, save_kwargs
+
+    def _create_resized_image(
+            self, image: Image, max_width: int, new_absolute_path: Path):
+        'If the image is animated, save an animated thumbnail.'
         width, height = image.size
+        new_height = max_width / width * height
+        new_height = int(new_height + 1 if new_height % 1 else new_height)
+        save_kwargs = dict()
+        if image.format == 'GIF':
+            image, save_kwargs = self._create_animated_thumbnail(
+                image=image, size=(max_width, new_height))
+        else:
+            image = image.copy()
+            image.thumbnail(size=(max_width, new_height), reducing_gap=3.0)
+        temp_path = Path(new_absolute_path).parent.joinpath(
+            f'temp-{new_absolute_path.name}')
+        image.save(fp=temp_path, **save_kwargs)
+        temp_path.rename(new_absolute_path)
+
+    def _get_thumbnail_path(
+            self, image: Image, path_elements: list, orig_path: Path) -> Path:
+        'Create the thumbnail and return its CDN absolute `Path`.'
         requested_size, *cdn_metapath = path_elements
         max_width = settings.CDN['IMAGESIZE'][requested_size]
         new_absolute_path = Path(
             settings.CDN['PATH_SIZES'][requested_size], *cdn_metapath
         ).absolute()
         new_absolute_path.parent.mkdir(parents=True, exist_ok=True)
-        if width <= max_width:
+        if image.size[0] <= max_width:
             relative_path = get_relative_path(
                 path_from=new_absolute_path, path_to=orig_path)
             new_absolute_path.symlink_to(target=relative_path)
             return new_absolute_path
-        new_height = int(max_width / width * height)
-        image.thumbnail(size=(max_width, new_height), reducing_gap=3.0)
-        temp_path = Path(new_absolute_path).parent.joinpath(
-            f'temp-{new_absolute_path.name}')
-        image.save(fp=temp_path)
-        image.close()
-        temp_path.rename(new_absolute_path)
+        self._create_resized_image(
+            image=image, max_width=max_width,
+            new_absolute_path=new_absolute_path)
         return new_absolute_path
 
     def _create_url_from_new_path(self, new_path: Path) -> str:
@@ -94,8 +127,9 @@ class ResizeImageView(RedirectView):
             return url.to_text()
         except FileExistsError:
             return '/'.join((settings.CDN['URL_PREFIX'], *path_elements))
-        created_absolute_path = self._get_thumbnail_path(
-            path_elements=path_elements, orig_path=orig_path)
+        with image_open(fp=orig_path) as image:
+            created_absolute_path = self._get_thumbnail_path(
+                image=image, path_elements=path_elements, orig_path=orig_path)
         return self._create_url_from_new_path(new_path=created_absolute_path)
 
     def get_redirect_url(self, **kwargs) -> str:
