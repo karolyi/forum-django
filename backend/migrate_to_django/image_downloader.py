@@ -49,6 +49,7 @@ def wrap_into_picture(img_tag: Tag, cdn_path: str, content: BeautifulSoup):
     picture_tag = content.new_tag(
         name='picture', **{'class': 'embedded-forum-picture'})
     original_img = img_tag.replace_with(picture_tag)
+    original_img['loading'] = 'lazy'
     picture_tag.extend(content.new_tag(
         name='source',
         media=f'(max-width: {settings.CDN["IMAGESIZE"][size]}px)',
