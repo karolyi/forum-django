@@ -1,3 +1,5 @@
 #!/usr/bin/env sh
 
-test -p /tmp/forum-prod.master-fifo.sock && echo l >/tmp/forum-prod.master-fifo.sock
+if [ -p /tmp/forum-prod.master-fifo.sock ]; then
+    echo l >/tmp/forum-prod.master-fifo.sock
+fi
