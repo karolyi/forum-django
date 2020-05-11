@@ -41,7 +41,7 @@ def _clear_old_converted_cdnfiles():
                         path.rmdir()
                         print(f'Removed directory {path}')
                     except OSError as exc:
-                        if exc.args[0] != 39:
+                        if exc.args[0] != 66:
                             raise
 
 
