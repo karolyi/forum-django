@@ -13,14 +13,14 @@ hyperlink==19.0.0
 idna==2.9
 Jinja2==2.11.2
 lxml==4.5.0
-Markdown==3.2.1
-markdown2==2.3.8
+Markdown==3.2.2
+markdown2==2.3.9
 MarkupSafe==1.1.1
 mysqlclient==1.4.6
 Pillow==7.1.2
 pytz==2020.1
 PyYAML==5.3.1
-redis==3.5.0
+redis==3.5.1
 requests==2.23.0
 rjsmin==1.1.0
 soupsieve==2.0
