@@ -63,11 +63,11 @@ def empty_django_db():
 
 
 def cdn_maintenance():
-    root_len = len(str(settings.CDN['PATH_SIZES']['dowloaded'])) + 1
+    root_len = len(str(settings.CDN['PATH_SIZES']['downloaded'])) + 1
     logger.info('===== * SEPARATOR * =====')
     logger.info('CDN-MODEL CHECK')
     file_images_set = set()
-    for root, dirs, files in os.walk(settings.CDN['PATH_SIZES']['dowloaded']):
+    for root, dirs, files in os.walk(settings.CDN['PATH_SIZES']['downloaded']):
         if not files:
             continue
         relative_root = root[root_len:]
@@ -81,7 +81,7 @@ def cdn_maintenance():
     variables.CDN_NO_MODEL = len(cdn_no_model_set)
     for relative_path in cdn_no_model_set:
         absolute_path = \
-            settings.CDN['PATH_SIZES']['dowloaded'].joinpath(relative_path)
+            settings.CDN['PATH_SIZES']['downloaded'].joinpath(relative_path)
         logger.info('No model for CDN file %s, deleting', relative_path)
         absolute_path.unlink()
     cdn_no_file_set = db_images_set - file_images_set
