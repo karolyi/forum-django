@@ -268,8 +268,9 @@ CDN['URLPREFIX_SIZE'] = dict()
 for size, path in CDN['PATH_SIZES'].items():  # type: str, Path
     if size == 'downloaded':
         continue
-    path.mkdir(mode=CDN['POSIXFLAGS']['mode_dir'], parents=True, exist_ok=True)
-    chown(path=path, uid=-1, gid=CDN['POSIXFLAGS']['gid'])
+    if not path.exists():
+        path.mkdir(mode=CDN['POSIXFLAGS']['mode_dir'], parents=True)
+        chown(path=path, uid=-1, gid=CDN['POSIXFLAGS']['gid'])
     CDN['URLPREFIX_SIZE'][size] = '/'.join((CDN['URL_PREFIX'], size))
 
 IMG_404_PATH = '/static/images/image-404.svg'
