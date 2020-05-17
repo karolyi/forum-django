@@ -15,6 +15,7 @@ import magic
 import variables
 from forum.base.models import Comment, User
 from forum.cdn.models import Image, ImageUrl, MissingImage
+from forum.cdn.utils.paths import get_ensured_dirs_path, set_file_mode
 from forum.utils import get_random_safestring
 from variables import (
     CANCEL_HASH_TUPLE, FILE_EXTENSIONS, FILE_EXTENSIONS_KEYSET,
@@ -26,6 +27,7 @@ FILE_SIMPLER_RE = re_compile(r'[^a-zA-Z0-9.\-]+')
 
 MISSING_ORIGSRC_LEN = MissingImage._meta.get_field('src').max_length
 MAXLEN_IMAGEURL = ImageUrl._meta.get_field('orig_src').max_length
+PATH_SIZE_IGNORES = set(['original', 'downloaded'])
 
 
 def get_sha512_digest(input_data):
@@ -55,7 +57,7 @@ def wrap_into_picture(img_tag: Tag, cdn_path: str, content: BeautifulSoup):
         media=f'(max-width: {settings.CDN["IMAGESIZE"][size]}px)',
         srcset='/'.join((base_url, cdn_path)))
         for size, base_url in settings.CDN['URLPREFIX_SIZE'].items()
-        if size != 'original')
+        if size not in PATH_SIZE_IGNORES)
     picture_tag.append(original_img)
 
 
@@ -97,14 +99,17 @@ def create_cdn_file(
     relative_path = Path(
         used_time.strftime('%Y'), used_time.strftime('%m'),
         used_time.strftime('%d'))
-    this_path = settings.CDN['PATH_SIZES']['original'].joinpath(relative_path)
+    this_path = \
+        settings.CDN['PATH_SIZES']['downloaded'].joinpath(relative_path)
     while True:
         filename = f'{get_random_safestring()}-{filename}'
-        absolute_path = this_path.joinpath(filename)
+        absolute_path = this_path.joinpath(filename)  # type: Path
         if not absolute_path.exists():
             break
-    this_path.mkdir(parents=True, exist_ok=True)
+    parts = list(absolute_path.relative_to(settings.CDN['PATH_ROOT']).parts)
+    get_ensured_dirs_path(path_elements=parts)
     absolute_path.write_bytes(data=content_data)
+    set_file_mode(path=absolute_path)
     return relative_path.joinpath(filename)
 
 
@@ -116,15 +121,15 @@ def check_hash_existing(img_tag, digest_value, model_item, content):
         cdn_image = Image.objects.get(file_hash=digest_value)
     except Image.DoesNotExist:
         return False
-    existing_cdn_url = '/'.join(
+    cdn_url_original = '/'.join(
         (settings.CDN['URLPREFIX_SIZE']['original'], cdn_image.cdn_path))
     orig_src = img_tag.get('src')
     logger.info(
-        'Object hash exists for url %s, existing_cdn_url: %s,'
+        'Object hash exists for url %s, cdn_url_original: %s,'
         ' digest_value is %s',
-        orig_src, existing_cdn_url, digest_value)
+        orig_src, cdn_url_original, digest_value)
     img_tag['data-cdn-pk'] = cdn_image.pk
-    img_tag['src'] = existing_cdn_url
+    img_tag['src'] = cdn_url_original
     wrap_into_picture(
         img_tag=img_tag, cdn_path=cdn_image.cdn_path, content=content)
     variables.ALREADY_DOWNLOADED_IMAGE_COUNT += 1
@@ -200,11 +205,11 @@ def do_download(img_tag, model_item, content):
     digest_value = get_sha512_digest(input_data=content_data)
     if check_hash_existing(img_tag, digest_value, model_item, content):
         return
-    cdn_relative_path = create_cdn_file(
+    cdn_metapath = create_cdn_file(
         filename=filename, mime_type=mime_type, content_data=content_data,
         model_item=model_item)
     cdn_image = Image(
-        mime_type=mime_type, cdn_path=cdn_relative_path,
+        mime_type=mime_type, cdn_path=cdn_metapath,
         file_hash=digest_value)
     cdn_image.save()
     cdn_image_url = ImageUrl(
@@ -213,11 +218,11 @@ def do_download(img_tag, model_item, content):
     cdn_image_url.save()
     future_assign_model_to_image(cdn_image, model_item)
     img_src = '/'.join(
-        (settings.CDN['URLPREFIX_SIZE']['original'], str(cdn_relative_path)))
+        (settings.CDN['URLPREFIX_SIZE']['original'], str(cdn_metapath)))
     img_tag['src'] = img_src
     img_tag['data-cdn-pk'] = '%s' % cdn_image.pk
     wrap_into_picture(
-        img_tag=img_tag, cdn_path=str(cdn_relative_path), content=content)
+        img_tag=img_tag, cdn_path=str(cdn_metapath), content=content)
     variables.SUCCESSFULLY_DOWNLOADED += 1
     logger.info(
         f'Object downloaded and added to cdn: {orig_src}, cdn_path: {img_src}')

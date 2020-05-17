@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import mimetypes
-from os import environ
+from grp import getgrnam
+from os import chown, environ
 from pathlib import Path
 
 from django.utils.translation import ugettext_lazy as _
@@ -260,19 +261,15 @@ CDN = locals().get('CDN') or dict(
         md=_path_cdnroot.joinpath('md'), xl=_path_cdnroot.joinpath('xl')),
     # Settings for the CDN files
     POSIXFLAGS=dict(
-        groupname='forum-cdn', mode_dir=0o775, mode_file=0o664,
+        gid=getgrnam(name='forum-cdn').gr_gid, mode_dir=0o775, mode_file=0o664,
         mode_link=0o664))
 
 CDN['URLPREFIX_SIZE'] = dict()
 for size, path in CDN['PATH_SIZES'].items():  # type: str, Path
     if size == 'downloaded':
         continue
-    path.mkdir(parents=True, exist_ok=True)
-    try:
-        path.chmod(mode=CDN['POSIXFLAGS']['mode_dir'])
-    except PermissionError as exc:
-        if exc.args[0] != 1:
-            raise
+    path.mkdir(mode=CDN['POSIXFLAGS']['mode_dir'], parents=True, exist_ok=True)
+    chown(path=path, uid=-1, gid=CDN['POSIXFLAGS']['gid'])
     CDN['URLPREFIX_SIZE'][size] = '/'.join((CDN['URL_PREFIX'], size))
 
 IMG_404_PATH = '/static/images/image-404.svg'
