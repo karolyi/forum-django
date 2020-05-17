@@ -1,6 +1,7 @@
-beautifulsoup4==4.9.0
+beautifulsoup4==4.9.1
 blessings==1.7
 certifi==2020.4.5.1
+chardet==3.0.4
 colour-runner==0.1.1
 Django==2.2.12
 django-debug-toolbar==2.2
@@ -20,10 +21,10 @@ mysqlclient==1.4.6
 Pillow==7.1.2
 pytz==2020.1
 PyYAML==5.3.1
-redis==3.5.1
+redis==3.5.2
 requests==2.23.0
 rjsmin==1.1.0
-soupsieve==2.0
+soupsieve==2.0.1
 sqlparse==0.3.1
 Unidecode==1.1.1
 urllib3==1.25.9
