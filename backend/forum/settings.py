@@ -265,8 +265,14 @@ CDN = locals().get('CDN') or dict(
 
 CDN['URLPREFIX_SIZE'] = dict()
 for size, path in CDN['PATH_SIZES'].items():  # type: str, Path
+    if size == 'downloaded':
+        continue
     path.mkdir(parents=True, exist_ok=True)
-    path.chmod(mode=CDN['POSIXFLAGS']['mode_dir'])
+    try:
+        path.chmod(mode=CDN['POSIXFLAGS']['mode_dir'])
+    except PermissionError as exc:
+        if exc.args[0] != 1:
+            raise
     CDN['URLPREFIX_SIZE'][size] = '/'.join((CDN['URL_PREFIX'], size))
 
 IMG_404_PATH = '/static/images/image-404.svg'
