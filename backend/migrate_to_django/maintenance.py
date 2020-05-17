@@ -63,30 +63,29 @@ def empty_django_db():
 
 
 def cdn_maintenance():
-    root_len = len(str(settings.CDN['PATH_SIZES']['original'])) + 1
+    root_len = len(str(settings.CDN['PATH_SIZES']['dowloaded'])) + 1
     logger.info('===== * SEPARATOR * =====')
     logger.info('CDN-MODEL CHECK')
     file_images_set = set()
-    for root, dirs, files in os.walk(settings.CDN['PATH_SIZES']['original']):
+    for root, dirs, files in os.walk(settings.CDN['PATH_SIZES']['dowloaded']):
         if not files:
             continue
         relative_root = root[root_len:]
         for file in files:
             relative_path = '/'.join((relative_root, file))
             file_images_set.add(relative_path)
-    db_images_set = set(
-        (item['cdn_path'] for item in Image.objects.values('cdn_path')))
+    db_images_set = set(Image.objects.values_list('cdn_path', flat=True))
     if file_images_set == db_images_set:
         return
     cdn_no_model_set = file_images_set - db_images_set
     variables.CDN_NO_MODEL = len(cdn_no_model_set)
     for relative_path in cdn_no_model_set:
         absolute_path = \
-            settings.CDN['PATH_SIZES']['original'].joinpath(relative_path)
+            settings.CDN['PATH_SIZES']['dowloaded'].joinpath(relative_path)
         logger.info('No model for CDN file %s, deleting', relative_path)
         absolute_path.unlink()
     cdn_no_file_set = db_images_set - file_images_set
-    model_list = Image.objects.filter(cdn_path__in=cdn_no_file_set)
+    model_list = Image.objects.filter(cdn_path__in=cdn_no_file_set).only('pk')
     variables.CDN_NO_FILE = len(cdn_no_file_set)
     if model_list:
         logger.info('No CDN file for model(s): %s', model_list)
