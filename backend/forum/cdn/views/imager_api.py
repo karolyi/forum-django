@@ -1,4 +1,3 @@
-from os import chown
 from pathlib import Path
 from typing import Tuple
 
@@ -13,11 +12,11 @@ from PIL.ImageSequence import Iterator as SeqIterator
 from forum.utils import get_relative_path, slugify
 from forum.utils.locking import MAX_FILENAME_SIZE, TempLock
 
-from ..utils.paths import get_ensured_dirs_path, save_new_image
+from ..utils.paths import get_ensured_dirs_path, save_new_image, set_file_mode
 
 IMG_404_URL = f'{settings.ALLOWED_HOSTS[0]}{settings.IMG_404_PATH}'
 RESIZED_PREFIXES = \
-    set(x for x in settings.CDN['PATH_SIZES'] if x != 'original')
+    set(x for x in settings.CDN['PATH_SIZES'] if x != 'downloaded')
 _404_PATH_PARAM = settings.IMG_404_PATH.split('/')[1:]
 
 
@@ -30,8 +29,10 @@ class ResizeImageView(RedirectView):
         original_url = self.kwargs['img_path']
         return original_url.lstrip('/').split('/')
 
-    def _check_target_exists(self):
-        'Raise `FileExistsError` when the target file already exists.'
+    def _sanity_checks(self):
+        'Execute sanity checks, raise exceptions on errors.'
+        if self._path_elements[0] not in RESIZED_PREFIXES:
+            raise FileNotFoundError
         size_rootpath = settings.CDN['PATH_SIZES'][self._path_elements[0]]
         target_path = Path(size_rootpath, *self._path_elements[1:]).absolute()
         try:
@@ -50,9 +51,6 @@ class ResizeImageView(RedirectView):
         found (or any security issue), `FileExistsError` when the target
         file already exists.
         """
-        if self._path_elements[0] not in RESIZED_PREFIXES:
-            raise FileNotFoundError
-        self._check_target_exists()
         downloaded_path = Path(
             settings.CDN['PATH_SIZES']['downloaded'], *self._path_elements[1:]
         ).resolve()
@@ -132,11 +130,7 @@ class ResizeImageView(RedirectView):
                 path_from=self._new_absolute_path,
                 path_to=self._watermarked_original_path)
             self._new_absolute_path.symlink_to(target=relative_path)
-            chown(
-                path=self._new_absolute_path, uid=-1,
-                gid=settings['CDN']['POSIXFLAGS']['gid'])
-            self._new_absolute_path.chmod(
-                mode=settings['CDN']['POSIXFLAGS']['mode_link'])
+            set_file_mode(path=self._new_absolute_path)
             return self._new_absolute_path
         self._create_resized_image(max_width=max_width)
         return self._new_absolute_path
@@ -149,6 +143,7 @@ class ResizeImageView(RedirectView):
     def _get_resized_imageurl(self) -> str:
         'Resize the image if available and return its URL.'
         try:
+            self._sanity_checks()
             self._downloaded_path
         except FileNotFoundError:
             url = URL(

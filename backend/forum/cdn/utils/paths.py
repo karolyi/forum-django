@@ -27,7 +27,10 @@ def get_ensured_dirs_path(path_elements: list) -> Path:
 def set_file_mode(path: Path):
     'Set CDN file modes and gids.'
     chown(path=path, uid=-1, gid=settings['CDN']['POSIXFLAGS']['gid'])
-    path.chmod(mode=settings['CDN']['POSIXFLAGS']['mode_file'])
+    if path.is_file():
+        path.chmod(mode=settings['CDN']['POSIXFLAGS']['mode_file'])
+    elif path.is_symlink():
+        path.chmod(mode=settings['CDN']['POSIXFLAGS']['mode_link'])
 
 
 def save_new_image(image: Image, new_path: Path, save_kwargs: dict):
