@@ -91,7 +91,7 @@ class ResizeImageView(RedirectView):
             image, save_kwargs = self._create_animated_thumbnail(
                 size=(max_width, new_height))
         else:
-            image = image.copy()
+            image = self._image.copy()
             image.thumbnail(size=(max_width, new_height), reducing_gap=3.0)
         save_new_image(
             image=image, new_path=self._new_absolute_path,
