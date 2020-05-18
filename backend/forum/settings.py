@@ -264,6 +264,8 @@ CDN = locals().get('CDN') or dict(
         gid=getgrnam(name='forum-cdn').gr_gid, mode_dir=0o775, mode_file=0o664,
         mode_link=0o664))
 
+WATERMARK_PATH = Path(BASE_DIR, 'static', 'images', 'watermark.png')
+
 CDN['URLPREFIX_SIZE'] = dict()
 for size, path in CDN['PATH_SIZES'].items():  # type: str, Path
     if size == 'downloaded':

@@ -20,6 +20,8 @@ RESIZED_PREFIXES = \
     set(x for x in settings.CDN['PATH_SIZES'] if x != 'downloaded')
 _404_PATH_PARAM = settings.IMG_404_PATH.split('/')[1:]
 LOCK_PREFIX = 'watermarked-'
+# with image_open(fp=settings.WATERMARK_PATH) as image:
+WATERMARK_IMAGE = image_open(fp=settings.WATERMARK_PATH)  # type: Image
 
 
 class ResizeImageView(RedirectView):
@@ -70,13 +72,17 @@ class ResizeImageView(RedirectView):
         def _thumbnails() -> Image:
             'Inner iterator for frames.'
             for frame in frames:  # type: Image
-                thumbnail = frame.copy()
+                thumbnail = frame.copy()  # type: Image
                 thumbnail.thumbnail(size=size, reducing_gap=3.0)
+                thumbnail.paste(
+                    im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
                 yield thumbnail
 
         frames = SeqIterator(im=self._image)
         output_image = next(_thumbnails())
         output_image.info = self._image.info.copy()
+        output_image.paste(
+            im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
         save_kwargs = dict(
             save_all=True, optimize=True, append_images=list(_thumbnails()),
             disposal=3)
@@ -94,6 +100,7 @@ class ResizeImageView(RedirectView):
         else:
             image = self._image.copy()
             image.thumbnail(size=(max_width, new_height), reducing_gap=3.0)
+            image.paste(im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
         save_new_image(
             image=image, new_path=self._new_absolute_path,
             save_kwargs=save_kwargs)
@@ -118,6 +125,7 @@ class ResizeImageView(RedirectView):
                 size=self._image.size)
         else:
             image = self._image.copy()
+            image.paste(im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
         save_new_image(
             image=image, new_path=original_path, save_kwargs=save_kwargs)
         return original_path
@@ -131,7 +139,7 @@ class ResizeImageView(RedirectView):
         requested_size = self._path_elements[0]
         if requested_size == 'original':
             return self._get_watermarked_original_path()
-        # Another size was requested, locking is necessary
+        # Another size was requested originally, locking is necessary
         lock_name = LOCK_PREFIX + slugify(
             input_data='-'.join(('original', *self._path_elements[1:])))
         with TempLock(name=lock_name):
@@ -171,7 +179,7 @@ class ResizeImageView(RedirectView):
         except FileExistsError:
             return '/'.join((settings.CDN['URL_PREFIX'], *self._path_elements))
         with image_open(fp=self._downloaded_path) as image:
-            self._image = image
+            self._image = image  # type: Image
             created_absolute_path = self._get_thumbnail_path()
             del self._image
         return self._create_url_from_new_path(new_path=created_absolute_path)
