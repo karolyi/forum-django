@@ -104,7 +104,9 @@ class ResizeImageView(RedirectView):
 
     @cached_property
     def _watermarked_original_path(self) -> Path:
-        'Return (and create) the path of the watermaked original image.'
+        """
+        Return (and create) the path of the watermarked original image.
+        """
         original_path = get_ensured_dirs_path(
             path_elements=['original', *self._path_elements[1:]])
         if original_path.exists():

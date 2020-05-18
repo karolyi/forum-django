@@ -3,6 +3,8 @@ from pathlib import Path
 
 from django.conf import settings
 from PIL.Image import Image
+from forum.utils.locking import TempLock, MAX_FILENAME_SIZE
+from forum.utils import slugify
 
 
 def get_ensured_dirs_path(path_elements: list) -> Path:
@@ -15,12 +17,17 @@ def get_ensured_dirs_path(path_elements: list) -> Path:
         settings.CDN['PATH_SIZES'][requested_size]).absolute()
     mode_dir = settings.CDN['POSIXFLAGS']['mode_dir']
     gid = settings.CDN['POSIXFLAGS']['gid']
+    lock_namelist = [requested_size]
     while _iter_metapath:
-        if not new_absolute_path.is_dir():
-            new_absolute_path.mkdir(mode=mode_dir)
-            chown(path=new_absolute_path, uid=-1, gid=gid)
-        new_absolute_path = \
-            new_absolute_path.joinpath(_iter_metapath.pop(0))
+        lock_name = ('ensure-dir-' + slugify(
+            input_data='-'.join(lock_namelist)))[:MAX_FILENAME_SIZE]
+        with TempLock(name=lock_name):
+            if not new_absolute_path.is_dir():
+                new_absolute_path.mkdir(mode=mode_dir)
+                chown(path=new_absolute_path, uid=-1, gid=gid)
+        _iter_pathitem = _iter_metapath.pop(0)
+        new_absolute_path = new_absolute_path.joinpath(_iter_pathitem)
+        lock_namelist.append(_iter_pathitem)
     return new_absolute_path
 
 
