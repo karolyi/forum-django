@@ -12,6 +12,7 @@ from PIL.ImageSequence import Iterator as SeqIterator
 from forum.utils import get_relative_path, slugify
 from forum.utils.locking import TempLock
 
+from ..utils.image import has_alpha
 from ..utils.paths import (
     get_path_with_ensured_dirs, save_new_image, set_cdn_fileattrs)
 
@@ -20,8 +21,9 @@ RESIZED_PREFIXES = \
     set(x for x in settings.CDN['PATH_SIZES'] if x != 'downloaded')
 _404_PATH_PARAM = settings.IMG_404_PATH.split('/')[1:]
 LOCK_PREFIX = 'watermarked-'
-# with image_open(fp=settings.WATERMARK_PATH) as image:
-WATERMARK_IMAGE = image_open(fp=settings.WATERMARK_PATH)  # type: Image
+with image_open(fp=settings.WATERMARK_PATH) as image:
+    WATERMARK_IMAGE = image  # type: Image
+    WATERMARK_IMAGE.load()
 
 
 class ResizeImageView(RedirectView):
@@ -66,14 +68,18 @@ class ResizeImageView(RedirectView):
             raise FileNotFoundError
         return downloaded_path
 
-    def _create_animated_thumbnail(self, size: tuple) -> Tuple[Image, dict]:
-        'If the image is animated, create an animated thumbnail.'
+    def _create_animated_gif(self, size: tuple) -> Tuple[Image, dict]:
+        'If the image is a GIF, create an its thumbnail here.'
 
         def _thumbnails() -> Image:
             'Inner iterator for frames.'
             for frame in frames:  # type: Image
                 thumbnail = frame.copy()  # type: Image
                 thumbnail.thumbnail(size=size, reducing_gap=3.0)
+                if has_alpha(image=frame):
+                    thumbnail = thumbnail.convert(mode='RGBA')  # type: Image
+                    alpha = thumbnail.split()[-1]
+                    thumbnail.putalpha(alpha=alpha)
                 thumbnail.paste(
                     im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
                 yield thumbnail
@@ -81,8 +87,6 @@ class ResizeImageView(RedirectView):
         frames = SeqIterator(im=self._image)
         output_image = next(_thumbnails())
         output_image.info = self._image.info.copy()
-        output_image.paste(
-            im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
         save_kwargs = dict(
             save_all=True, optimize=True, append_images=list(_thumbnails()),
             disposal=3)
@@ -95,7 +99,7 @@ class ResizeImageView(RedirectView):
         new_height = int(new_height + 1 if new_height % 1 else new_height)
         save_kwargs = dict()
         if self._image.format == 'GIF':
-            image, save_kwargs = self._create_animated_thumbnail(
+            image, save_kwargs = self._create_animated_gif(
                 size=(max_width, new_height))
         else:
             image = self._image.copy()
@@ -121,7 +125,7 @@ class ResizeImageView(RedirectView):
             return original_path
         save_kwargs = dict()
         if self._image.format == 'GIF':
-            image, save_kwargs = self._create_animated_thumbnail(
+            image, save_kwargs = self._create_animated_gif(
                 size=self._image.size)
         else:
             image = self._image.copy()
