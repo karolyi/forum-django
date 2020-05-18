@@ -3,8 +3,9 @@ from pathlib import Path
 
 from django.conf import settings
 from PIL.Image import Image
-from forum.utils.locking import TempLock, MAX_FILENAME_SIZE
+
 from forum.utils import slugify
+from forum.utils.locking import MAX_FILENAME_SIZE, TempLock
 
 
 def get_ensured_dirs_path(path_elements: list) -> Path:
