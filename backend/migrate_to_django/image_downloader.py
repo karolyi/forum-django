@@ -15,7 +15,7 @@ import magic
 import variables
 from forum.base.models import Comment, User
 from forum.cdn.models import Image, ImageUrl, MissingImage
-from forum.cdn.utils.paths import get_ensured_dirs_path, set_file_mode
+from forum.cdn.utils.paths import get_path_with_ensured_dirs, set_cdn_fileattrs
 from forum.utils import get_random_safestring
 from variables import (
     CANCEL_HASH_TUPLE, FILE_EXTENSIONS, FILE_EXTENSIONS_KEYSET,
@@ -54,7 +54,7 @@ def wrap_into_picture(img_tag: Tag, cdn_path: str, content: BeautifulSoup):
     original_img['loading'] = 'lazy'
     picture_tag.extend(content.new_tag(
         name='source',
-        media=f'(max-width: {settings.CDN["IMAGESIZE"][size]}px)',
+        media=f'(max-width: {settings.CDN["MAXWIDTH"][size]}px)',
         srcset='/'.join((base_url, cdn_path)))
         for size, base_url in settings.CDN['URLPREFIX_SIZE'].items()
         if size not in PATH_SIZE_IGNORES)
@@ -107,9 +107,9 @@ def create_cdn_file(
         if not absolute_path.exists():
             break
     parts = list(absolute_path.relative_to(settings.CDN['PATH_ROOT']).parts)
-    get_ensured_dirs_path(path_elements=parts)
+    get_path_with_ensured_dirs(path_elements=parts)
     absolute_path.write_bytes(data=content_data)
-    set_file_mode(path=absolute_path)
+    set_cdn_fileattrs(path=absolute_path)
     return relative_path.joinpath(filename)
 
 

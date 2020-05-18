@@ -253,7 +253,7 @@ CDN = locals().get('CDN') or dict(
     URL_PREFIX='http://test.localdomain:8000/static/forum-django-cdn',
     # See https://getbootstrap.com/docs/4.4/layout/grid/#grid-options
     # The order is important, <picture> tag generates along this
-    IMAGESIZE=dict(xs=576, sm=768, md=992, xl=1200),
+    MAXWIDTH=dict(xs=576, sm=768, md=992, xl=1200),
     PATH_SIZES=dict(
         downloaded=_path_cdnroot.joinpath('downloaded'),
         original=_path_cdnroot.joinpath('original'),

@@ -18,7 +18,7 @@ def _clear_templocks():
 def _clear_old_converted_cdnfiles():
     'Delete old CDN files that were a result of a conversion.'
     one_week_ago = time() - 60 * 60 * 24 * 7
-    for size in settings.CDN['IMAGESIZE']:
+    for size in settings.CDN['MAXWIDTH']:
         for path in settings.CDN['PATH_SIZES'][size].rglob(
                 pattern='*'):  # type: Path
             if path.is_symlink():

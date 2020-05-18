@@ -25,9 +25,7 @@ def slugify(input_data):
 
 
 def memoized_method(*lru_args, **lru_kwargs):
-    """
-    http://stackoverflow.com/a/33672499/1067833
-    """
+    'http://stackoverflow.com/a/33672499/1067833'
     def decorator(func):
         @wraps(func)
         def wrapped_func(self, *args, **kwargs):
@@ -35,6 +33,7 @@ def memoized_method(*lru_args, **lru_kwargs):
             # a strong reference to self the instance would be never
             # garbage collected.
             self_weak = ref(self)
+
             @wraps(func)
             @lru_cache(*lru_args, **lru_kwargs)
             def cached_method(*args, **kwargs):
@@ -54,6 +53,7 @@ def get_relative_path(path_from: Path, path_to: Path) -> Path:
         raise ValueError('One or both of the passed paths are not absolute.')
     items_from = path_from.parts
     items_to = path_to.parts
+    # Remove identical path prefix parts
     while items_from[0] == items_to[0]:
         items_from = items_from[1:]
         items_to = items_to[1:]

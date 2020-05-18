@@ -8,10 +8,10 @@ from forum.utils import slugify
 from forum.utils.locking import MAX_FILENAME_SIZE, TempLock
 
 
-def get_ensured_dirs_path(path_elements: list) -> Path:
+def get_path_with_ensured_dirs(path_elements: list) -> Path:
     """
-    Ensure the directories up until the file with the right
-    mode/gid.
+    Return a CDN `Path` while ensuring the directories up until the file
+    (last part) with the right attributes.
     """
     requested_size, *_iter_metapath = path_elements
     new_absolute_path = Path(
@@ -32,8 +32,8 @@ def get_ensured_dirs_path(path_elements: list) -> Path:
     return new_absolute_path
 
 
-def set_file_mode(path: Path):
-    'Set CDN file modes and gids.'
+def set_cdn_fileattrs(path: Path):
+    'Set CDN file attributes.'
     chown(path=path, uid=-1, gid=settings.CDN['POSIXFLAGS']['gid'])
     if path.is_file():
         path.chmod(mode=settings.CDN['POSIXFLAGS']['mode_file'])
@@ -45,5 +45,5 @@ def save_new_image(image: Image, new_path: Path, save_kwargs: dict):
     'Save the image and ensure its mode/gid.'
     temp_path = Path(new_path).parent.joinpath(f'temp-{new_path.name}')
     image.save(fp=temp_path, **save_kwargs)
-    set_file_mode(path=temp_path)
+    set_cdn_fileattrs(path=temp_path)
     temp_path.rename(new_path)

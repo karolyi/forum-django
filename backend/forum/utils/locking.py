@@ -51,7 +51,7 @@ class TempLock(object):
     _is_acquired = False
 
     def __init__(self, name: str):
-        name = Path(name).name
+        name = Path(name).name[:MAX_FILENAME_SIZE]
         self.path = PATH_TEMPLOCK_DIR.joinpath(name)
 
     def __enter__(self):

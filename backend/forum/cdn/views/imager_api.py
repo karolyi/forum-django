@@ -10,14 +10,16 @@ from PIL.Image import open as image_open
 from PIL.ImageSequence import Iterator as SeqIterator
 
 from forum.utils import get_relative_path, slugify
-from forum.utils.locking import MAX_FILENAME_SIZE, TempLock
+from forum.utils.locking import TempLock
 
-from ..utils.paths import get_ensured_dirs_path, save_new_image, set_file_mode
+from ..utils.paths import (
+    get_path_with_ensured_dirs, save_new_image, set_cdn_fileattrs)
 
 IMG_404_URL = f'{settings.ALLOWED_HOSTS[0]}{settings.IMG_404_PATH}'
 RESIZED_PREFIXES = \
     set(x for x in settings.CDN['PATH_SIZES'] if x != 'downloaded')
 _404_PATH_PARAM = settings.IMG_404_PATH.split('/')[1:]
+LOCK_PREFIX = 'watermarked-'
 
 
 class ResizeImageView(RedirectView):
@@ -48,8 +50,7 @@ class ResizeImageView(RedirectView):
         """
         Do sanity checks, return the absolute `Path` of the downloaded
         file, raise `FileNotFoundError` when the source file is not
-        found (or any security issue), `FileExistsError` when the target
-        file already exists.
+        found (or any security issue).
         """
         downloaded_path = Path(
             settings.CDN['PATH_SIZES']['downloaded'], *self._path_elements[1:]
@@ -100,14 +101,14 @@ class ResizeImageView(RedirectView):
     @cached_property
     def _new_absolute_path(self) -> Path:
         'Return a created recursive CDN path while setting mode/gid.'
-        return get_ensured_dirs_path(path_elements=self._path_elements)
+        return get_path_with_ensured_dirs(path_elements=self._path_elements)
 
-    @cached_property
-    def _watermarked_original_path(self) -> Path:
+    def _get_watermarked_original_path(self) -> Path:
         """
-        Return (and create) the path of the watermarked original image.
+        Return the created watermarked original `Path`while optionally
+        locked.
         """
-        original_path = get_ensured_dirs_path(
+        original_path = get_path_with_ensured_dirs(
             path_elements=['original', *self._path_elements[1:]])
         if original_path.exists():
             return original_path
@@ -121,18 +122,33 @@ class ResizeImageView(RedirectView):
             image=image, new_path=original_path, save_kwargs=save_kwargs)
         return original_path
 
+    @cached_property
+    def _watermarked_original_path(self) -> Path:
+        """
+        Return (and create) the path of the watermarked original image.
+        Optionally lock if necessary.
+        """
+        requested_size = self._path_elements[0]
+        if requested_size == 'original':
+            return self._get_watermarked_original_path()
+        # Another size was requested, locking is necessary
+        lock_name = LOCK_PREFIX + slugify(
+            input_data='-'.join(('original', *self._path_elements[1:])))
+        with TempLock(name=lock_name):
+            return self._get_watermarked_original_path()
+
     def _get_thumbnail_path(self) -> Path:
         'Create the thumbnail and return its CDN absolute `Path`.'
         requested_size = self._path_elements[0]
         if requested_size == 'original':
             return self._watermarked_original_path
-        max_width = settings.CDN['IMAGESIZE'][requested_size]
+        max_width = settings.CDN['MAXWIDTH'][requested_size]
         if self._image.size[0] <= max_width:
             relative_path = get_relative_path(
                 path_from=self._new_absolute_path,
                 path_to=self._watermarked_original_path)
             self._new_absolute_path.symlink_to(target=relative_path)
-            set_file_mode(path=self._new_absolute_path)
+            set_cdn_fileattrs(path=self._new_absolute_path)
             return self._new_absolute_path
         self._create_resized_image(max_width=max_width)
         return self._new_absolute_path
@@ -162,9 +178,8 @@ class ResizeImageView(RedirectView):
 
     def get_redirect_url(self, **kwargs) -> str:
         'Resize the image and return the redirect URL while locking.'
-        lock_name = (
-            'imageresizer-' +
-            slugify(input_data=kwargs['img_path']))[:MAX_FILENAME_SIZE]
+        lock_name = \
+            (LOCK_PREFIX + slugify(input_data='-'.join(self._path_elements)))
         with TempLock(name=lock_name):
             url = self._get_resized_imageurl()
         query_string = self.request.META.get('QUERY_STRING')
