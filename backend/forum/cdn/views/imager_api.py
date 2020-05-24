@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Tuple
 
 from django.conf import settings
 from django.utils.functional import cached_property
@@ -7,12 +6,12 @@ from django.views.generic.base import RedirectView
 from hyperlink._url import URL
 from PIL.Image import Image
 from PIL.Image import open as image_open
-from PIL.ImageSequence import Iterator as SeqIterator
 
 from forum.utils import get_relative_path, slugify
 from forum.utils.locking import TempLock
 
-from ..utils.image import WATERMARK_IMAGE, create_animated_gif, has_alpha
+from ..utils.image import (
+    WATERMARK_IMAGE, create_animated_gif, get_conversion_format)
 from ..utils.paths import (
     get_path_with_ensured_dirs, save_new_image, set_cdn_fileattrs)
 
@@ -65,31 +64,6 @@ class ResizeImageView(RedirectView):
             raise FileNotFoundError
         return downloaded_path
 
-    def _create_animated_gif(self, size: tuple) -> Tuple[Image, dict]:
-        'If the image is a GIF, create an its thumbnail here.'
-
-        def _thumbnails() -> Image:
-            'Inner iterator for frames.'
-            for frame in frames:  # type: Image
-                thumbnail = frame.copy()  # type: Image
-                thumbnail.thumbnail(size=size, reducing_gap=3.0)
-                if has_alpha(image=frame):
-                    thumbnail = thumbnail.convert(mode='RGBA')  # type: Image
-                    # https://stackoverflow.com/a/1963146/1067833
-                    alpha = thumbnail.split()[-1]
-                    thumbnail.putalpha(alpha=alpha)
-                thumbnail.paste(
-                    im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
-                yield thumbnail
-
-        frames = SeqIterator(im=self._image)
-        output_image = next(_thumbnails())
-        output_image.info = self._image.info.copy()
-        save_kwargs = dict(
-            save_all=True, optimize=True, append_images=list(_thumbnails()),
-            disposal=3)
-        return output_image, save_kwargs
-
     def _create_resized_image(self, max_width: int):
         'If the image is animated, save an animated thumbnail.'
         width, height = self._image.size
@@ -100,7 +74,8 @@ class ResizeImageView(RedirectView):
             image, save_kwargs = create_animated_gif(
                 image=self._image, size=(max_width, new_height))
         else:
-            image = self._image.convert(mode='RGBA')
+            image = self._image.convert(
+                mode=get_conversion_format(image=self._image))
             image.thumbnail(size=(max_width, new_height), reducing_gap=3.0)
             image.paste(im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
         save_new_image(
@@ -126,7 +101,8 @@ class ResizeImageView(RedirectView):
             image, save_kwargs = create_animated_gif(
                 image=self._image, size=self._image.size)
         else:
-            image = self._image.convert(mode='RGBA')
+            image = self._image.convert(
+                mode=get_conversion_format(image=self._image))
             image.paste(im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
         save_new_image(
             image=image, new_path=original_path, save_kwargs=save_kwargs)

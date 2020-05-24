@@ -11,6 +11,7 @@ from PIL.ImageSequence import Iterator as SeqIterator
 with image_open(fp=settings.WATERMARK_PATH) as image:
     WATERMARK_IMAGE = image  # type: Image
     WATERMARK_IMAGE = WATERMARK_IMAGE.convert(mode='RGBA')
+CONVERSION_MAP = dict(JPEG='RGB')
 
 
 def has_alpha(image: Image) -> bool:
@@ -147,3 +148,8 @@ def create_animated_gif(image: Image, size: tuple) -> Tuple[Image, dict]:
         append_images=list(_thumbnails()),
         disposal=2)  # Other disposals don't work
     return output_image, save_kwargs
+
+
+def get_conversion_format(image: Image) -> str:
+    'Return a viable conversion format for the `Image`.'
+    return CONVERSION_MAP.get(image.format, 'RGBA')
