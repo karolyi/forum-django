@@ -114,11 +114,11 @@ class TransparentAnimatedGifConverter(object):
     def process(self) -> Image:
         'Return the processed mode `P` `Image`.'
         self._img_p = self._img_rgba.convert(mode='P')
-        self._img_p_data = bytearray(self._img_p.tobytes())
-        self._palette_replaces = dict(idx_from=list(), idx_to=list())
         self._process_pixels()
         if not self._transparent_pixels:
             return self._img_p
+        self._img_p_data = bytearray(self._img_p.tobytes())
+        self._palette_replaces = dict(idx_from=list(), idx_to=list())
         self._process_palette()
         self._adjust_pixels()
         self._adjust_palette()
