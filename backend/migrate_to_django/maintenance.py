@@ -22,7 +22,7 @@ from forum.rating.models import CommentVote, UserRating
 from markdownparser import parse_to_markdown
 from topicparser import (
     finish_assign_topic_to_image, fix_content_image, parse_description)
-from utils import non_naive_datetime_ber, non_naive_datetime_utc
+from utils import non_naive_datetime_ber
 from variables import (
     comment_uniqid_dict, conn, event_dict, session_dict, topic_dict, user_dict)
 from video_converter import parse_videos
@@ -269,7 +269,7 @@ def parse_users():
             user_item.introduction_html_reg = item[21]
             user_item.introduction_html_friends = item[22]
             user_item.picture_emails = item[23]
-            user_item.last_login = non_naive_datetime_utc(
+            user_item.last_login = non_naive_datetime_ber(
                 datetime.datetime.fromtimestamp(session_dict[item[0]]))
             parse_settings(user_item, settings)
             parse_introductions(user_item)

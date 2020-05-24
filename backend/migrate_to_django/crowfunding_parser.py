@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup as bs
 from commentparser import fix_comment_image
 from forum.crowdfunding.models import Project, ProjectBacker
 from markdownparser import parse_to_markdown
-from utils import non_naive_datetime_ber, non_naive_datetime_utc
+from utils import non_naive_datetime_ber
 from variables import conn, topic_dict, user_dict
 from video_converter import parse_videos
 
@@ -56,7 +56,7 @@ def parse_crowdfunding_project():
         '`autoCloseDate`, `ownerId`, `topicId`, `state`, `descriptionParsed` '
         'FROM `projectNames` ORDER BY `projectId`')
     for item in cursor:
-        last_updated_at = non_naive_datetime_utc(
+        last_updated_at = non_naive_datetime_ber(
             datetime.fromtimestamp(item[2]))
         related_topic = topic_dict.get(item[5])
         ends_at = non_naive_datetime_ber(datetime.combine(
@@ -92,7 +92,7 @@ def parse_crowdfunding_backers():
             count_multiback += 1
             continue
         set_backer.add(item[1])
-        last_updated_at = non_naive_datetime_utc(
+        last_updated_at = non_naive_datetime_ber(
             datetime.fromtimestamp(item[2]))
         model_projectbacker = ProjectBacker(
             project=project_dict[item[0]], user=user_dict[item[1]],

@@ -12,7 +12,7 @@ from image_downloader import (
     do_download, future_assign_model_to_image, get_sha512_digest,
     wrap_into_picture)
 from markdownparser import parse_to_markdown
-from utils import non_naive_datetime_utc
+from utils import non_naive_datetime_ber
 from variables import (
     DEAD_HOSTERS, INNER_IMAGE_URLS, OLD_SELF_URL, comment_uniqid_dict, conn,
     topic_dict, user_dict)
@@ -47,7 +47,7 @@ def build_comment(item):
         return comment_uniqid_dict[item[10]]
     comment_item = Comment(
         number=item[0], user=user_dict[item[1]],
-        time=non_naive_datetime_utc(datetime.datetime.fromtimestamp(item[2])),
+        time=non_naive_datetime_ber(datetime.datetime.fromtimestamp(item[2])),
         voting_value=item[3], host=item[4], ip='0.0.0.0',
         moved_from=topic_dict[item[9]] if item[9] else None,
         unique_id=item[10], content_html=item[12],

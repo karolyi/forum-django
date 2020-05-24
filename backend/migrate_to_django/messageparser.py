@@ -7,7 +7,7 @@ from django.utils.crypto import get_random_string
 from commentparser import fix_comment_image
 from forum.messaging.models import GlobalMessage, Mail
 from markdownparser import parse_to_markdown
-from utils import non_naive_datetime_ber, non_naive_datetime_utc
+from utils import non_naive_datetime_ber
 from variables import conn, message_dict, user_dict
 from video_converter import parse_videos
 
@@ -73,7 +73,7 @@ def parse_messaging():
         message_count += 1
         if message_count % 5000 == 0:
             print('counter:', message_count)
-        opened_at = created_at = non_naive_datetime_utc(
+        opened_at = created_at = non_naive_datetime_ber(
             datetime.fromtimestamp(item[2]))
         model_mail = Mail(
             sender=user_dict[item[3]], recipient=user_dict[item[0]],
@@ -91,7 +91,7 @@ def parse_messaging():
         if length == 1:
             out_item = cursor_outbox.fetchone()
             model_mail.is_retained_sender = out_item[1] == 0
-            opened_at = non_naive_datetime_utc(
+            opened_at = non_naive_datetime_ber(
                 datetime.fromtimestamp(out_item[0]))
         model_mail.save()
         Mail.objects.filter(id=model_mail.id).update(
@@ -109,7 +109,7 @@ def parse_messaging():
         if message_count % 5000 == 0:
             print('counter:', message_count)
         extra_len += 1
-        opened_at = created_at = non_naive_datetime_utc(
+        opened_at = created_at = non_naive_datetime_ber(
             datetime.fromtimestamp(item[2]))
         model_mail = Mail(
             sender=user_dict[item[0]], recipient=user_dict[item[3]],
