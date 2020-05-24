@@ -12,7 +12,7 @@ from PIL.ImageSequence import Iterator as SeqIterator
 from forum.utils import get_relative_path, slugify
 from forum.utils.locking import TempLock
 
-from ..utils.image import has_alpha
+from ..utils.image import WATERMARK_IMAGE, create_animated_gif, has_alpha
 from ..utils.paths import (
     get_path_with_ensured_dirs, save_new_image, set_cdn_fileattrs)
 
@@ -21,9 +21,6 @@ RESIZED_PREFIXES = \
     set(x for x in settings.CDN['PATH_SIZES'] if x != 'downloaded')
 _404_PATH_PARAM = settings.IMG_404_PATH.split('/')[1:]
 LOCK_PREFIX = 'watermarked-'
-with image_open(fp=settings.WATERMARK_PATH) as image:
-    WATERMARK_IMAGE = image  # type: Image
-    WATERMARK_IMAGE.load()
 
 
 class ResizeImageView(RedirectView):
@@ -78,6 +75,7 @@ class ResizeImageView(RedirectView):
                 thumbnail.thumbnail(size=size, reducing_gap=3.0)
                 if has_alpha(image=frame):
                     thumbnail = thumbnail.convert(mode='RGBA')  # type: Image
+                    # https://stackoverflow.com/a/1963146/1067833
                     alpha = thumbnail.split()[-1]
                     thumbnail.putalpha(alpha=alpha)
                 thumbnail.paste(
@@ -99,10 +97,10 @@ class ResizeImageView(RedirectView):
         new_height = int(new_height + 1 if new_height % 1 else new_height)
         save_kwargs = dict()
         if self._image.format == 'GIF':
-            image, save_kwargs = self._create_animated_gif(
-                size=(max_width, new_height))
+            image, save_kwargs = create_animated_gif(
+                image=self._image, size=(max_width, new_height))
         else:
-            image = self._image.copy()
+            image = self._image.convert(mode='RGBA')
             image.thumbnail(size=(max_width, new_height), reducing_gap=3.0)
             image.paste(im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
         save_new_image(
@@ -125,10 +123,10 @@ class ResizeImageView(RedirectView):
             return original_path
         save_kwargs = dict()
         if self._image.format == 'GIF':
-            image, save_kwargs = self._create_animated_gif(
-                size=self._image.size)
+            image, save_kwargs = create_animated_gif(
+                image=self._image, size=self._image.size)
         else:
-            image = self._image.copy()
+            image = self._image.convert(mode='RGBA')
             image.paste(im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
         save_new_image(
             image=image, new_path=original_path, save_kwargs=save_kwargs)
