@@ -96,11 +96,11 @@ class ResizeImageView(RedirectView):
             path_elements=['original', *self._path_elements[1:]])
         if original_path.exists():
             return original_path
-        save_kwargs = dict()
         if self._image.format == 'GIF':
             image, save_kwargs = create_animated_gif(
                 image=self._image, size=self._image.size)
         else:
+            save_kwargs = dict()
             image = self._image.convert(
                 mode=get_conversion_format(image=self._image))
             image.paste(im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)

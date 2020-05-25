@@ -10,15 +10,15 @@ from django.utils.safestring import mark_safe
 from django.utils.text import slugify as django_slugify
 from unidecode import unidecode
 
+SLUG_TRANSTABLE = str.maketrans('./_', '---')
+
 
 def slugify(input_data):
     """
     Powerup version of the original django slugify.
     """
     pass_one = unidecode(force_text(input_data))\
-        .replace('.', '-')\
-        .replace('/', '-')\
-        .replace('_', '-')\
+        .translate(SLUG_TRANSTABLE)\
         .strip('-')
     pass_two = django_slugify(value=pass_one)
     return mark_safe(pass_two)
