@@ -160,8 +160,7 @@ def create_animated_webp(image: Image, size: tuple) -> Tuple[Image, dict]:
     def _thumbnails() -> Image:
         'Inner iterator for frames.'
         for idx, frame in enumerate(frames):  # type: Image
-            thumbnail_rgba = frame.copy() if frame.mode == 'RGBA' \
-                else frame.convert(mode='RGBA')
+            thumbnail_rgba = get_converted_image(image=frame)
             thumbnail_rgba.thumbnail(size=size, reducing_gap=3.0)
             thumbnail_rgba.paste(
                 im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
@@ -177,6 +176,9 @@ def create_animated_webp(image: Image, size: tuple) -> Tuple[Image, dict]:
     return output_image, save_kwargs
 
 
-def get_conversion_format(image: Image) -> str:
-    'Return a viable conversion format for the `Image`.'
-    return CONVERSION_MAP.get(image.format, 'RGBA')
+def get_converted_image(image: Image) -> Image:
+    'Return an `Image` converted to a format that can be worked with.'
+    converted_format = CONVERSION_MAP.get(image.format, 'RGBA')
+    if image.format == converted_format:
+        return image.copy()
+    return image.convert(mode=converted_format)

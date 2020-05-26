@@ -12,7 +12,7 @@ from forum.utils.locking import TempLock
 
 from ..utils.image import (
     WATERMARK_IMAGE, create_animated_gif, create_animated_webp,
-    get_conversion_format)
+    get_converted_image)
 from ..utils.paths import (
     get_path_with_ensured_dirs, save_new_image, set_cdn_fileattrs)
 
@@ -78,8 +78,7 @@ class ResizeImageView(RedirectView):
             image, save_kwargs = create_animated_webp(
                 image=self._image, size=(max_width, new_height))
         else:
-            image = self._image.convert(
-                mode=get_conversion_format(image=self._image))
+            image = get_converted_image(image=self._image)
             image.thumbnail(size=(max_width, new_height), reducing_gap=3.0)
             image.paste(im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
         save_new_image(
@@ -108,8 +107,7 @@ class ResizeImageView(RedirectView):
                 image=self._image, size=self._image.size)
         else:
             save_kwargs = dict()
-            image = self._image.convert(
-                mode=get_conversion_format(image=self._image))
+            image = get_converted_image(image=self._image)
             image.paste(im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
         save_new_image(
             image=image, new_path=original_path, save_kwargs=save_kwargs)
