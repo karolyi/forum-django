@@ -11,7 +11,8 @@ from forum.utils import get_relative_path, slugify
 from forum.utils.locking import TempLock
 
 from ..utils.image import (
-    WATERMARK_IMAGE, create_animated_gif, get_conversion_format)
+    WATERMARK_IMAGE, create_animated_gif, create_animated_webp,
+    get_conversion_format)
 from ..utils.paths import (
     get_path_with_ensured_dirs, save_new_image, set_cdn_fileattrs)
 
@@ -73,6 +74,9 @@ class ResizeImageView(RedirectView):
         if self._image.format == 'GIF':
             image, save_kwargs = create_animated_gif(
                 image=self._image, size=(max_width, new_height))
+        elif self._image.format == 'WEBP':
+            image, save_kwargs = create_animated_webp(
+                image=self._image, size=(max_width, new_height))
         else:
             image = self._image.convert(
                 mode=get_conversion_format(image=self._image))
@@ -98,6 +102,9 @@ class ResizeImageView(RedirectView):
             return original_path
         if self._image.format == 'GIF':
             image, save_kwargs = create_animated_gif(
+                image=self._image, size=self._image.size)
+        elif self._image.format == 'WEBP':
+            image, save_kwargs = create_animated_webp(
                 image=self._image, size=self._image.size)
         else:
             save_kwargs = dict()

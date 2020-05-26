@@ -152,6 +152,31 @@ def create_animated_gif(image: Image, size: tuple) -> Tuple[Image, dict]:
     return output_image, save_kwargs
 
 
+def create_animated_webp(image: Image, size: tuple) -> Tuple[Image, dict]:
+    'If the image is a WEBP, create an its thumbnail here.'
+    save_kwargs = dict()
+    frame_durations = list()
+
+    def _thumbnails() -> Image:
+        'Inner iterator for frames.'
+        for idx, frame in enumerate(frames):  # type: Image
+            thumbnail_rgba = frame.copy() if frame.mode == 'RGBA' \
+                else frame.convert(mode='RGBA')
+            thumbnail_rgba.thumbnail(size=size, reducing_gap=3.0)
+            thumbnail_rgba.paste(
+                im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
+            frame_durations.append(frame.info['duration'])
+            yield thumbnail_rgba
+
+    frames = SeqIterator(im=image)
+    output_image = next(_thumbnails())
+    save_kwargs.update(
+        format='WEBP', save_all=True, append_images=list(_thumbnails()),
+        duration=frame_durations, background=output_image.info['background'],
+        loop=output_image.info['loop'])
+    return output_image, save_kwargs
+
+
 def get_conversion_format(image: Image) -> str:
     'Return a viable conversion format for the `Image`.'
     return CONVERSION_MAP.get(image.format, 'RGBA')
