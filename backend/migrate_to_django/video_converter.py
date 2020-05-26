@@ -9,6 +9,9 @@ from requests.exceptions import RequestException
 import magic
 
 mime = magic.Magic(mime=True)
+RATIO_16_9 = 16 / 9
+RATIO_10_1 = 10
+RATIO_1_1 = 1
 
 
 def is_not_200(video_url):
@@ -58,26 +61,10 @@ def get_parameter(video_url, parameter_name):
     return
 
 
-def create_flash_string(video_url):
-    return (
-        '<div class="player-wrapper">\n'
-        '<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" '
-        'width="100%%" height="100%%">\n'
-        '<param name="movie" value="%s" />\n'
-        '<param name="pluginspage" '
-        'value="http://www.macromedia.com/go/getflashplayer" />\n'
-        '<param name="allowScriptAccess" value="always" />\n'
-        '<param name="allowFullScreen" value="true" />\n'
-        '<!--[if !IE]>-->\n'
-        '<object type="application/x-shockwave-flash" data="%s" '
-        'width="100%%" height="100%%"></object>\n'
-        '<!--<![endif]-->\n'
-        '</object>\n</div>') % (video_url, video_url)
-
-
-def create_embed_obj(html_string, ratio_class):
+def create_embed_obj(html_string, ratio: float):
     embed_obj = bs(markup=(
-        f'<div class="embedded-player {ratio_class}">{html_string}</div>'),
+        f'<div class="embedded-player" data-aspect-ratio="{ratio}">'
+        f'{html_string}</div>'),
         features='lxml').div
     return embed_obj
 
@@ -90,7 +77,7 @@ def get_soundcloud_player(video_url):
         '<iframe class="player-wrapper" '
         'src="https://w.soundcloud.com/player/?url=%s&show_artwork=true'
         '&auto_play=false"></iframe>') % quote(string=sound_url)
-    return create_embed_obj(html_string, 'maxheight-166'), sound_url
+    return create_embed_obj(html_string=html_string, ratio=10), sound_url
 
 
 def get_youtube_player(video_url):
@@ -135,7 +122,7 @@ def get_youtube_player(video_url):
         'yt_img': 'https://img.youtube.com/vi/',
         'video_id': video_id
     }
-    return create_embed_obj(html_string, 'ratio-16-9'), md_url
+    return create_embed_obj(html_string=html_string, ratio=RATIO_16_9), md_url
 
 
 def get_audio_player(video_url):
@@ -147,7 +134,7 @@ def get_audio_player(video_url):
         '<audio width="100%%" height="100%%" controls>'
         '<source src="%s"/></audio></div>') % path
     md_url = path
-    return create_embed_obj(html_string, 'maxheight-40'), md_url
+    return create_embed_obj(html_string=html_string, ratio=RATIO_10_1), md_url
 
 
 def get_vimeo_player(video_url):
@@ -159,14 +146,7 @@ def get_vimeo_player(video_url):
         '<iframe class="player-wrapper" '
         'src="https://player.vimeo.com/video/%s" frameborder="0">'
         '</iframe>') % clip_id
-    return create_embed_obj(html_string, 'ratio-16-9'), md_url
-
-
-def get_flash_player(video_url):
-    if is_not_200(video_url):
-        return None, None
-    return create_embed_obj(
-        create_flash_string(video_url), 'ratio-16-9'), video_url
+    return create_embed_obj(html_string=html_string, ratio=RATIO_16_9), md_url
 
 
 def get_indavideo_player(video_url):
@@ -184,7 +164,7 @@ def get_indavideo_player(video_url):
         'src="http://embed.indavideo.hu/player/video/%s/">'
         '</iframe>') % video_id
     md_url = 'http://indavideo.hu/video/%s' % video_id
-    return create_embed_obj(html_string, 'ratio-16-9'), md_url
+    return create_embed_obj(html_string=html_string, ratio=RATIO_16_9), md_url
 
 
 def get_dailymotion_player(video_url):
@@ -199,7 +179,7 @@ def get_dailymotion_player(video_url):
         '<iframe frameborder="0" class="player-wrapper" '
         'src="http://www.dailymotion.com/embed/video/%s"></iframe>'
     ) % path_last_element
-    return create_embed_obj(html_string, 'ratio-16-9'), md_url
+    return create_embed_obj(html_string=html_string, ratio=RATIO_16_9), md_url
 
 
 def get_videa_player(video_url):
@@ -209,7 +189,7 @@ def get_videa_player(video_url):
         'src="http://videa.hu/player?v=%s" frameborder="0"></iframe>'
     ) % video_id
     md_url = 'http://videa.hu/videok/%s' % video_id
-    return create_embed_obj(html_string, 'ratio-16-9'), md_url
+    return create_embed_obj(html_string=html_string, ratio=RATIO_16_9), md_url
 
 
 def get_liveleak_player(video_url):
@@ -228,7 +208,7 @@ def get_liveleak_player(video_url):
         '<iframe class="player-wrapper" '
         'src="http://www.liveleak.com/ll_embed?f=%s"></iframe>') % video_id
     md_url = 'http://www.liveleak.com/view?i=%s' % path_last_element
-    return create_embed_obj(html_string, 'ratio-16-9'), md_url
+    return create_embed_obj(html_string=html_string, ratio=RATIO_16_9), md_url
 
 
 def get_bad_youtube_player(video_url):
@@ -242,7 +222,7 @@ def get_facebook_video_embed(video_url):
         '<iframe src="https://www.facebook.com/video/embed?video_id=%s" '
         'class="player-wrapper" frameborder="0"></iframe>') % video_id
     md_url = 'https://www.facebook.com/video.php?v=%s' % video_id
-    return create_embed_obj(html_string, 'ratio-16-9'), md_url
+    return create_embed_obj(html_string=html_string, ratio=RATIO_16_9), md_url
 
 
 def get_facebook_player(video_url):
@@ -254,7 +234,7 @@ def get_facebook_player(video_url):
         '<iframe src="https://www.facebook.com/video/embed?video_id=%s" '
         'class="player-wrapper" frameborder="0"></iframe>') % path_last_element
     md_url = 'https://www.facebook.com/video.php?v=%s' % path_last_element
-    return create_embed_obj(html_string, 'ratio-16-9'), md_url
+    return create_embed_obj(html_string=html_string, ratio=RATIO_16_9), md_url
 
 
 def get_metacafe_player(video_url):
@@ -266,7 +246,7 @@ def get_metacafe_player(video_url):
         '<iframe src="http://www.metacafe.com/embed/%s/" '
         'class="player-wrapper" frameborder="0"></iframe>') % path_element
     md_url = 'http://www.metacafe.com/w/%s' % path_element
-    return create_embed_obj(html_string, 'ratio-16-9'), md_url
+    return create_embed_obj(html_string=html_string, ratio=RATIO_16_9), md_url
 
 
 def get_movieweb_player(video_url):
@@ -278,7 +258,7 @@ def get_movieweb_player(video_url):
         '<iframe src="http://www.movieweb.com/v/%s/embed_video" '
         'class="player-wrapper" frameborder="0"></iframe>') % path_last_element
     md_url = 'http://www.movieweb.com/v/%s/embed_video' % path_last_element
-    return create_embed_obj(html_string, 'ratio-16-9'), md_url
+    return create_embed_obj(html_string=html_string, ratio=RATIO_16_9), md_url
 
 
 def get_mixcloud_player(video_url):
@@ -294,18 +274,7 @@ def get_mixcloud_player(video_url):
     html_string = (
         '<iframe src="%s" class="player-wrapper" frameborder="0">'
         '</iframe>') % url
-    return create_embed_obj(html_string, 'ratio-1-1'), feed_url
-
-
-def create_player_if_flash(video_url):
-    try:
-        req_obj = requests.get(url=video_url, verify=False, timeout=10)
-        mime_type = mime.from_buffer(buf=req_obj.content)
-    except RequestException:
-        return None, None
-    if mime_type != 'application/x-shockwave-flash; charset=binary':
-        return None, None
-    return get_flash_player(video_url)
+    return create_embed_obj(html_string=html_string, ratio=RATIO_1_1), url
 
 
 def find_embed_string(video_url):
@@ -340,11 +309,6 @@ def find_embed_string(video_url):
         return get_liveleak_player(video_url)
     if '//www.youtube.com/watch?' in video_url:
         return get_bad_youtube_player(video_url)
-    if 'tv.gamestar.hu/player/' in video_url\
-            or 'www.traileraddict.com/emd/' in video_url\
-            or '.zippyshare.com/swf/player_local.swf' in video_url\
-            or 'www.hks-tv.com/watch_vx/hks_vxs.swf?watch=' in video_url:
-        return get_flash_player(video_url)
     if 'facebook.com/v/' in video_url:
         return get_facebook_player(video_url)
     if 'facebook.com/video/embed?' in video_url:
@@ -360,7 +324,7 @@ def find_embed_string(video_url):
         # freevlog.hu doesn't exist anymore
         # gametrailers.com does not provide a good url
         return None, None
-    return create_player_if_flash(video_url)
+    return None, None
 
 
 def replace_video(object_item, video_url):
@@ -380,7 +344,7 @@ def parse_videos(html: Tag):
         if not video_url:
             make_empty(object_item)
             continue
-        replace_video(object_item, video_url)
+        replace_video(object_item=object_item, video_url=video_url)
 
 
 # def html_to_md(content):
