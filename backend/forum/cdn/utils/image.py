@@ -2,10 +2,12 @@ from collections import defaultdict
 from itertools import chain
 from random import randrange
 from typing import Tuple
+from io import BytesIO
 
 from django.conf import settings
 from PIL.Image import Image
 from PIL.Image import open as image_open
+from PIL.Image import MIME
 from PIL.ImageSequence import Iterator as SeqIterator
 
 with image_open(fp=settings.WATERMARK_PATH) as image:
@@ -182,3 +184,16 @@ def get_converted_image(image: Image) -> Image:
     if image.format == converted_format:
         return image.copy()
     return image.convert(mode=converted_format)
+
+
+def get_enforced_mimetype(content_data: bytes, mime_type: str) -> bytes:
+    """
+    Return a mimetype enforced `content_data`. That is, convert the
+    image to the detected mime type if it's not it by the PIL module.
+    """
+    fp = BytesIO(initial_bytes=content_data)
+    with image_open(fp=fp) as image:  # type: Image
+        image.load()
+    if MIME[image.format] == mime_type:
+        return content_data
+

@@ -2,28 +2,25 @@ import datetime
 import hashlib
 import logging
 from pathlib import Path
-from re import compile as re_compile
 from urllib.parse import unquote, urlparse
 
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from django.conf import settings
-from unidecode import unidecode
 
 import magic
 import variables
 from forum.base.models import Comment, User
 from forum.cdn.models import Image, ImageUrl, MissingImage
-from forum.cdn.utils.paths import get_path_with_ensured_dirs, set_cdn_fileattrs
+from forum.cdn.utils.paths import (
+    FILE_EXTENSIONS_KEYSET, get_path_with_ensured_dirs, normalize_filename,
+    set_cdn_fileattrs)
 from forum.utils import get_random_safestring
-from variables import (
-    CANCEL_HASH_TUPLE, FILE_EXTENSIONS, FILE_EXTENSIONS_KEYSET,
-    FILENAME_MAXLENGTH, UNNECESSARY_FILENAME_PARTS)
+from variables import CANCEL_HASH_TUPLE
 
 mime = magic.Magic(mime=True)
 logger = logging.getLogger(__name__)
-FILE_SIMPLER_RE = re_compile(r'[^a-zA-Z0-9.\-]+')
 
 MISSING_ORIGSRC_LEN = MissingImage._meta.get_field('src').max_length
 MAXLEN_IMAGEURL = ImageUrl._meta.get_field('orig_src').max_length
@@ -61,30 +58,6 @@ def wrap_into_picture(img_tag: Tag, cdn_path: str, content: BeautifulSoup):
     picture_tag.append(original_img)
 
 
-def get_extension(mime_type) -> str:
-    for mime_type_config in FILE_EXTENSIONS:
-        if mime_type.startswith(mime_type_config):
-            return FILE_EXTENSIONS[mime_type_config]
-    return 'jpg'
-
-
-def remove_unnecessary_filename_parts(filename: Path) -> str:
-    changed = original = str(filename)
-    for unnecessary_part in UNNECESSARY_FILENAME_PARTS:
-        changed = changed.replace(unnecessary_part, '')
-    return original if original == changed else changed
-
-
-def normalize_filename(filename: Path, mime_type: str) -> str:
-    filename = Path(unidecode(
-        string=remove_unnecessary_filename_parts(filename=filename)))
-    name = FILE_SIMPLER_RE.sub('-', filename.stem).strip('-')
-    extension = get_extension(mime_type)
-    if len(str(filename)) > FILENAME_MAXLENGTH:
-        name = name[:FILENAME_MAXLENGTH - len(extension)]
-    return '.'.join((name, extension))
-
-
 def create_cdn_file(
     filename: Path, mime_type: str, content_data: bytes, model_item
 ) -> Path:
@@ -102,7 +75,7 @@ def create_cdn_file(
     this_path = \
         settings.CDN['PATH_SIZES']['downloaded'].joinpath(relative_path)
     while True:
-        filename = f'{get_random_safestring()}-{filename}'
+        filename = f'{get_random_safestring(length=5)}-{filename}'
         absolute_path = this_path.joinpath(filename)  # type: Path
         if not absolute_path.exists():
             break
@@ -141,7 +114,7 @@ def check_hash_existing(img_tag, digest_value, model_item, content):
     return True
 
 
-def get_filename_from_url(url: str) -> Path:
+def get_filename_from_url(url: str, mime_type: str) -> Path:
     result = urlparse(url)
     last_part = result.path.split('/')[-1:][0]
     last_part = unquote(last_part)
@@ -201,7 +174,7 @@ def do_download(img_tag, model_item, content):
         logger.error('mime_type is %s', mime_type)
         add_missing_comment_image(img_tag)
         return
-    filename = get_filename_from_url(orig_src)
+    filename = get_filename_from_url(url=orig_src, mime_type=mime_type)
     digest_value = get_sha512_digest(input_data=content_data)
     if check_hash_existing(img_tag, digest_value, model_item, content):
         return
