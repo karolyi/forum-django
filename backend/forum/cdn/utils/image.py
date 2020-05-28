@@ -1,13 +1,12 @@
 from collections import defaultdict
+from io import BytesIO
 from itertools import chain
 from random import randrange
-from typing import Tuple
-from io import BytesIO
+from typing import Optional, Tuple
 
 from django.conf import settings
-from PIL.Image import Image
+from PIL.Image import MIME, Image
 from PIL.Image import open as image_open
-from PIL.Image import MIME
 from PIL.ImageSequence import Iterator as SeqIterator
 
 with image_open(fp=settings.WATERMARK_PATH) as image:
@@ -129,18 +128,21 @@ class TransparentAnimatedGifConverter(object):
         return self._img_p
 
 
-def create_animated_gif(image: Image, size: tuple) -> Tuple[Image, dict]:
+def create_animated_gif(
+    image: Image, size: tuple, do_watermark: bool = True,
+) -> Tuple[Image, dict]:
     'If the image is a GIF, create an its thumbnail here.'
     save_kwargs = dict()
 
     def _thumbnails() -> Image:
         'Inner iterator for frames.'
-        for idx, frame in enumerate(frames):  # type: Image
-            thumbnail = frame.copy()  # type: Image
-            thumbnail_rgba = thumbnail.convert(mode='RGBA')
-            thumbnail_rgba.thumbnail(size=size, reducing_gap=3.0)
-            thumbnail_rgba.paste(
-                im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
+        for idx, frame in enumerate(frames):  # type: int, Image
+            thumbnail_rgba = frame.convert(mode='RGBA')
+            if size != frame.size:
+                thumbnail_rgba.thumbnail(size=size, reducing_gap=3.0)
+            if do_watermark:
+                thumbnail_rgba.paste(
+                    im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
             converter = TransparentAnimatedGifConverter(
                 img_rgba=thumbnail_rgba)
             yield converter.process()  # type: Image
@@ -154,27 +156,38 @@ def create_animated_gif(image: Image, size: tuple) -> Tuple[Image, dict]:
     return output_image, save_kwargs
 
 
-def create_animated_webp(image: Image, size: tuple) -> Tuple[Image, dict]:
+def create_animated_webp(
+    image: Image, size: tuple, do_watermark: bool = True
+) -> Tuple[Image, dict]:
     'If the image is a WEBP, create an its thumbnail here.'
     save_kwargs = dict()
     frame_durations = list()
 
-    def _thumbnails() -> Image:
+    def _thumbnails(index_size: Optional[Tuple[int, int]] = None) -> Image:
         'Inner iterator for frames.'
-        for idx, frame in enumerate(frames):  # type: Image
-            thumbnail_rgba = get_converted_image(image=frame)
-            thumbnail_rgba.thumbnail(size=size, reducing_gap=3.0)
-            thumbnail_rgba.paste(
-                im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
-            frame_durations.append(frame.info['duration'])
+        for idx, frame in enumerate(frames):  # type: int, Image
+            if index_size and frame.size != index_size:
+                continue
+            thumbnail_rgba = frame.convert(mode='RGBA')  # type: Image
+            if size != frame.size:
+                thumbnail_rgba.thumbnail(size=size, reducing_gap=3.0)
+            thumbnail_rgba.save(f'{idx}.webp', format='WEBP')
+            if do_watermark:
+                thumbnail_rgba.paste(
+                    im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
+            frame_durations.append(frame.info.get('duration', 1000))
             yield thumbnail_rgba
 
     frames = SeqIterator(im=image)
     output_image = next(_thumbnails())
     save_kwargs.update(
-        format='WEBP', save_all=True, append_images=list(_thumbnails()),
-        duration=frame_durations, background=output_image.info['background'],
-        loop=output_image.info['loop'])
+        format='WEBP', allow_mixed=True,
+        background=output_image.info.get('background', (0, 0, 0, 0)))
+    append_images = list(_thumbnails(index_size=output_image.size))
+    if append_images:
+        save_kwargs.update(
+            save_all=True, append_images=append_images,
+            duration=frame_durations, loop=output_image.info.get('loop', True))
     return output_image, save_kwargs
 
 
@@ -196,4 +209,3 @@ def get_enforced_mimetype(content_data: bytes, mime_type: str) -> bytes:
         image.load()
     if MIME[image.format] == mime_type:
         return content_data
-

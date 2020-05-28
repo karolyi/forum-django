@@ -226,6 +226,12 @@ if DEBUG:
         'debug_toolbar.panels.logging.LoggingPanel',
         'debug_toolbar.panels.redirects.RedirectsPanel',
     ]
+    # Make logging log to STDERR when DEBUG is True
+    from logging import basicConfig
+    from logging import DEBUG as _LOG_DEBUG
+    from sys import stderr
+    basicConfig(stream=stderr, level=_LOG_DEBUG)
+
 
 SHELL_PLUS_PYGMENTS_FORMATTER_KWARGS = dict(bg='dark')
 # Truncate sql queries to this number of characters
