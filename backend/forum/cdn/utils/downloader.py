@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 from hashlib import sha512
 from io import BytesIO
 from logging import Logger, getLogger
@@ -31,6 +31,19 @@ MIMETYPE_ASSIGNMENTS = {
     'image/jpeg': dict(extension='jpg', mode='RGB'),
     'image/jp2': dict(extension='jp2', mode='RGBA')
 }
+# Don't download images with these hashes
+CANCEL_HASH_SET = set((
+    'cc2aa0e463e98c8f9a35ca3bfc244eb5c1426df254905286e34ac55956d8d02f'
+    '63e0183406b6003f36096909bfcb82b8af68c6454ecf2f42cdbfaef92c9587bd',
+))
+
+
+class ImageAlreadyDownloadedException(Exception):
+    'Raised when the image is already downloaded.'
+
+
+class ImageAlreadyMissingException(Exception):
+    'Raised when the image is already mi.'
 
 
 class CdnImageDownloader(object):
@@ -44,8 +57,9 @@ class CdnImageDownloader(object):
     )
     _FILE_SIMPLER_RE = re_compile(r'[^a-zA-Z0-9.\-]+')
 
-    def __init__(self, url: str):
+    def __init__(self, url: str, timestamp: Optional[datetime] = None):
         self._url_source = url
+        self._timestamp = timestamp or datetime.now()
 
     @cached_property
     def _hash_source(self) -> str:
@@ -93,6 +107,7 @@ class CdnImageDownloader(object):
             mime_type = 'image/webp'
         output_image.save(fp=new_fp, **save_kwargs)
         self._downloaded_content = new_fp
+        del(self._hash_downloaded)
         return extension, mime_type
 
     def _get_filename_with_mimetype(self) -> Tuple[str, str]:
@@ -146,7 +161,8 @@ class CdnImageDownloader(object):
                 msg=f'{self._url_source!r} already downloaded to '
                 f'{cdn_image.cdn_path!r}.')
             return cdn_image
-        path_parts = ('downloaded', *date.today().isoformat().split('-'), '')
+        path_parts = (
+            'downloaded', *self._timestamp.date().isoformat().split('-'), '')
         abs_dir = get_path_with_ensured_dirs(path_elements=path_parts)
         filename = \
             self._get_stored_filename(abs_dir=abs_dir, filename=filename)
@@ -155,24 +171,34 @@ class CdnImageDownloader(object):
             mime_type=mime_type, cdn_path=cdn_metapath,
             file_hash=self._hash_downloaded)
 
-    def process(self) -> Optional[Image]:
-        'Download and process, return an `Image` of `None` on error.'
+    def _do_preliminary_checks(self):
+        'Do preliminary, checks, to raise exceptions for early exits.'
         if MissingImage.objects.filter(
                 src=self._url_source[:MISSING_ORIGSRC_LEN]).exists():
             _logger.debug(msg=f'{self._url_source!r} already missing.')
-            return
+            raise ImageAlreadyMissingException
         stored_url = ImageUrl.objects.select_related('image').filter(
             src_hash=self._hash_source).first()  # type: ImageUrl
         if stored_url:
             _logger.debug(
                 msg=f'{self._url_source!r} already downloaded to'
                 f'{stored_url.image.cdn_path!r}.')
-            return stored_url.image
-        if self._downloaded_content is None:
+            raise ImageAlreadyDownloadedException(stored_url.image)
+        if self._downloaded_content is None or \
+                self._hash_downloaded in CANCEL_HASH_SET:
             _logger.debug(msg=f'Added {self._url_source!r} as missing.')
             MissingImage.objects.create(
                 src=self._url_source[:MISSING_ORIGSRC_LEN])
+            raise ImageAlreadyMissingException
+
+    def process(self) -> Optional[Image]:
+        'Download and process, return an `Image` of `None` on error.'
+        try:
+            self._do_preliminary_checks()
+        except ImageAlreadyMissingException:
             return
+        except ImageAlreadyDownloadedException as exc:
+            return exc.args[0]
         cdn_image = self._get_cdn_image()
         ImageUrl.objects.create(
             image=cdn_image, orig_src=self._url_source[:MAXLEN_IMAGEURL],

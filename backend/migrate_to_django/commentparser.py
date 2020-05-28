@@ -121,7 +121,7 @@ def check_already_downloaded(img_tag, comment_item, content):
     img_tag['data-cdn-pk'] = cdn_image.pk
     img_tag['src'] = '/'.join((
         settings.CDN['URLPREFIX_SIZE']['original'], cdn_image.cdn_path))
-    wrap_into_picture(img_tag, cdn_image.cdn_path, content)
+    wrap_into_picture(img_tag=img_tag, cdn_metapath=cdn_image.cdn_path)
     variables.ALREADY_DOWNLOADED_IMAGE_COUNT += 1
     return True
 
@@ -137,7 +137,7 @@ def download_and_replace(img_tag, comment_item, content):
         return
     if check_already_downloaded(img_tag, comment_item, content):
         return
-    do_download(img_tag, comment_item, content)
+    do_download(img_tag=img_tag, model_item=comment_item)
 
 
 def fix_comment_image(img_tag, comment_item, content):

@@ -1,30 +1,21 @@
-import datetime
 import hashlib
 import logging
-from pathlib import Path
-from urllib.parse import unquote, urlparse
 
-import requests
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 from django.conf import settings
+from django.db.models import Model
 
 import magic
 import variables
 from forum.base.models import Comment, User
-from forum.cdn.models import Image, ImageUrl, MissingImage
-from forum.cdn.utils.paths import (
-    FILE_EXTENSIONS_KEYSET, get_path_with_ensured_dirs, normalize_filename,
-    set_cdn_fileattrs)
-from forum.utils import get_random_safestring
-from variables import CANCEL_HASH_TUPLE
+from forum.cdn.utils.downloader import CdnImageDownloader
 
 mime = magic.Magic(mime=True)
 logger = logging.getLogger(__name__)
 
-MISSING_ORIGSRC_LEN = MissingImage._meta.get_field('src').max_length
-MAXLEN_IMAGEURL = ImageUrl._meta.get_field('orig_src').max_length
 PATH_SIZE_IGNORES = set(['original', 'downloaded'])
+_HTML = BeautifulSoup(markup='', features='lxml')
 
 
 def get_sha512_digest(input_data):
@@ -39,163 +30,38 @@ def future_assign_model_to_image(cdn_image, model_item):
     model_item.temp_cdn_image_list.append(cdn_image)
 
 
-def wrap_into_picture(img_tag: Tag, cdn_path: str, content: BeautifulSoup):
+def wrap_into_picture(img_tag: Tag, cdn_metapath: str):
     """
     Use
     https://www.w3schools.com/TAGS/tryit.asp?filename=tryhtml5_picture
     for testing.
     """
-    picture_tag = content.new_tag(
+    picture_tag = _HTML.new_tag(
         name='picture', **{'class': 'embedded-forum-picture'})
     original_img = img_tag.replace_with(picture_tag)
     original_img['loading'] = 'lazy'
-    picture_tag.extend(content.new_tag(
+    picture_tag.extend(_HTML.new_tag(
         name='source',
         media=f'(max-width: {settings.CDN["MAXWIDTH"][size]}px)',
-        srcset='/'.join((base_url, cdn_path)))
+        srcset='/'.join((base_url, cdn_metapath)))
         for size, base_url in settings.CDN['URLPREFIX_SIZE'].items()
         if size not in PATH_SIZE_IGNORES)
     picture_tag.append(original_img)
 
 
-def create_cdn_file(
-    filename: Path, mime_type: str, content_data: bytes, model_item
-) -> Path:
-    filename = normalize_filename(filename=filename, mime_type=mime_type)
-    # Add Y-m-d resolution
-    if isinstance(model_item, Comment):
-        used_time = model_item.time
-    elif isinstance(model_item, User):
-        used_time = model_item.date_joined
-    else:
-        used_time = datetime.datetime.now()
-    relative_path = Path(
-        used_time.strftime('%Y'), used_time.strftime('%m'),
-        used_time.strftime('%d'))
-    this_path = \
-        settings.CDN['PATH_SIZES']['downloaded'].joinpath(relative_path)
-    while True:
-        filename = f'{get_random_safestring(length=5)}-{filename}'
-        absolute_path = this_path.joinpath(filename)  # type: Path
-        if not absolute_path.exists():
-            break
-    parts = list(absolute_path.relative_to(settings.CDN['PATH_ROOT']).parts)
-    get_path_with_ensured_dirs(path_elements=parts)
-    absolute_path.write_bytes(data=content_data)
-    set_cdn_fileattrs(path=absolute_path)
-    return relative_path.joinpath(filename)
-
-
-def check_hash_existing(img_tag, digest_value, model_item, content):
-    if digest_value in CANCEL_HASH_TUPLE:
-        add_missing_comment_image(img_tag)
-        return True
-    try:
-        cdn_image = Image.objects.get(file_hash=digest_value)
-    except Image.DoesNotExist:
-        return False
-    cdn_url_original = '/'.join(
-        (settings.CDN['URLPREFIX_SIZE']['original'], cdn_image.cdn_path))
-    orig_src = img_tag.get('src')
-    logger.info(
-        'Object hash exists for url %s, cdn_url_original: %s,'
-        ' digest_value is %s',
-        orig_src, cdn_url_original, digest_value)
-    img_tag['data-cdn-pk'] = cdn_image.pk
-    img_tag['src'] = cdn_url_original
-    wrap_into_picture(
-        img_tag=img_tag, cdn_path=cdn_image.cdn_path, content=content)
-    variables.ALREADY_DOWNLOADED_IMAGE_COUNT += 1
-    image_url = ImageUrl(
-        image=cdn_image, orig_src=orig_src[:MAXLEN_IMAGEURL],
-        src_hash=get_sha512_digest(orig_src))
-    image_url.save()
-    future_assign_model_to_image(cdn_image, model_item)
-    return True
-
-
-def get_filename_from_url(url: str, mime_type: str) -> Path:
-    result = urlparse(url)
-    last_part = result.path.split('/')[-1:][0]
-    last_part = unquote(last_part)
-    if not last_part:
-        last_part = get_random_safestring()
-    return Path(last_part)
-
-
-def check_right_mime_type(content_data, accepted_mimetypes=('text/html;',)):
-    """
-    Return False if mimetype not accepted, true when accepted.
-    """
-    mime_type = mime.from_buffer(buf=content_data)
-    if mime_type is None:
-        return False
-    for accepted_mimetype in accepted_mimetypes:
-        if mime_type.startswith(accepted_mimetype):
-            return mime_type
-    logger.info('Mimetype %s not in %s', mime_type, accepted_mimetypes)
-    return False
-
-
-def download_file(url):
-    logger.debug('Downloading %s', url)
-    try:
-        r = requests.get(url=url, verify=False, timeout=10)
-    except Exception as e:
-        logger.error('download_file - caught error: %s', e)
-        return None
-    if r.status_code != 200:
-        return None
-    return r.content
-
-
-def add_missing_comment_image(img_tag):
+def do_download(img_tag: Tag, model_item: Model):
+    used_time = model_item.time if type(model_item) is Comment \
+        else model_item.date_joined if type(model_item) is User else None
     img_src = img_tag.get('src')
-    logger.info('Marking object as missing: %s', img_src)
-    missing_image = MissingImage(src=img_src[:MISSING_ORIGSRC_LEN])
-    missing_image.save()
-    img_tag['src'] = settings.IMG_404_PATH
-    img_tag['class'] = 'notfound-picture'
-    img_tag['data-missing'] = '1'
-    img_tag['data-cdn-pk'] = '%s' % missing_image.pk
-    variables.MISSING_IMAGE_COUNT += 1
-
-
-def do_download(img_tag, model_item, content):
-    orig_src = img_tag.get('src')
-    content_data = download_file(orig_src)
-    if not content_data:
-        logger.error('content_data empty')
-        add_missing_comment_image(img_tag)
+    processor = CdnImageDownloader(url=img_src, timestamp=used_time)
+    cdn_image = processor.process()
+    if not cdn_image:
         return
-    mime_type = check_right_mime_type(
-        content_data=content_data, accepted_mimetypes=FILE_EXTENSIONS_KEYSET)
-    if not mime_type:
-        logger.error('mime_type is %s', mime_type)
-        add_missing_comment_image(img_tag)
-        return
-    filename = get_filename_from_url(url=orig_src, mime_type=mime_type)
-    digest_value = get_sha512_digest(input_data=content_data)
-    if check_hash_existing(img_tag, digest_value, model_item, content):
-        return
-    cdn_metapath = create_cdn_file(
-        filename=filename, mime_type=mime_type, content_data=content_data,
-        model_item=model_item)
-    cdn_image = Image(
-        mime_type=mime_type, cdn_path=cdn_metapath,
-        file_hash=digest_value)
-    cdn_image.save()
-    cdn_image_url = ImageUrl(
-        image=cdn_image, orig_src=orig_src[:MAXLEN_IMAGEURL],
-        src_hash=get_sha512_digest(orig_src))
-    cdn_image_url.save()
     future_assign_model_to_image(cdn_image, model_item)
+    cdn_metapath = str(cdn_image.cdn_path)
     img_src = '/'.join(
-        (settings.CDN['URLPREFIX_SIZE']['original'], str(cdn_metapath)))
+        (settings.CDN['URLPREFIX_SIZE']['original'], cdn_metapath))
     img_tag['src'] = img_src
-    img_tag['data-cdn-pk'] = '%s' % cdn_image.pk
-    wrap_into_picture(
-        img_tag=img_tag, cdn_path=str(cdn_metapath), content=content)
+    img_tag['data-cdn-pk'] = str(cdn_image.pk)
+    wrap_into_picture(img_tag=img_tag, cdn_metapath=cdn_metapath)
     variables.SUCCESSFULLY_DOWNLOADED += 1
-    logger.info(
-        f'Object downloaded and added to cdn: {orig_src}, cdn_path: {img_src}')
