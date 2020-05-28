@@ -9,7 +9,9 @@ from django.db.models import Model
 import magic
 import variables
 from forum.base.models import Comment, User
-from forum.cdn.utils.downloader import CdnImageDownloader
+from forum.cdn.models import MissingImage
+from forum.cdn.utils.downloader import (
+    CdnImageDownloader, ImageAlreadyDownloadedException, ImageMissingException)
 
 mime = magic.Magic(mime=True)
 logger = logging.getLogger(__name__)
@@ -49,14 +51,29 @@ def wrap_into_picture(img_tag: Tag, cdn_metapath: str):
     picture_tag.append(original_img)
 
 
+def add_missing_comment_image(img_tag: Tag, missing_image: MissingImage):
+    'Add an image as missing in the content.'
+    img_src = img_tag.get('src')
+    logger.info(f'Marking object as missing: {img_src!r}')
+    img_tag['src'] = settings.IMG_404_PATH
+    img_tag['class'] = 'notfound-picture'
+    img_tag['data-missing'] = '1'
+    img_tag['data-cdn-pk'] = str(missing_image.pk)
+    variables.MISSING_IMAGE_COUNT += 1
+
+
 def do_download(img_tag: Tag, model_item: Model):
     used_time = model_item.time if type(model_item) is Comment \
         else model_item.date_joined if type(model_item) is User else None
     img_src = img_tag.get('src')
     processor = CdnImageDownloader(url=img_src, timestamp=used_time)
-    cdn_image = processor.process()
-    if not cdn_image:
-        return
+    try:
+        cdn_image = processor.process()
+    except ImageMissingException as exc:
+        return add_missing_comment_image(
+            img_tag=img_tag, missing_image=exc.args[0])
+    except ImageAlreadyDownloadedException as exc:
+        cdn_image = exc.args[0]
     future_assign_model_to_image(cdn_image, model_item)
     cdn_metapath = str(cdn_image.cdn_path)
     img_src = '/'.join(

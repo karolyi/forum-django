@@ -42,8 +42,8 @@ class ImageAlreadyDownloadedException(Exception):
     'Raised when the image is already downloaded.'
 
 
-class ImageAlreadyMissingException(Exception):
-    'Raised when the image is already mi.'
+class ImageMissingException(Exception):
+    'Raised when the image is already missing.'
 
 
 class CdnImageDownloader(object):
@@ -172,11 +172,12 @@ class CdnImageDownloader(object):
             file_hash=self._hash_downloaded)
 
     def _do_preliminary_checks(self):
-        'Do preliminary, checks, to raise exceptions for early exits.'
-        if MissingImage.objects.filter(
-                src=self._url_source[:MISSING_ORIGSRC_LEN]).exists():
+        'Do preliminary checks, to raise exceptions for early exits.'
+        obj_missing = MissingImage.objects.filter(
+            src=self._url_source[:MISSING_ORIGSRC_LEN]).first()
+        if obj_missing:
             _logger.debug(msg=f'{self._url_source!r} already missing.')
-            raise ImageAlreadyMissingException
+            raise ImageMissingException(obj_missing)
         stored_url = ImageUrl.objects.select_related('image').filter(
             src_hash=self._hash_source).first()  # type: ImageUrl
         if stored_url:
@@ -187,18 +188,13 @@ class CdnImageDownloader(object):
         if self._downloaded_content is None or \
                 self._hash_downloaded in CANCEL_HASH_SET:
             _logger.debug(msg=f'Added {self._url_source!r} as missing.')
-            MissingImage.objects.create(
+            obj_missing = MissingImage.objects.create(
                 src=self._url_source[:MISSING_ORIGSRC_LEN])
-            raise ImageAlreadyMissingException
+            raise ImageMissingException(obj_missing)
 
     def process(self) -> Optional[Image]:
-        'Download and process, return an `Image` of `None` on error.'
-        try:
-            self._do_preliminary_checks()
-        except ImageAlreadyMissingException:
-            return
-        except ImageAlreadyDownloadedException as exc:
-            return exc.args[0]
+        'Download and process, return an `Image`, or raise exceptions.'
+        self._do_preliminary_checks()
         cdn_image = self._get_cdn_image()
         ImageUrl.objects.create(
             image=cdn_image, orig_src=self._url_source[:MAXLEN_IMAGEURL],
