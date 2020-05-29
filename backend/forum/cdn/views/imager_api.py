@@ -10,9 +10,7 @@ from PIL.Image import open as image_open
 from forum.utils import get_relative_path, slugify
 from forum.utils.locking import TempLock
 
-from ..utils.image import (
-    WATERMARK_IMAGE, create_animated_gif, create_animated_webp,
-    get_converted_image)
+from ..utils.image import convert_image
 from ..utils.paths import (
     get_path_with_ensured_dirs, save_new_image, set_cdn_fileattrs)
 
@@ -70,17 +68,8 @@ class ResizeImageView(RedirectView):
         width, height = self._image.size
         new_height = max_width / width * height
         new_height = int(new_height + 1 if new_height % 1 else new_height)
-        save_kwargs = dict()
-        if self._image.format == 'GIF':
-            image, save_kwargs = create_animated_gif(
-                image=self._image, size=(max_width, new_height))
-        elif self._image.format == 'WEBP':
-            image, save_kwargs = create_animated_webp(
-                image=self._image, size=(max_width, new_height))
-        else:
-            image = get_converted_image(image=self._image)
-            image.thumbnail(size=(max_width, new_height), reducing_gap=3.0)
-            image.paste(im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
+        image, save_kwargs = convert_image(
+            image=self._image, size=(max_width, new_height), do_watermark=True)
         save_new_image(
             image=image, new_path=self._new_absolute_path,
             save_kwargs=save_kwargs)
@@ -99,16 +88,8 @@ class ResizeImageView(RedirectView):
             path_elements=['original', *self._path_elements[1:]])
         if original_path.exists():
             return original_path
-        if self._image.format == 'GIF':
-            image, save_kwargs = create_animated_gif(
-                image=self._image, size=self._image.size)
-        elif self._image.format == 'WEBP':
-            image, save_kwargs = create_animated_webp(
-                image=self._image, size=self._image.size)
-        else:
-            save_kwargs = dict()
-            image = get_converted_image(image=self._image)
-            image.paste(im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
+        image, save_kwargs = convert_image(
+            image=self._image, size=self._image.size, do_watermark=True)
         save_new_image(
             image=image, new_path=original_path, save_kwargs=save_kwargs)
         return original_path

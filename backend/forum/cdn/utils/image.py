@@ -1,11 +1,10 @@
 from collections import defaultdict
-from io import BytesIO
 from itertools import chain
 from random import randrange
 from typing import Optional, Tuple
 
 from django.conf import settings
-from PIL.Image import MIME, Image
+from PIL.Image import Image
 from PIL.Image import open as image_open
 from PIL.ImageSequence import Iterator as SeqIterator
 
@@ -199,13 +198,24 @@ def get_converted_image(image: Image) -> Image:
     return image.convert(mode=converted_format)
 
 
-def get_enforced_mimetype(content_data: bytes, mime_type: str) -> bytes:
+def convert_image(
+    image: Image, size: Tuple[int, int], do_watermark: bool = True
+) -> Tuple[Image, dict]:
     """
-    Return a mimetype enforced `content_data`. That is, convert the
-    image to the detected mime type if it's not it by the PIL module.
+    Return the converted image and its keyword arguments for saving.
+    This is an umbrella function for converting images properly.
     """
-    fp = BytesIO(initial_bytes=content_data)
-    with image_open(fp=fp) as image:  # type: Image
-        image.load()
-    if MIME[image.format] == mime_type:
-        return content_data
+    if image.format == 'GIF':
+        image, save_kwargs = create_animated_gif(
+            image=image, size=size, do_watermark=do_watermark)
+    elif image.format == 'WEBP':
+        image, save_kwargs = create_animated_webp(
+            image=image, size=size, do_watermark=do_watermark)
+    else:
+        save_kwargs = dict()
+        image = get_converted_image(image=image)
+        if image.size != size:
+            image.thumbnail(size=size, reducing_gap=3.0)
+        if do_watermark:
+            image.paste(im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
+    return image, save_kwargs
