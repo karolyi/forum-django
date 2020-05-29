@@ -5,12 +5,9 @@ from bs4 import BeautifulSoup as bs
 from bs4.element import Tag
 from django.conf import settings
 
-import variables
 from forum.base.models import Comment
 from forum.cdn.models import ImageUrl, MissingImage
-from image_downloader import (
-    do_download, future_assign_model_to_image, get_sha512_digest,
-    wrap_into_picture)
+from image_downloader import do_download
 from markdownparser import parse_to_markdown
 from utils import non_naive_datetime_ber
 from variables import (
@@ -82,61 +79,13 @@ def fix_if_link(img_tag):
         parent_tag.unwrap()
 
 
-def check_already_missing(img_tag):
-    """
-    Return True if missing, False if not found in the MissingImage table.
-    """
-
-    img_src = img_tag.get('src')
-    try:
-        MissingImage.objects.get(src=img_src[:MISSING_ORIGSRC_LEN])
-    except MissingImage.DoesNotExist:
-        return False
-
-    img_tag['data-missing'] = '1'
-    img_tag['src'] = settings.IMG_404_PATH
-    img_tag['class'] = 'notfound-picture'
-    logger.info('Object already missing: %s', img_src)
-    variables.ALREADY_MISSING_IMAGE_COUNT += 1
-    return True
-
-
-def check_already_downloaded(img_tag, comment_item, content):
-    """
-    Returns True if already downloaded, False if not.
-    """
-    orig_src = img_tag.get('src')
-    src_hash = get_sha512_digest(orig_src)
-    try:
-        image_url = ImageUrl.objects.get(src_hash=src_hash)
-    except ImageUrl.DoesNotExist:
-        return False
-
-    cdn_image = image_url.image
-    future_assign_model_to_image(cdn_image, comment_item)
-    cdn_url = '/'.join((
-        settings.CDN['URLPREFIX_SIZE']['original'], cdn_image.cdn_path))
-    logger.info(
-        'Object already downloaded: %s, cdn_url: %s', orig_src, cdn_url)
-    img_tag['data-cdn-pk'] = cdn_image.pk
-    img_tag['src'] = '/'.join((
-        settings.CDN['URLPREFIX_SIZE']['original'], cdn_image.cdn_path))
-    wrap_into_picture(img_tag=img_tag, cdn_metapath=cdn_image.cdn_path)
-    variables.ALREADY_DOWNLOADED_IMAGE_COUNT += 1
-    return True
-
-
-def download_and_replace(img_tag, comment_item, content):
+def download_and_replace(img_tag: Tag, comment_item: Comment):
     img_src = img_tag.get('src')
     if not img_src.startswith('http://') and \
             not img_src.startswith('https://'):
         img_src = 'https://%s' % img_src
         img_tag['src'] = img_src
     logger.info('------- * SEPARATOR * -------')
-    if check_already_missing(img_tag):
-        return
-    if check_already_downloaded(img_tag, comment_item, content):
-        return
     do_download(img_tag=img_tag, model_item=comment_item)
 
 
@@ -162,7 +111,7 @@ def fix_comment_image(img_tag, comment_item, content):
         img_tag['src'] = '/static%s' % img_src
         return
     if not img_src.startswith(INNER_IMAGE_URLS):
-        download_and_replace(img_tag, comment_item, content)
+        download_and_replace(img_tag=img_tag, comment_item=comment_item)
 
 
 def parse_links(content: Tag):

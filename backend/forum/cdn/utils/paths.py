@@ -28,7 +28,6 @@ def get_path_with_ensured_dirs(path_elements: Iterable) -> Path:
         settings.CDN['PATH_SIZES'][requested_size]).absolute()
     mode_dir = settings.CDN['POSIXFLAGS']['mode_dir']
     gid = settings.CDN['POSIXFLAGS']['gid']
-    lock_namelist = [requested_size]
     old_umask = umask(0o777 - mode_dir)
     while _iter_metapath:
         if not new_absolute_path.exists():
@@ -37,7 +36,6 @@ def get_path_with_ensured_dirs(path_elements: Iterable) -> Path:
             chown(path=new_absolute_path, uid=-1, gid=gid)
         _iter_pathitem = _iter_metapath.pop(0)
         new_absolute_path = new_absolute_path.joinpath(_iter_pathitem)
-        lock_namelist.append(_iter_pathitem)
     umask(old_umask)
     return new_absolute_path
 

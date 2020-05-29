@@ -36,7 +36,7 @@ def fix_content_image(img_tag, model_item, content):
         img_src = '%s%s' % (OLD_SELF_URL, img_src)
         img_tag['src'] = img_src
     if not img_src.startswith(INNER_IMAGE_URLS):
-        download_and_replace(img_tag, model_item, content)
+        download_and_replace(img_tag=img_tag, comment_item=model_item)
 
 
 def parse_description(topic_item: Topic):

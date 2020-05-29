@@ -69,10 +69,12 @@ def do_download(img_tag: Tag, model_item: Model):
     processor = CdnImageDownloader(url=img_src, timestamp=used_time)
     try:
         cdn_image = processor.process()
+        variables.SUCCESSFULLY_DOWNLOADED += 1
     except ImageMissingException as exc:
         return add_missing_comment_image(
             img_tag=img_tag, missing_image=exc.args[0])
     except ImageAlreadyDownloadedException as exc:
+        variables.ALREADY_DOWNLOADED_IMAGE_COUNT += 1
         cdn_image = exc.args[0]
     future_assign_model_to_image(cdn_image, model_item)
     cdn_metapath = str(cdn_image.cdn_path)
@@ -81,4 +83,3 @@ def do_download(img_tag: Tag, model_item: Model):
     img_tag['src'] = img_src
     img_tag['data-cdn-pk'] = str(cdn_image.pk)
     wrap_into_picture(img_tag=img_tag, cdn_metapath=cdn_metapath)
-    variables.SUCCESSFULLY_DOWNLOADED += 1
