@@ -8,6 +8,7 @@ from typing import Optional, Tuple
 
 from django.utils.functional import cached_property
 from hyperlink import URL
+from PIL import UnidentifiedImageError
 from PIL.Image import Image as PilImage
 from PIL.Image import open as image_open
 from requests import get
@@ -43,7 +44,7 @@ class ImageAlreadyDownloadedException(Exception):
 
 
 class ImageMissingException(Exception):
-    'Raised when the image is already missing.'
+    'Raised when the image is (already) missing.'
 
 
 class CdnImageDownloader(object):
@@ -86,11 +87,12 @@ class CdnImageDownloader(object):
         'Return the SHA512 hash of the downloaded content.'
         return sha512(self._downloaded_content.getvalue()).hexdigest()
 
-    def _get_extension_with_mimetype(self, im: PilImage) -> str:
+    def _get_extension_with_mimetype(self) -> str:
         """
         Return the enforced extension from the PIL Image, while
         optionally having it converted to another file type.
         """
+        im = self._loaded_image
         mime_type = im.get_format_mimetype()
         if mime_type in MIMETYPE_ASSIGNMENTS:
             return MIMETYPE_ASSIGNMENTS[mime_type]['extension'], mime_type
@@ -110,17 +112,28 @@ class CdnImageDownloader(object):
         del(self._hash_downloaded)
         return extension, mime_type
 
+    @cached_property
+    def _loaded_image(self) -> PilImage:
+        'Return the memory loaded `PilImage`.'
+        try:
+            with image_open(self._downloaded_content) as fp:  # type: PilImage
+                im = fp
+                im.load()
+                return im
+        except UnidentifiedImageError:
+            _logger.debug(
+                msg=f'{self._url_source!r} unidentified, marked as missing.')
+            obj_missing = MissingImage.objects.create(
+                src=self._url_source[:MISSING_ORIGSRC_LEN])
+            raise ImageMissingException(obj_missing)
+
     def _get_filename_with_mimetype(self) -> Tuple[str, str]:
         """
         Return the filename for this download while converting the the
         downloaded content into one that can be stored and converted
         further later on.
         """
-        with image_open(self._downloaded_content) as fp:  # type: PilImage
-            im = fp
-            im.load()
-        enforced_extension, mime_type = \
-            self._get_extension_with_mimetype(im=im)
+        enforced_extension, mime_type = self._get_extension_with_mimetype()
         url = URL.from_text(text=self._url_source)
         prefix = '.'.join(url.path[-1].split('.')[:-1]) or \
             get_random_safestring(length=5)
