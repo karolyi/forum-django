@@ -31,8 +31,10 @@ def get_path_with_ensured_dirs(path_elements: Iterable) -> Path:
     lock_namelist = [requested_size]
     old_umask = umask(0o777 - mode_dir)
     while _iter_metapath:
-        new_absolute_path.mkdir(exist_ok=True)
-        chown(path=new_absolute_path, uid=-1, gid=gid)
+        if not new_absolute_path.exists():
+            # No locking needed this way
+            new_absolute_path.mkdir(exist_ok=True)
+            chown(path=new_absolute_path, uid=-1, gid=gid)
         _iter_pathitem = _iter_metapath.pop(0)
         new_absolute_path = new_absolute_path.joinpath(_iter_pathitem)
         lock_namelist.append(_iter_pathitem)
