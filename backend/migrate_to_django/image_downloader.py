@@ -1,4 +1,3 @@
-import hashlib
 import logging
 
 from bs4 import BeautifulSoup
@@ -18,12 +17,6 @@ logger = logging.getLogger(__name__)
 
 PATH_SIZE_IGNORES = set(['original', 'downloaded'])
 _HTML = BeautifulSoup(markup='', features='lxml')
-
-
-def get_sha512_digest(input_data):
-    if type(input_data) is str:
-        input_data = bytearray(input_data, 'utf-8')
-    return hashlib.sha512(input_data).hexdigest()
 
 
 def future_assign_model_to_image(cdn_image, model_item):
