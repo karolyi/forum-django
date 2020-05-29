@@ -1,12 +1,9 @@
-from os import chown
+from os import chown, umask
 from pathlib import Path
 from typing import Iterable
 
 from django.conf import settings
 from PIL.Image import Image
-
-from forum.utils import slugify
-from forum.utils.locking import MAX_FILENAME_SIZE, TempLock
 
 FILE_EXTENSIONS = {
     'image/jpeg': 'jpg',
@@ -32,16 +29,14 @@ def get_path_with_ensured_dirs(path_elements: Iterable) -> Path:
     mode_dir = settings.CDN['POSIXFLAGS']['mode_dir']
     gid = settings.CDN['POSIXFLAGS']['gid']
     lock_namelist = [requested_size]
+    old_umask = umask(0o777 - mode_dir)
     while _iter_metapath:
-        lock_name = ('ensure-dir-' + slugify(
-            input_data='-'.join(lock_namelist)))[:MAX_FILENAME_SIZE]
-        with TempLock(name=lock_name):
-            if not new_absolute_path.is_dir():
-                new_absolute_path.mkdir(mode=mode_dir)
-                chown(path=new_absolute_path, uid=-1, gid=gid)
+        new_absolute_path.mkdir(exist_ok=True)
+        chown(path=new_absolute_path, uid=-1, gid=gid)
         _iter_pathitem = _iter_metapath.pop(0)
         new_absolute_path = new_absolute_path.joinpath(_iter_pathitem)
         lock_namelist.append(_iter_pathitem)
+    umask(old_umask)
     return new_absolute_path
 
 
