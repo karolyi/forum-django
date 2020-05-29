@@ -31,9 +31,9 @@ logger = logging.getLogger(__name__)
 cursor = conn.cursor()
 
 TRUNCATED_TABLES = [
-    'forum_base_comment', 'forum_base_comment_images',
-    'forum_base_commentbookmark', 'forum_base_edit', 'forum_base_edit_images',
-    'forum_base_comment_images', 'forum_base_introductionmodification',
+    'forum_base_comment', 'forum_base_commentbookmark', 'forum_base_edit',
+    'forum_base_edit_images', 'forum_base_comment_images',
+    'forum_base_introductionmodification',
     'forum_base_introductionmodification_images', 'forum_base_topic',
     'forum_base_topic_images', 'forum_base_user',
     'forum_base_user_friended_users', 'forum_base_user_groups',
@@ -65,7 +65,7 @@ def empty_django_db():
 def cdn_maintenance():
     root_len = len(str(settings.CDN['PATH_SIZES']['downloaded'])) + 1
     logger.info('===== * SEPARATOR * =====')
-    logger.info('CDN-MODEL CHECK')
+    logger.info('CDN-MODEL SYNC')
     file_images_set = set()
     for root, dirs, files in os.walk(settings.CDN['PATH_SIZES']['downloaded']):
         if not files:
