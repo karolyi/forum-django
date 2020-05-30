@@ -122,7 +122,7 @@ class CdnImageDownloader(object):
                 msg=f'{self._url_source!r} unidentified, marked as missing.')
             obj_missing = MissingImage.objects.create(
                 src=self._url_source[:MISSING_ORIGSRC_LEN])
-            raise ImageMissingException(obj_missing)
+            raise ImageMissingException(obj_missing, True)
 
     def _get_filename_with_mimetype(self) -> Tuple[str, str]:
         """
@@ -187,7 +187,7 @@ class CdnImageDownloader(object):
             src=self._url_source[:MISSING_ORIGSRC_LEN]).first()
         if obj_missing:
             _logger.debug(msg=f'{self._url_source!r} already missing.')
-            raise ImageMissingException(obj_missing)
+            raise ImageMissingException(obj_missing, False)
         stored_url = ImageUrl.objects.select_related('image').filter(
             src_hash=self._hash_source).first()  # type: ImageUrl
         if stored_url:
@@ -200,7 +200,7 @@ class CdnImageDownloader(object):
             _logger.debug(msg=f'Added {self._url_source!r} as missing.')
             obj_missing = MissingImage.objects.create(
                 src=self._url_source[:MISSING_ORIGSRC_LEN])
-            raise ImageMissingException(obj_missing)
+            raise ImageMissingException(obj_missing, True)
 
     def process(self) -> Optional[Image]:
         'Download and process, return an `Image`, or raise exceptions.'

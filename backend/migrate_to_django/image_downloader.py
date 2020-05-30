@@ -44,7 +44,8 @@ def wrap_into_picture(img_tag: Tag, cdn_metapath: str):
     picture_tag.append(original_img)
 
 
-def add_missing_comment_image(img_tag: Tag, missing_image: MissingImage):
+def add_missing_comment_image(
+        img_tag: Tag, missing_image: MissingImage, is_newly_missing: bool):
     'Add an image as missing in the content.'
     img_src = img_tag.get('src')
     logger.info(f'Marking object as missing: {img_src!r}')
@@ -52,7 +53,10 @@ def add_missing_comment_image(img_tag: Tag, missing_image: MissingImage):
     img_tag['class'] = 'notfound-picture'
     img_tag['data-missing'] = '1'
     img_tag['data-cdn-pk'] = str(missing_image.pk)
-    variables.MISSING_IMAGE_COUNT += 1
+    if is_newly_missing:
+        variables.MISSING_IMAGE_COUNT += 1
+    else:
+        variables.ALREADY_MISSING_IMAGE_COUNT += 1
 
 
 def do_download(img_tag: Tag, model_item: Model):
@@ -65,7 +69,8 @@ def do_download(img_tag: Tag, model_item: Model):
         variables.SUCCESSFULLY_DOWNLOADED += 1
     except ImageMissingException as exc:
         return add_missing_comment_image(
-            img_tag=img_tag, missing_image=exc.args[0])
+            img_tag=img_tag, missing_image=exc.args[0],
+            is_newly_missing=exc.args[1])
     except ImageAlreadyDownloadedException as exc:
         variables.ALREADY_DOWNLOADED_IMAGE_COUNT += 1
         cdn_image = exc.args[0]
