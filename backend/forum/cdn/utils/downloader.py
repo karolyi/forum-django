@@ -18,17 +18,18 @@ from forum.utils import get_random_safestring
 from forum.utils.locking import MAX_FILENAME_SIZE
 
 from ..models import Image, ImageUrl, MissingImage
-from .image import create_animated_gif, create_animated_webp
+from .image import convert_image
 from .paths import get_path_with_ensured_dirs, set_cdn_fileattrs
 
 MISSING_ORIGSRC_LEN = MissingImage._meta.get_field('src').max_length
 MAXLEN_IMAGEURL = ImageUrl._meta.get_field('orig_src').max_length
 _logger = getLogger(name=__name__)  # type: Logger
-MIMETYPE_ASSIGNMENTS = {
+NOCONVERT_MIMETYPES = {
     'image/webp': dict(extension='webp', mode='RGBA'),
     # 'image/apng': dict(extension='png', mode='RGBA'),
     'image/png': dict(extension='png', mode='RGBA'),
-    'image/gif': dict(extension='gif', mode='P'),
+    # GIF is handled separately
+    # 'image/gif': dict(extension='gif', mode='P'),
     'image/jpeg': dict(extension='jpg', mode='RGB'),
     'image/jp2': dict(extension='jp2', mode='RGBA')
 }
@@ -94,19 +95,16 @@ class CdnImageDownloader(object):
         """
         im = self._loaded_image
         mime_type = im.get_format_mimetype()
-        if mime_type in MIMETYPE_ASSIGNMENTS:
-            return MIMETYPE_ASSIGNMENTS[mime_type]['extension'], mime_type
+        if mime_type in NOCONVERT_MIMETYPES:
+            return NOCONVERT_MIMETYPES[mime_type]['extension'], mime_type
         new_fp = BytesIO()
-        if im.mode == 'P' and mime_type != 'image/apng':
-            output_image, save_kwargs = \
-                create_animated_gif(image=im, size=im.size, do_watermark=False)
-            extension = 'gif'
-            mime_type = 'image/gif'
-        else:
-            output_image, save_kwargs = create_animated_webp(
-                image=im, size=im.size, do_watermark=False)
+        output_image, save_kwargs, mime_type, extension = convert_image(
+            image=im, size=im.size, do_watermark=False)
+        if extension is None:
+            # Convert everything else to WEBP
             extension = 'webp'
             mime_type = 'image/webp'
+            save_kwargs.update(format='WEBP', minimize_size=True)
         output_image.save(fp=new_fp, **save_kwargs)
         self._downloaded_content = new_fp
         del(self._hash_downloaded)

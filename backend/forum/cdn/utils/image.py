@@ -232,33 +232,30 @@ def create_animated_png(
 def get_converted_image(image: Image) -> Image:
     'Return an `Image` converted to a format that can be worked with.'
     converted_format = CONVERSION_MAP.get(image.format, 'RGBA')
-    if image.format == converted_format:
-        return image.copy()
-    return image.convert(mode=converted_format)
+    return image.copy() if image.format == converted_format else \
+        image.convert(mode=converted_format)
 
 
 def convert_image(
     image: Image, size: Tuple[int, int], do_watermark: bool = True
-) -> Tuple[Image, dict]:
+) -> Tuple[Image, dict, str, Optional[str]]:
     """
-    Return the converted image and its keyword arguments for saving.
-    This is an umbrella function for converting images properly.
+    Return the converted image and its keyword arguments, a mime type
+    and an optional extension for saving. This is an umbrella function
+    for converting images properly.
     """
     mimetype = image.get_format_mimetype()
     if mimetype == 'image/gif':
         image, save_kwargs = create_animated_gif(
             image=image, size=size, do_watermark=do_watermark)
-    elif mimetype == 'image/webp':
+        return image, save_kwargs, 'image/gif', 'gif'
+    elif mimetype == 'image/webp' or mimetype == 'image/apng':
         image, save_kwargs = create_animated_webp(
             image=image, size=size, do_watermark=do_watermark)
-    elif mimetype == 'image/apng':
-        image, save_kwargs = create_animated_webp(
-            image=image, size=size, do_watermark=do_watermark)
-    else:
-        save_kwargs = dict()
-        image = get_converted_image(image=image)
-        if image.size != size:
-            image.thumbnail(size=size, reducing_gap=3.0)
-        if do_watermark:
-            image.paste(im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
-    return image, save_kwargs
+        return image, save_kwargs, 'image/webp', 'webp'
+    image = get_converted_image(image=image)
+    if image.size != size:
+        image.thumbnail(size=size, reducing_gap=3.0)
+    if do_watermark:
+        image.paste(im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
+    return image, dict(), mimetype, None

@@ -68,7 +68,7 @@ class ResizeImageView(RedirectView):
         width, height = self._image.size
         new_height = max_width / width * height
         new_height = int(new_height + 1 if new_height % 1 else new_height)
-        image, save_kwargs = convert_image(
+        image, save_kwargs, *_ = convert_image(
             image=self._image, size=(max_width, new_height), do_watermark=True)
         save_new_image(
             image=image, new_path=self._new_absolute_path,
@@ -88,7 +88,7 @@ class ResizeImageView(RedirectView):
             path_elements=['original', *self._path_elements[1:]])
         if original_path.exists():
             return original_path
-        image, save_kwargs = convert_image(
+        image, save_kwargs, *_ = convert_image(
             image=self._image, size=self._image.size, do_watermark=True)
         save_new_image(
             image=image, new_path=original_path, save_kwargs=save_kwargs)
