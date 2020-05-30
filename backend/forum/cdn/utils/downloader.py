@@ -56,7 +56,7 @@ class CdnImageDownloader(object):
         'wwwkepfeltolteshu',
         'wwwkepfeltoltes',
     )
-    _FILE_SIMPLER_RE = re_compile(r'[^a-zA-Z0-9.\-]+')
+    _FILE_SIMPLER_RE = re_compile(r'([^a-zA-Z0-9.\-]|-)+')
 
     def __init__(self, url: str, timestamp: Optional[datetime] = None):
         self._url_source = url
