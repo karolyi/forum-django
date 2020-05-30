@@ -5,6 +5,7 @@ from logging import Logger, getLogger
 from pathlib import Path
 from re import compile as re_compile
 from typing import Optional, Tuple
+from urllib.parse import unquote
 
 from django.utils.functional import cached_property
 from hyperlink import URL
@@ -57,6 +58,9 @@ class CdnImageDownloader(object):
         'wwwkepfeltoltes',
     )
     _FILE_SIMPLER_RE = re_compile(r'([^a-zA-Z0-9.\-]|-)+')
+    _MAXLEN_FILENAME = min(
+        Image._meta.get_field('cdn_path').max_length - len('2012/12/31/'),
+        MAX_FILENAME_SIZE)
 
     def __init__(self, url: str, timestamp: Optional[datetime] = None):
         self._url_source = url
@@ -132,13 +136,13 @@ class CdnImageDownloader(object):
         """
         enforced_extension, mime_type = self._get_extension_with_mimetype()
         url = URL.from_text(text=self._url_source)
-        prefix = '.'.join(url.path[-1].split('.')[:-1]) or \
+        prefix = '.'.join(unquote(string=url.path[-1]).split('.')[:-1]) or \
             get_random_safestring(length=5)
         prefix = unidecode(string=prefix)
         for unnecessary_part in self._UNNECESSARY_FILENAME_PARTS:
             prefix = prefix.replace(unnecessary_part, '')
         prefix = self._FILE_SIMPLER_RE.sub('-', prefix).strip('-')
-        prefix = prefix[:MAX_FILENAME_SIZE - len(enforced_extension) - 1]
+        prefix = prefix[:self._MAXLEN_FILENAME - len(enforced_extension) - 1]
         return '.'.join([prefix, enforced_extension]), mime_type
 
     def _get_stored_filename(self, abs_dir: Path, filename: str) -> str:
