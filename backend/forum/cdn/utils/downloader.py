@@ -28,8 +28,7 @@ NOCONVERT_MIMETYPES = {
     'image/webp': dict(extension='webp', mode='RGBA'),
     # 'image/apng': dict(extension='png', mode='RGBA'),
     'image/png': dict(extension='png', mode='RGBA'),
-    # GIF is handled separately
-    # 'image/gif': dict(extension='gif', mode='P'),
+    'image/gif': dict(extension='gif', mode='P'),
     'image/jpeg': dict(extension='jpg', mode='RGB'),
     'image/jp2': dict(extension='jp2', mode='RGBA')
 }
