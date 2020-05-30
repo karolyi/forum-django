@@ -170,11 +170,10 @@ def create_animated_webp(
             thumbnail_rgba = frame.convert(mode='RGBA')  # type: Image
             if size != frame.size:
                 thumbnail_rgba.thumbnail(size=size, reducing_gap=3.0)
-            thumbnail_rgba.save(f'{idx}.webp', format='WEBP')
             if do_watermark:
                 thumbnail_rgba.paste(
                     im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
-            frame_durations.append(frame.info.get('duration', 1000))
+            frame_durations.append(int(frame.info.get('duration', 1000)))
             yield thumbnail_rgba
 
     frames = SeqIterator(im=image)
@@ -187,6 +186,46 @@ def create_animated_webp(
         save_kwargs.update(
             save_all=True, append_images=append_images,
             duration=frame_durations, loop=output_image.info.get('loop', True))
+    return output_image, save_kwargs
+
+
+def create_animated_png(
+    image: Image, size: tuple, do_watermark: bool = True
+) -> Tuple[Image, dict]:
+    """
+    If the image is a PNG/APNG, create an its thumbnail here.
+    NOT USED, might be working when
+    https://github.com/python-pillow/Pillow/issues/4657 gets fixed.
+    """
+    save_kwargs = dict()
+    frame_durations = list()
+    frame_disposals = list()
+    frame_blends = list()
+
+    def _thumbnails(index_size: Optional[Tuple[int, int]] = None) -> Image:
+        'Inner iterator for frames.'
+        for idx, frame in enumerate(frames):  # type: int, Image
+            if index_size and frame.size != index_size:
+                continue
+            thumbnail_rgba = frame.copy() if frame.mode == 'RGBA' \
+                else frame.convert(mode='RGBA')  # type: Image
+            if size != frame.size:
+                thumbnail_rgba.thumbnail(size=size, reducing_gap=3.0)
+            if do_watermark:
+                thumbnail_rgba.paste(
+                    im=WATERMARK_IMAGE, box=(0, 0), mask=WATERMARK_IMAGE)
+            frame_durations.append(frame.info.get('duration', 1000))
+            frame_disposals.append(frame.info.get('disposal', 0))
+            frame_blends.append(frame.info.get('blend', 0))
+            yield thumbnail_rgba
+
+    frames = SeqIterator(im=image)
+    output_image = next(_thumbnails())
+    append_images = list(_thumbnails(index_size=output_image.size))
+    save_kwargs.update(
+        format='PNG', optimize=True, save_all=True, default_image=True,
+        append_images=append_images, loop=output_image.info.get('loop', 0),
+        duration=frame_durations, disposal=frame_disposals, blend=frame_blends)
     return output_image, save_kwargs
 
 
@@ -205,10 +244,14 @@ def convert_image(
     Return the converted image and its keyword arguments for saving.
     This is an umbrella function for converting images properly.
     """
-    if image.format == 'GIF':
+    mimetype = image.get_format_mimetype()
+    if mimetype == 'image/gif':
         image, save_kwargs = create_animated_gif(
             image=image, size=size, do_watermark=do_watermark)
-    elif image.format == 'WEBP':
+    elif mimetype == 'image/webp':
+        image, save_kwargs = create_animated_webp(
+            image=image, size=size, do_watermark=do_watermark)
+    elif mimetype == 'image/apng':
         image, save_kwargs = create_animated_webp(
             image=image, size=size, do_watermark=do_watermark)
     else:

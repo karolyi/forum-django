@@ -26,7 +26,7 @@ MAXLEN_IMAGEURL = ImageUrl._meta.get_field('orig_src').max_length
 _logger = getLogger(name=__name__)  # type: Logger
 MIMETYPE_ASSIGNMENTS = {
     'image/webp': dict(extension='webp', mode='RGBA'),
-    'image/apng': dict(extension='png', mode='RGBA'),
+    # 'image/apng': dict(extension='png', mode='RGBA'),
     'image/png': dict(extension='png', mode='RGBA'),
     'image/gif': dict(extension='gif', mode='P'),
     'image/jpeg': dict(extension='jpg', mode='RGB'),
@@ -97,7 +97,7 @@ class CdnImageDownloader(object):
         if mime_type in MIMETYPE_ASSIGNMENTS:
             return MIMETYPE_ASSIGNMENTS[mime_type]['extension'], mime_type
         new_fp = BytesIO()
-        if im.mode == 'P':
+        if im.mode == 'P' and mime_type != 'image/apng':
             output_image, save_kwargs = \
                 create_animated_gif(image=im, size=im.size, do_watermark=False)
             extension = 'gif'
