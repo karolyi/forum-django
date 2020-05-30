@@ -437,7 +437,7 @@ def parse_comment_votes():
     logger.info('Parsing comment votes.')
     print('Parsing comment votes.')
     response = requests.get(
-        'https://crxforum.flix.hu/exportCommentVotes.php', timeout=300)
+        'https://crxforum.ksol.io/exportCommentVotes.php', timeout=300)
     count_errors = 0
     count_dup = 0
     for count, item in enumerate(response.json()):
