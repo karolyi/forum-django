@@ -24,7 +24,7 @@ from .paths import get_path_with_ensured_dirs, set_cdn_fileattrs
 
 MISSING_ORIGSRC_LEN = MissingImage._meta.get_field('src').max_length
 MAXLEN_IMAGEURL = ImageUrl._meta.get_field('orig_src').max_length
-_logger = getLogger(name=__name__)  # type: Logger
+_LOGGER = getLogger(name=__name__)  # type: Logger
 NOCONVERT_MIMETYPES = {
     'image/webp': dict(extension='webp', mode='RGBA'),
     # 'image/apng': dict(extension='png', mode='RGBA'),
@@ -77,10 +77,10 @@ class CdnImageDownloader(object):
         try:
             r = get(url=self._url_source, verify=False, timeout=10)
         except Exception as e:
-            _logger.error(msg=f'_downloaded_content - caught error: f{e}')
+            _LOGGER.error(msg=f'_downloaded_content - caught error: f{e}')
             return None
         if r.status_code != 200:
-            _logger.error(
+            _LOGGER.error(
                 msg='_downloaded_content - status_code for '
                 f'{self._url_source!r} is {r.status_code}')
             return None
@@ -122,7 +122,7 @@ class CdnImageDownloader(object):
                 im.load()
                 return im
         except UnidentifiedImageError:
-            _logger.debug(
+            _LOGGER.debug(
                 msg=f'{self._url_source!r} unidentified, marked as missing.')
             obj_missing = MissingImage.objects.create(
                 src=self._url_source[:MISSING_ORIGSRC_LEN])
@@ -161,7 +161,7 @@ class CdnImageDownloader(object):
         temp_path.write_bytes(data=self._downloaded_content.getvalue())
         set_cdn_fileattrs(path=temp_path)
         temp_path.rename(target=abspath)
-        _logger.debug(msg=f'Stored {self._url_source!r} into {abspath!r}.')
+        _LOGGER.debug(msg=f'Stored {self._url_source!r} into {abspath!r}.')
         return abspath.name
 
     def _get_cdn_image(self) -> Image:
@@ -171,7 +171,7 @@ class CdnImageDownloader(object):
         cdn_image = Image.objects.filter(
             file_hash=self._hash_downloaded).first()  # type: Image
         if cdn_image:
-            _logger.debug(
+            _LOGGER.debug(
                 msg=f'{self._url_source!r} already downloaded to '
                 f'{cdn_image.cdn_path!r}.')
             return cdn_image
@@ -190,18 +190,18 @@ class CdnImageDownloader(object):
         obj_missing = MissingImage.objects.filter(
             src=self._url_source[:MISSING_ORIGSRC_LEN]).first()
         if obj_missing:
-            _logger.debug(msg=f'{self._url_source!r} already missing.')
+            _LOGGER.debug(msg=f'{self._url_source!r} already missing.')
             raise ImageMissingException(obj_missing, False)
         stored_url = ImageUrl.objects.select_related('image').filter(
             src_hash=self._hash_source).first()  # type: ImageUrl
         if stored_url:
-            _logger.debug(
+            _LOGGER.debug(
                 msg=f'{self._url_source!r} already downloaded to'
                 f'{stored_url.image.cdn_path!r}.')
             raise ImageAlreadyDownloadedException(stored_url.image)
         if self._downloaded_content is None or \
                 self._hash_downloaded in CANCEL_HASH_SET:
-            _logger.debug(msg=f'Added {self._url_source!r} as missing.')
+            _LOGGER.debug(msg=f'Added {self._url_source!r} as missing.')
             obj_missing = MissingImage.objects.create(
                 src=self._url_source[:MISSING_ORIGSRC_LEN])
             raise ImageMissingException(obj_missing, True)
