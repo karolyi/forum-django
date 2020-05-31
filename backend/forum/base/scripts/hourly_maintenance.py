@@ -33,6 +33,7 @@ def _destroy_path(path: Path):
         except OSError as exc:
             if exc.args[0] != 66:
                 raise
+            return
     print(f'Removed {filetype} {path!r} ({path_date})')
 
 
