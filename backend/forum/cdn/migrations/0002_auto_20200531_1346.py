@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 max_length=64, verbose_name='SHA512 hash of orig_src'),
             preserve_default=False,
         ),
-        migrations.RunPython(code=imageurl_migrate_to_binhash),
+        migrations.RunPython(code=imageurl_migrate_to_binhash, elidable=True),
         migrations.RemoveField(model_name='imageurl', name='src_hash'),
         migrations.RenameField(
             model_name='imageurl', old_name='bin_hash', new_name='src_hash'),
@@ -54,7 +54,7 @@ class Migration(migrations.Migration):
                 max_length=64, verbose_name='File SHA512 hash'),
             preserve_default=False,
         ),
-        migrations.RunPython(code=image_migrate_to_binhash),
+        migrations.RunPython(code=image_migrate_to_binhash, elidable=True),
         migrations.RemoveField(model_name='image', name='file_hash'),
         migrations.RenameField(
             model_name='image', old_name='bin_hash', new_name='file_hash'),
