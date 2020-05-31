@@ -23,7 +23,8 @@ def _destroy_path(path: Path):
     filetype = 'symlink' if path.is_symlink() else \
         'file' if path.is_file() else \
         'directory' if path.is_dir() else 'unknown type'
-    path_date = datetime.fromtimestamp(path.stat().st_mtime).strftime('%c')
+    stat = path.lstat() if filetype == 'symlink' else path.stat()
+    path_date = datetime.fromtimestamp(stat.st_mtime).strftime('%c')
     if filetype != 'directory':
         path.unlink()
     else:
