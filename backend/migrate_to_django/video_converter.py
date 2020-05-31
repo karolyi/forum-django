@@ -24,7 +24,7 @@ def is_not_200(video_url):
     return False
 
 
-def get_flash_objects(html):
+def get_extracted_flash_objects(html):
     object_list = html.select('object')
     return object_list
 
@@ -338,7 +338,7 @@ def replace_video(object_item, video_url):
 
 def parse_videos(html: Tag):
     # TODO: esemenyek/adatlapok markdownba, videokkal
-    object_list = get_flash_objects(html)
+    object_list = get_extracted_flash_objects(html)
     for object_item in object_list:
         video_url = filter_video_url(object_item)
         if not video_url:

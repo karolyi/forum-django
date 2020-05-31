@@ -1,3 +1,4 @@
+from binascii import unhexlify
 from datetime import datetime
 from hashlib import sha512
 from io import BytesIO
@@ -34,7 +35,7 @@ NOCONVERT_MIMETYPES = {
     'image/jp2': dict(extension='jp2', mode='RGBA')
 }
 # Don't download images with these hashes
-CANCEL_HASH_SET = set((
+CANCEL_HASH_SET = set(unhexlify(x) for x in (
     'cc2aa0e463e98c8f9a35ca3bfc244eb5c1426df254905286e34ac55956d8d02f'
     '63e0183406b6003f36096909bfcb82b8af68c6454ecf2f42cdbfaef92c9587bd',
 ))
@@ -69,7 +70,7 @@ class CdnImageDownloader(object):
     @cached_property
     def _hash_source(self) -> str:
         'Return the SHA512 hash of the source URL.'
-        return sha512(bytes(self._url_source, encoding='utf-8')).hexdigest()
+        return sha512(bytes(self._url_source, encoding='utf-8')).digest()
 
     @cached_property
     def _downloaded_content(self) -> Optional[BytesIO]:
@@ -89,7 +90,7 @@ class CdnImageDownloader(object):
     @cached_property
     def _hash_downloaded(self) -> str:
         'Return the SHA512 hash of the downloaded content.'
-        return sha512(self._downloaded_content.getvalue()).hexdigest()
+        return sha512(self._downloaded_content.getvalue()).digest()
 
     def _get_extension_with_mimetype(self) -> str:
         """

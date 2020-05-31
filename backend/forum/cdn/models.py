@@ -2,11 +2,14 @@ from pathlib import Path
 
 from django.conf import settings
 from django.db.models.base import Model
+from django.db.models.constraints import UniqueConstraint
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import CharField, FilePathField, URLField
 from django.db.models.fields.related import ForeignKey
 from django.db.models.signals import pre_delete
 from django.utils.translation import ugettext_lazy as _
+
+from forum.base.dbfields import Sha512Field
 
 
 def cdn_delete_file(sender, instance, *args, **kwargs):
@@ -23,13 +26,15 @@ class Image(Model):
     class Meta(object):
         verbose_name = _('Image')
         verbose_name_plural = _('Images')
+        constraints = (
+            UniqueConstraint(fields=['file_hash'], name='filehash'),
+        )
 
     mime_type = CharField(verbose_name=_('Mime type'), max_length=100)
     cdn_path = FilePathField(
-        path=settings.CDN['PATH_ROOT'], verbose_name=_('Path in CDN'),
+        path=str(settings.CDN['PATH_ROOT']), verbose_name=_('Path in CDN'),
         max_length=191, unique=True)
-    file_hash = CharField(
-        verbose_name=_('File SHA512 hash'), max_length=128, unique=True)
+    file_hash = Sha512Field(verbose_name=_('File SHA512 hash'), max_length=64)
 
     def __str__(self):
         return self.cdn_path
@@ -44,6 +49,9 @@ class ImageUrl(Model):
     class Meta(object):
         verbose_name = _('ImageUrl')
         verbose_name_plural = _('ImageUrls')
+        constraints = (
+            UniqueConstraint(fields=['src_hash'], name='srchash'),
+        )
 
     def __str__(self):
         return self.orig_src
@@ -52,8 +60,8 @@ class ImageUrl(Model):
         to=Image, on_delete=CASCADE, verbose_name=_('The CDN file'))
     orig_src = URLField(
         verbose_name=_('Original source'), max_length=512)
-    src_hash = CharField(
-        verbose_name=_('SHA512 hash of orig_src'), max_length=128, unique=True)
+    src_hash = Sha512Field(
+        verbose_name=_('SHA512 hash of orig_src'), max_length=64)
 
 
 class MissingImage(Model):
