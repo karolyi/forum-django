@@ -79,7 +79,7 @@ def _clean_watermarked_originals():
     relative_list = list(
         path.relative_to(original_path)
         for path in original_path.rglob(pattern='*')
-        if path.is_file() and path.stat().st_mtime <= one_week_ago)
+        if path.exists() and path.stat().st_mtime <= one_week_ago)
     for relative in relative_list:
         for size in settings.CDN['MAXWIDTH']:
             size_path = settings.CDN['PATH_SIZES'][size]  # type: Path
