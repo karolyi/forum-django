@@ -9,7 +9,7 @@ DatabaseWrapper.data_types['Sha512Field'] = 'BINARY(64)'
 
 class CharBinaryField(CharField):
     """
-    `VARBINARY` stored CharField that has no collation, hence case
+    `VARBINARY` stored CharField that has no collation, hence is case
     sensitive.
     """
     get_db_prep_value = BinaryField.get_db_prep_value
