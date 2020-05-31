@@ -76,15 +76,16 @@ def _clear_old_converted_sized_cdnfiles():
 def _clean_watermarked_originals():
     'Clean up `original` watermarked files.'
     original_path = settings.CDN['PATH_SIZES']['original']  # type: Path
-    for path in original_path.rglob(pattern='*'):  # type: Path
-        if not path.is_file() or path.stat().st_mtime <= one_week_ago:
-            continue
-        relative = path.relative_to(original_path)
+    relative_list = list(
+        path.relative_to(original_path)
+        for path in original_path.rglob(pattern='*')
+        if path.is_file() and path.stat().st_mtime <= one_week_ago)
+    for relative in relative_list:
         for size in settings.CDN['MAXWIDTH']:
             size_path = settings.CDN['PATH_SIZES'][size]  # type: Path
             size_path = size_path.joinpath(relative)
             _unlink_path_and_parents(path=size_path)
-        _unlink_path_and_parents(path=original_path.joinpath(path))
+        _unlink_path_and_parents(path=original_path.joinpath(relative))
 
 
 def run():
