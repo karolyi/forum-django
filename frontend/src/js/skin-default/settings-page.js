@@ -1,8 +1,8 @@
-/* globals gettext */
-require('bootstrap/js/src/tooltip')
-require('bootstrap/js/src/alert')
-const $ = require('jquery')
-const richTextArea = require('./rich-text-area')
+/* global Forum */
+import $ from 'jquery'
+import { init as richTextAreaInit } from './rich-text-area'
+import 'bootstrap/js/src/tooltip'
+import 'bootstrap/js/src/alert'
 // const paginator = require('./paginator')
 // const userName = require('./userName')
 // const timeActualizer = require('./time-actualizer')
@@ -30,26 +30,26 @@ export class Instance {
       // debug: true,
       ajax: {
         delay: 250,
-        transport: ::this.searchUsernames,
+        transport: :: this.searchUsernames,
       },
       closeOnSelect: false,
       minimumInputLength: 2,
-      placeholder: gettext('Choose usernames to ignore...'),
+      placeholder: Forum.django.gettext('Choose usernames to ignore...'),
     })
     $('#id_friended_users').select2({
       ajax: {
         delay: 250,
-        transport: ::this.searchUsernames,
+        transport: :: this.searchUsernames,
       },
       closeOnSelect: false,
       minimumInputLength: 2,
-      placeholder: gettext('Choose usernames to befriend...'),
+      placeholder: Forum.django.gettext('Choose usernames to befriend...'),
     })
   }
 
   initTextAreas() {
     this.introMdTextArea = $('#id_introduction_md_all')
-    richTextArea.init({
+    richTextAreaInit({
       jqWrapper: this.introMdTextArea.parent(),
       jqElement: this.introMdTextArea,
     })

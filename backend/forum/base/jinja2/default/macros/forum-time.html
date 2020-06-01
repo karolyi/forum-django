@@ -1,7 +1,7 @@
 {% macro forum_time(time, is_template=False) -%}
 {% if not is_template -%}
 {%- set l_time = time|localtime -%}
-<time class="forum-time" datetime="{{ l_time.isoformat() }}" title="{{ l_time|date('DATETIME_FORMAT') }}">{{ l_time|naturaltime }}</time>
+<time class="forum-time" datetime="{{ l_time.isoformat() }}" title="{{ l_time|naturaltime|e }}">{{ l_time|date('DATETIME_FORMAT') }}</time>
 {% else %}
 <time class="forum-time" datetime="" title=""></time>
 {% endif %}

@@ -1,5 +1,5 @@
-{% from 'default/macros/user-actions.html' import user_actions with context %}
-{% get_my_language_info as current_language %}
+{% from 'default/macros/user-actions.html' import user_actions with context -%}
+{% get_my_language_info as current_language -%}
 <!DOCTYPE html>
 <html lang="{{ current_language.code|escape }}">
 <head>
@@ -7,7 +7,16 @@
     {{ render_bundle('runtime') }}
     {{ render_bundle('common') }}
     <title>{% block title %}{{ django_settings.SITE_NAME }}{% endblock title %}</title>
-    <script type="text/javascript" src="{{ url('javascript-catalog') }}"></script>
+    {% cache 600 current_language.code -%}
+    {% jsmin -%}
+    <script type="text/javascript">
+    (function(){
+        {{ get_django_jscatalog(request=request) }}
+    }.bind(window.Forum.django = {}))();
+    console.log('THIS IS', this)
+    </script>
+    {%- endjsmin %}
+    {%- endcache %}
     <link rel="icon" href="{{ static('favicon.ico') }}" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1, user-scalable=no">
 

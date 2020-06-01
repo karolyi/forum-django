@@ -1,10 +1,13 @@
-/* global npgettext, interpolate, pgettext, gettext */
+/* global Forum */
 import 'bootstrap/js/src/tooltip'
 import $ from 'jquery'
 import moment from 'moment'
 // const momentTimezone = require('moment-timezone')
 import { observeRemoveJq } from './mutation-observer'
 
+const {
+  npgettext, interpolate, pgettext, gettext,
+} = Forum.django
 const instanceMap = new Map()
 const options = {}
 const formatStrOnePart = pgettext('naturaltime_js', '%(partOne)s ago')
@@ -127,10 +130,10 @@ const calculateNatural = (currentMomentUtc, dateMomentUtc) => {
 
 const updateInstances = () => {
   const currentMomentUtc = moment.utc()
-  for (const [, data] of instanceMap) {
+  for (const data of instanceMap.values()) {
     const naturalValue =
       calculateNatural(currentMomentUtc, data.momentInstance)
-    data.jqElement.text(naturalValue)
+    data.jqElement.attr('data-original-title', naturalValue)
   }
 }
 
@@ -147,8 +150,11 @@ export function add(jqTimeElements) {
     const momentInstance = moment.utc(jqElement.attr('datetime'))
     if (!instanceMap.has(domNode)) {
       instanceMap.set(domNode, { jqElement, momentInstance })
-      jqElement.text(calculateNatural(currentMomentUtc, momentInstance))
       jqElement.tooltip()
+      jqElement.attr(
+        'data-original-title',
+        calculateNatural(currentMomentUtc, momentInstance),
+      )
     }
   }
   observeRemoveJq(jqTimeElements, onRemoveElement)

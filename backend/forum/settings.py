@@ -283,7 +283,8 @@ for size, path in CDN['PATH_SIZES'].items():  # type: str, Path
     CDN['URLPREFIX_SIZE'][size] = '/'.join((CDN['URL_PREFIX'], size))
 
 IMG_404_PATH = '/static/images/image-404.svg'
-
+CACHES = locals().get('CACHES') or dict(default=dict(
+    BACKEND='django.core.cache.backends.dummy.DummyCache'))
 
 LANGUAGES = locals().get('LANGUAGES') or (
     ('en', _('English')),

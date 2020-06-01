@@ -5,14 +5,19 @@ from debug_toolbar.panels.templates import TemplatesPanel as BaseTemplatesPanel
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.humanize.templatetags.humanize import naturaltime
+from django.http.response import HttpResponse
 from django.utils.html import strip_spaces_between_tags
 from django.utils.translation import (
     get_language_from_request, get_language_info)
+from django.views.i18n import JavaScriptCatalog
 from jinja2 import nodes
 from jinja2.ext import Extension
 from rjsmin import jsmin
 
+from .utils.wsgi import ForumWSGIRequest
+
 ForumAuthForm = None
+_JSCATALOG_VIEW = JavaScriptCatalog.as_view()
 
 
 class JsMinExtension(Extension):
@@ -153,6 +158,12 @@ def forum_auth_form():
     return ForumAuthForm
 
 
+def get_django_jscatalog(request: ForumWSGIRequest) -> str:
+    'Return the extracted `/jsi18n/` result from `JavaScriptCatalog`.'
+    output = _JSCATALOG_VIEW(request=request)  # type: HttpResponse
+    return output.content.decode('utf-8').strip()
+
+
 class ForumToolsExtension(Extension):
     """
     Puts the settings variable and other utilities into the global
@@ -167,3 +178,4 @@ class ForumToolsExtension(Extension):
             paginator_generic_get_list
         environment.filters['naturaltime'] = naturaltime
         environment.globals['messages'] = messages
+        environment.globals['get_django_jscatalog'] = get_django_jscatalog
