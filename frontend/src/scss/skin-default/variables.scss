@@ -1,3 +1,6 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+
 $fa-font-path: "~font-awesome/fonts";
 
 $enable-flex: true;
@@ -20,6 +23,8 @@ $spacer: .4rem;
 $grid-gutter-width: 10px;
 $card-spacer-y: .25rem;
 $card-spacer-x: .25rem;
+$card-cap-bg: rgba($black, .20);
+$card-border-color: rgba($black, .325);
 $line-height-base: 1.2;
 $input-btn-padding-y: .1875rem;
 $input-btn-padding-x: .375rem;
