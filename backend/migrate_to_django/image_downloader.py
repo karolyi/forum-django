@@ -8,7 +8,7 @@ from django.db.models import Model
 import magic
 import variables
 from forum.base.models import Comment, User
-from forum.cdn.models import MissingImage, Image
+from forum.cdn.models import Image, MissingImage
 from forum.cdn.utils.downloader import (
     CdnImageDownloader, ImageAlreadyDownloadedException, ImageMissingException)
 
