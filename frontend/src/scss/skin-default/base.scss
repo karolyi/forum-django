@@ -50,6 +50,7 @@
 }
 
 .page-content-wrapper {
+  max-width: map-get($grid-breakpoints, 'xl');
   .forum-username {
     &.is-admin {
       color: $success;

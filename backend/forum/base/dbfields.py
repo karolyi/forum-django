@@ -3,6 +3,8 @@ from django.db.backends.mysql.compiler import SQLUpdateCompiler
 from django.db.models.expressions import Col
 from django.db.models.fields import BinaryField, CharField
 
+'This works only with MySQL/MariaDB for now.'
+
 DatabaseWrapper.data_types['CharBinaryField'] = 'VARBINARY(%(max_length)s)'
 DatabaseWrapper.data_types['Sha512Field'] = 'BINARY(64)'
 
@@ -44,7 +46,8 @@ class CharBinaryField(CharField):
         connection: DatabaseWrapper
     ) -> str:
         'Note the DB we want to store binary data.'
-        return connection.ops.binary_placeholder_sql(value)
+        return BinaryField.get_placeholder(
+            self=self, value=value, compiler=compiler, connection=connection)
 
 
 class Sha512Field(BinaryField):
