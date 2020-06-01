@@ -13,7 +13,6 @@
     (function(){
         {{ get_django_jscatalog(request=request) }}
     }.bind(window.Forum.django = {}))();
-    console.log('THIS IS', this)
     </script>
     {%- endjsmin %}
     {%- endcache %}
