@@ -2,7 +2,7 @@ from binascii import unhexlify
 
 from django.db import migrations, models
 
-from forum.base.dbfields import Sha512Field
+from forum.utils.dbfields import Sha512Field
 
 
 def imageurl_migrate_to_binhash(apps, schema_editor):

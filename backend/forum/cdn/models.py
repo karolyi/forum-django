@@ -9,7 +9,7 @@ from django.db.models.fields.related import ForeignKey
 from django.db.models.signals import pre_delete
 from django.utils.translation import ugettext_lazy as _
 
-from forum.base.dbfields import Sha512Field
+from forum.utils.dbfields import Sha512Field
 
 
 def cdn_delete_file(sender, instance, *args, **kwargs):

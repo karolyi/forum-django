@@ -134,6 +134,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE = (
+    'forum.utils.middleware.DisableClientSideCachingMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     # https://docs.djangoproject.com/en/2.2/topics/i18n/translation/#how-django-discovers-language-preference
     'django.middleware.locale.LocaleMiddleware',
