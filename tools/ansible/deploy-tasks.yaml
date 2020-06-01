@@ -59,7 +59,7 @@
 
 - name: Flushing REDIS cache
   shell: |
-    /usr/local/bin/redis-cli -h jail-redis -a $(cat ~/secrets-redis-password.txt) EVAL "return redis.call('DEL', unpack(redis.call('KEYS', ARGV[1] .. '*')))" 0 {{ redis_prefix }}:
+    /usr/local/bin/redis-cli -h jail-redis -a $(cat ~/secrets/redis-password.txt) EVAL "return redis.call('DEL', unpack(redis.call('KEYS', ARGV[1] .. '*')))" 0 {{ redis_prefix }}:
 
 # --- Other Server restarts should go here
 
