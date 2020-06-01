@@ -8,7 +8,7 @@ from django.db.models import Model
 import magic
 import variables
 from forum.base.models import Comment, User
-from forum.cdn.models import MissingImage
+from forum.cdn.models import MissingImage, Image
 from forum.cdn.utils.downloader import (
     CdnImageDownloader, ImageAlreadyDownloadedException, ImageMissingException)
 
@@ -25,7 +25,7 @@ def future_assign_model_to_image(cdn_image, model_item):
     model_item.temp_cdn_image_list.append(cdn_image)
 
 
-def wrap_into_picture(img_tag: Tag, cdn_metapath: str, cdn_pk: int):
+def wrap_into_picture(img_tag: Tag, cdn_image: Image):
     """
     Use
     https://www.w3schools.com/TAGS/tryit.asp?filename=tryhtml5_picture
@@ -33,7 +33,8 @@ def wrap_into_picture(img_tag: Tag, cdn_metapath: str, cdn_pk: int):
     """
     picture_tag = _HTML.new_tag(
         name='picture',
-        **{'class': 'embedded-forum-picture', 'data-cdn-pk': cdn_pk})
+        **{'class': 'embedded-forum-picture', 'data-cdn-pk': cdn_image.pk})
+    cdn_metapath = str(cdn_image.cdn_path)
     picture_tag.extend(_HTML.new_tag(
         name='source',
         media=f'(max-width: {settings.CDN["MAXWIDTH"][size]}px)',
@@ -42,6 +43,7 @@ def wrap_into_picture(img_tag: Tag, cdn_metapath: str, cdn_pk: int):
         if size not in PATH_SIZE_IGNORES)
     original_img = img_tag.replace_with(picture_tag)
     original_img['loading'] = 'lazy'
+    # The biggest displayed image is the XL size
     original_img['src'] = '/'.join(
         (settings.CDN['URLPREFIX_SIZE']['xl'], cdn_metapath))
     picture_tag.append(original_img)
@@ -78,9 +80,4 @@ def do_download(img_tag: Tag, model_item: Model):
         variables.ALREADY_DOWNLOADED_IMAGE_COUNT += 1
         cdn_image = exc.args[0]
     future_assign_model_to_image(cdn_image=cdn_image, model_item=model_item)
-    cdn_metapath = str(cdn_image.cdn_path)
-    img_src = '/'.join(
-        (settings.CDN['URLPREFIX_SIZE']['original'], cdn_metapath))
-    img_tag['src'] = img_src
-    wrap_into_picture(
-        img_tag=img_tag, cdn_metapath=cdn_metapath, cdn_pk=cdn_image.pk)
+    wrap_into_picture(img_tag=img_tag, cdn_image=cdn_image)
