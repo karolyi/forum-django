@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import django.db.models.deletion
+from django.conf import settings
 from django.db import migrations, models
 
 
@@ -19,7 +20,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('mime_type', models.CharField(max_length=100, verbose_name='Mime type')),
-                ('cdn_path', models.FilePathField(max_length=191, path='/home/karolyi/Work/forum-django-cdn/original', unique=True, verbose_name='Path in CDN')),
+                ('cdn_path', models.FilePathField(max_length=191, path=str(settings.CDN['PATH_ROOT']), unique=True, verbose_name='Path in CDN')),
                 ('file_hash', models.CharField(max_length=128, unique=True, verbose_name='File SHA512 hash')),
             ],
             options={
