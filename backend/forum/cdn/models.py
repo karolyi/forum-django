@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db.models.base import Model
 from django.db.models.constraints import UniqueConstraint
 from django.db.models.deletion import CASCADE
-from django.db.models.fields import CharField, FilePathField, URLField
+from django.db.models.fields import CharField, FilePathField, URLField, PositiveIntegerField
 from django.db.models.fields.related import ForeignKey
 from django.db.models.signals import pre_delete
 from django.utils.translation import ugettext_lazy as _
@@ -62,6 +62,8 @@ class ImageUrl(Model):
         verbose_name=_('Original source'), max_length=512)
     src_hash = Sha512Field(
         verbose_name=_('SHA512 hash of orig_src'), max_length=64)
+    width = PositiveIntegerField(verbose_name=_('Width'))
+    height = PositiveIntegerField(verbose_name=_('Height'))
 
 
 class MissingImage(Model):
