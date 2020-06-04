@@ -1,4 +1,5 @@
 import $ from 'jquery'
+import 'bootstrap/js/src/tooltip'
 import template from 'lodash/template'
 import { ScrollFix } from './scroll-fix'
 import { options as commonOptions, extractTemplateHtml } from './common'
@@ -7,7 +8,6 @@ import { add as usernameAdd } from './username'
 import { add as timeActualizerAdd } from './time-actualizer'
 import { init as paginatorInit } from './paginator'
 
-require('bootstrap/js/src/tooltip')
 
 export class CommentListing {
   onClickLinkPreviousComment(event) {
