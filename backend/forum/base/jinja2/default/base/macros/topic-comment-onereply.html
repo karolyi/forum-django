@@ -4,8 +4,8 @@
 {% macro topic_comment_onereply(comment=None, is_template=False) -%}
 <div class="topic-comment-onereply">
     {{ _('replied by ') -}}
-    {{ forum_username(user=comment.user, is_template=is_template) -}}
-    {{- forum_time(time=comment.time, is_template=is_template) }}
+    {{ forum_username(user=comment.user, is_template=is_template) }}
+    {{ forum_time(time=comment.time, is_template=is_template) -}}
     {% if is_template -%}
     <a href="" class="to-reply-comment" data-link-to="">
         #<span class="comment-number"></span>

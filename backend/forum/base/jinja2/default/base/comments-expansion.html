@@ -31,12 +31,14 @@
         </section>
         {%- endif %}
         <section class="card border-secondary group-comments-in-topic mb-3" aria-label="{{ _('Comments in the same topic') }}" data-topic-slug='{{ comment.topic.slug }}'>
-            <div class="card-body">
-                <div class="topic-button-wrapper">
-                    <a class="btn btn-sm btn-info" href="{{ url('forum:base:topic-comment-listing', topic_slug=comment.topic.slug) }}">
-                        {{ comment.topic.name_text|e }}
+            <div class="card-header text-center">
+                <h3 class="topic-button-wrapper">
+                    <a href="{{ url('forum:base:topic-comment-listing', topic_slug=comment.topic.slug) }}">
+                        {{ comment.topic.name_html }}
                     </a>
-                </div>
+                </h3>
+            </div>
+            <div class="card-body">
         {%- endif %}
 
         {{ topic_comment_template(comment=comment, is_template=False) }}

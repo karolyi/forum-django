@@ -4,6 +4,8 @@ import templateSettings from 'lodash/templateSettings'
 // The navbar needs these on all pages
 import 'bootstrap/js/src/dropdown'
 import 'bootstrap/js/src/collapse'
+import { Settings as LuxonSettings } from 'luxon'
+import { init as timeActualizerInit } from './time-actualizer'
 
 window.$ = $
 
@@ -31,6 +33,10 @@ export function init(optionsPassed) {
   for (const key of Object.keys(optionsPassed)) {
     options[key] = optionsPassed[key]
   }
+  LuxonSettings.defaultLocale = optionsPassed.languageInfo.code
+  timeActualizerInit({
+    languageInfo: optionsPassed.languageInfo,
+  })
 }
 
 export function extractTemplateHtml(domTemplateElement) {

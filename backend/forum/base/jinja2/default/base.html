@@ -7,15 +7,6 @@
     {{ render_bundle('runtime') }}
     {{ render_bundle('common') }}
     <title>{% block title %}{{ django_settings.SITE_NAME }}{% endblock title %}</title>
-    {% cache 600 current_language.code -%}
-    {% jsmin -%}
-    <script type="text/javascript">
-    (function(){
-        {{ get_django_jscatalog(request=request) }}
-    }.bind(window.Forum.django = {}))();
-    </script>
-    {%- endjsmin %}
-    {%- endcache %}
     <link rel="icon" href="{{ static('favicon.ico') }}" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1, user-scalable=no">
 

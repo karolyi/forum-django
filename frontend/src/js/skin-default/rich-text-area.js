@@ -1,4 +1,3 @@
-/* globals gettext, interpolate */
 import $ from 'jquery'
 import 'bootstrap/js/src/tooltip'
 import 'bootstrap/js/src/tab'
@@ -6,7 +5,8 @@ import URI from 'urijs'
 import TextareaEditor, { formats as editorFormats } from 'textarea-editor'
 import template from './template/rich-text-area.html'
 import {
-  options as commonOptions, addCsrfHeader, updateCsrfToken, escapeHtml,
+  options as commonOptions, addCsrfHeader, updateCsrfToken,
+  // escapeHtml,
 } from './common'
 
 editorFormats.strikethrough = {
@@ -19,12 +19,12 @@ editorFormats.forumEmbed = {
   suffix: ']',
 }
 
-const unknownError = gettext('Unknown error')
-const errorStr = gettext(
-  'An error occurred. If the error persists, please notify the ' +
-  'administrators. The error was: <br><b>%(errorText)s</b>',
-)
-const loadingText = gettext('Loading ...')
+// const unknownError = gettext('Unknown error')
+// const errorStr = lodashTemplate(
+//   'An error occurred. If the error persists, please notify the ' +
+//   'administrators. The error was: <br><b>{errorText}</b>',
+// )
+// const loadingText = gettext('Loading ...')
 const anyCharRegex = /^\S+$/i
 
 // const cachedResponses = {
@@ -116,18 +116,19 @@ export class Instance {
     updateCsrfToken(this.jqCsrfToken)
   }
 
-  onXhrErrorUpdatePreview(data) {
-    let errorText = unknownError
-    if (data.responseJSON && data.responseJSON.message) {
-      errorText = data.responseJSON.message
-    }
-    const errorStrFormatted =
-      interpolate(errorStr, { errorText: escapeHtml(errorText) }, true)
-    this.jqPreviewWrapper.html(
-      '<span class="text-danger">' +
-      '<i class="fa fa-exclamation-triangle"></i> ' +
-      `${errorStrFormatted}</span>`,
-    )
+  onXhrErrorUpdatePreview() {
+  // onXhrErrorUpdatePreview(data) {
+    // let errorText = unknownError
+    // if (data.responseJSON && data.responseJSON.message) {
+    //   errorText = data.responseJSON.message
+    // }
+    // const errorStrFormatted =
+    //   interpolate(errorStr, { errorText: escapeHtml(errorText) }, true)
+    // this.jqPreviewWrapper.html(
+    //   '<span class="text-danger">' +
+    //   '<i class="fa fa-exclamation-triangle"></i> ' +
+    //   `${errorStrFormatted}</span>`,
+    // )
     updateCsrfToken(this.jqCsrfToken)
   }
 
@@ -183,10 +184,10 @@ export class Instance {
 
   updatePreview() {
     const fieldValue = this.options.jqElement.val()
-    this.jqPreviewWrapper.html(
-      '<i class="fa fa-spinner fa-pulse fa-fw"></i>' +
-      `<span class="sr-only">${loadingText}</span>`,
-    )
+    // this.jqPreviewWrapper.html(
+    //   '<i class="fa fa-spinner fa-pulse fa-fw"></i>' +
+    //   `<span class="sr-only">${loadingText}</span>`,
+    // )
     $.when($.ajax({
       url: commonOptions.urls.mdParser,
       beforeSend: addCsrfHeader,
@@ -201,36 +202,36 @@ export class Instance {
 
   initBtnToolbar() {
     const jqToolbar = this.jqTemplate.find('.btn-toolbar')
-    jqToolbar.find('.toolbar-bold')
-      .prop('title', gettext('Insert bold formatting'))
-      .click(::this.onClickToolbarBold)
-    jqToolbar.find('.toolbar-italic')
-      .prop('title', gettext('Insert italic formatting'))
-      .click(::this.onClickToolbarItalic)
-    jqToolbar.find('.toolbar-strikethrough')
-      .prop('title', gettext('Insert strikethrough formatting'))
-      .click(::this.onClickToolbarStrikethrough)
-    jqToolbar.find('.toolbar-ul')
-      .prop('title', gettext('Insert unordered list formatting'))
-      .click(::this.onClickToolbarUl)
-    jqToolbar.find('.toolbar-ol')
-      .prop('title', gettext('Insert ordered list formatting'))
-      .click(::this.onClickToolbarOl)
-    jqToolbar.find('.toolbar-quote')
-      .prop('title', gettext('Insert quote formatting'))
-      .click(::this.onClickToolbarQuote)
-    jqToolbar.find('.toolbar-h1')
-      .prop('title', gettext('Insert heading 1 formatting'))
-      .click(::this.onClickToolbarH1)
-    jqToolbar.find('.toolbar-h2')
-      .prop('title', gettext('Insert heading 2 formatting'))
-      .click(::this.onClickToolbarH2)
-    jqToolbar.find('.toolbar-h3')
-      .prop('title', gettext('Insert heading 3 formatting'))
-      .click(::this.onClickToolbarH3)
-    jqToolbar.find('.toolbar-embed')
-      .prop('title', gettext('Embed video/link/image'))
-      .click(::this.onClickToolbarEmbed)
+    // jqToolbar.find('.toolbar-bold')
+    //   .prop('title', gettext('Insert bold formatting'))
+    //   .click(::this.onClickToolbarBold)
+    // jqToolbar.find('.toolbar-italic')
+    //   .prop('title', gettext('Insert italic formatting'))
+    //   .click(::this.onClickToolbarItalic)
+    // jqToolbar.find('.toolbar-strikethrough')
+    //   .prop('title', gettext('Insert strikethrough formatting'))
+    //   .click(::this.onClickToolbarStrikethrough)
+    // jqToolbar.find('.toolbar-ul')
+    //   .prop('title', gettext('Insert unordered list formatting'))
+    //   .click(::this.onClickToolbarUl)
+    // jqToolbar.find('.toolbar-ol')
+    //   .prop('title', gettext('Insert ordered list formatting'))
+    //   .click(::this.onClickToolbarOl)
+    // jqToolbar.find('.toolbar-quote')
+    //   .prop('title', gettext('Insert quote formatting'))
+    //   .click(::this.onClickToolbarQuote)
+    // jqToolbar.find('.toolbar-h1')
+    //   .prop('title', gettext('Insert heading 1 formatting'))
+    //   .click(::this.onClickToolbarH1)
+    // jqToolbar.find('.toolbar-h2')
+    //   .prop('title', gettext('Insert heading 2 formatting'))
+    //   .click(::this.onClickToolbarH2)
+    // jqToolbar.find('.toolbar-h3')
+    //   .prop('title', gettext('Insert heading 3 formatting'))
+    //   .click(::this.onClickToolbarH3)
+    // jqToolbar.find('.toolbar-embed')
+    //   .prop('title', gettext('Embed video/link/image'))
+    //   .click(::this.onClickToolbarEmbed)
     jqToolbar.find('[data-toggle=tooltip]').tooltip()
   }
 
@@ -239,14 +240,14 @@ export class Instance {
     this.jqPreviewWrapper = this.jqTemplate.find('.tabpane-preview')
     this.id = this.options.jqElement.attr('id')
     // Setup tabs
-    this.jqTemplate.find('.tab-edit')
-      .prop('href', `#tabpane_edit_${this.id}`)
-      .attr('aria-controls', `tabpane_edit_${this.id}`)
-      .text(gettext('Edit'))
-    this.jqTemplate.find('.tab-preview')
-      .prop('href', `#tabpane_preview_${this.id}`)
-      .attr('aria-controls', `tabpane_preview_${this.id}`)
-      .text(gettext('Preview'))
+    // this.jqTemplate.find('.tab-edit')
+    //   .prop('href', `#tabpane_edit_${this.id}`)
+    //   .attr('aria-controls', `tabpane_edit_${this.id}`)
+    //   .text(gettext('Edit'))
+    // this.jqTemplate.find('.tab-preview')
+    //   .prop('href', `#tabpane_preview_${this.id}`)
+    //   .attr('aria-controls', `tabpane_preview_${this.id}`)
+    //   .text(gettext('Preview'))
     // Setup tabpanes
     this.jqTemplate.find('.tabpane-edit')
       .prop('id', `tabpane_edit_${this.id}`)
