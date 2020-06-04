@@ -1,3 +1,5 @@
+from sys import exit
+
 from django.conf import settings
 from PIL import Image as PilImage
 from PIL import UnidentifiedImageError
@@ -6,6 +8,8 @@ from forum.cdn.models import Image
 
 
 def run():
+    print('already done')
+    exit(1)
     all_images = list()
     to_delete = set()
     for idx, image in enumerate(Image.objects.all()):  # type: int, Image
