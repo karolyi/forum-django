@@ -11,13 +11,13 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='imageurl',
+            model_name='image',
             name='height',
             field=models.PositiveIntegerField(default=0, verbose_name='Height'),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='imageurl',
+            model_name='image',
             name='width',
             field=models.PositiveIntegerField(default=0, verbose_name='Width'),
             preserve_default=False,

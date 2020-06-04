@@ -92,10 +92,10 @@ class CdnImageDownloader(object):
         'Return the SHA512 hash of the downloaded content.'
         return sha512(self._downloaded_content.getvalue()).digest()
 
-    def _get_extension_with_mimetype(self) -> str:
+    def _get_extension_with_mimetype(self) -> Tuple[str, str]:
         """
-        Return the enforced extension from the PIL Image, while
-        optionally having it converted to another file type.
+        Return the enforced extension and mime type from the PIL Image,
+        while optionally having it converted to another file type.
         """
         im = self._loaded_image
         mime_type = im.get_format_mimetype()
@@ -110,6 +110,7 @@ class CdnImageDownloader(object):
             mime_type = 'image/webp'
             save_kwargs.update(format='WEBP', minimize_size=True)
         output_image.save(fp=new_fp, **save_kwargs)
+        self._loaded_image = output_image
         self._downloaded_content = new_fp
         del(self._hash_downloaded)
         return extension, mime_type
@@ -184,7 +185,8 @@ class CdnImageDownloader(object):
         cdn_metapath = Path(*path_parts[1:-1], filename)
         return Image.objects.create(
             mime_type=mime_type, cdn_path=cdn_metapath,
-            file_hash=self._hash_downloaded)
+            file_hash=self._hash_downloaded, width=self._loaded_image.width,
+            height=self._loaded_image.height)
 
     def _do_preliminary_checks(self):
         'Do preliminary checks, to raise exceptions for early exits.'

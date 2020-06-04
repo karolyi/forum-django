@@ -46,6 +46,8 @@ def wrap_into_picture(img_tag: Tag, cdn_image: Image):
     # The biggest displayed image is the XL size
     original_img['src'] = '/'.join(
         (settings.CDN['URLPREFIX_SIZE']['xl'], cdn_metapath))
+    original_img['width'] = cdn_image.width
+    original_img['height'] = cdn_image.height
     picture_tag.append(original_img)
 
 
