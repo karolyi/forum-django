@@ -259,13 +259,15 @@ CDN = locals().get('CDN') or dict(
     # Avoid the trailing slash
     URL_PREFIX='http://test.localdomain:8000/static/forum-django-cdn',
     # See https://getbootstrap.com/docs/4.4/layout/grid/#grid-options
-    # The order is important, <picture> tag generates along this
-    MAXWIDTH=dict(xs=576, sm=768, md=992, xl=1200),
+    # The order is important, <picture> tag generates along this.
+    # XXS is added for super small widths
+    MAXWIDTH=dict(xxs=360, xs=576, sm=768, md=992, xl=1200),
     PATH_SIZES=dict(
         downloaded=_path_cdnroot.joinpath('downloaded'),
         original=_path_cdnroot.joinpath('original'),
-        xs=_path_cdnroot.joinpath('xs'), sm=_path_cdnroot.joinpath('sm'),
-        md=_path_cdnroot.joinpath('md'), xl=_path_cdnroot.joinpath('xl')),
+        xxs=_path_cdnroot.joinpath('xxs'), xs=_path_cdnroot.joinpath('xs'),
+        sm=_path_cdnroot.joinpath('sm'), md=_path_cdnroot.joinpath('md'),
+        xl=_path_cdnroot.joinpath('xl')),
     # Settings for the CDN files
     POSIXFLAGS=dict(
         gid=getgrnam(name='forum-cdn').gr_gid, mode_dir=0o775, mode_file=0o664,
