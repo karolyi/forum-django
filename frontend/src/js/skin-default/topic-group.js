@@ -97,6 +97,7 @@ class Instance {
         },
         popover: {
           placement: 'auto',
+          container: node.parentNode,
         },
       })
     }
