@@ -310,8 +310,7 @@ CRXFORUM_CONNECTION = locals().get('CRXFORUM_CONNECTION') or dict(
 
 # Where (and how) to reach the iframely embed server
 IFRAMELY_CONNECTION = locals().get('IFRAMELY_CONNECTION') or dict(
-    host='localhost', port=443, scheme='https', path='/',
-    auth=dict(mode=None, username='', password=''))
+    host='localhost', port=443, scheme='https', path='/', auth=dict(mode=None))
 
 # Keep this at the very bottom of settings.py
 try:

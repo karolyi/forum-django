@@ -34,10 +34,8 @@ class TimeActualizer {
   updateTime() {
     this.now = DateTime.local().setLocale(this.options.languageInfo.code)
     this.isoToday = this.now.toISODate()
-    this.isoYesterday =
-      this.now.minus({ days: 1 }).toISODate()
-    this.isoDayBeforeYesterday =
-      this.now.minus({ days: 2 }).toISODate()
+    this.isoYesterday = this.now.minus({ days: 1 }).toISODate()
+    this.isoDayBeforeYesterday = this.now.minus({ days: 2 }).toISODate()
   }
 
   updateOneInstance(data) {
