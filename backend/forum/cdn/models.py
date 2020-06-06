@@ -68,9 +68,7 @@ class ImageUrl(Model):
 
 
 class MissingImage(Model):
-    """
-    The missing images, so they don't need to be downloaded again.
-    """
+    'The missing images, so they don\'t need to be downloaded again.'
 
     class Meta(object):
         verbose_name = _('Missing Image')

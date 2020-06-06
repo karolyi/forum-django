@@ -4,18 +4,7 @@
 // Bootswatch variables
 // @import "../../../node_modules/bootswatch/paper/_variables.scss";
 
-/* roboto-condensed-regular - latin-ext_latin */
-@font-face {
-  font-family: 'Roboto Condensed';
-  font-style: normal;
-  font-weight: 400;
-  src: url("../fonts/roboto-condensed-v13-latin-ext_latin-regular.eot");
-
-  /* IE9 Compat Modes */
-  src: local("Roboto Condensed"), local("RobotoCondensed-Regular"), url("../fonts/roboto-condensed-v13-latin-ext_latin-regular.eot?#iefix") format("embedded-opentype"), url("../fonts/roboto-condensed-v13-latin-ext_latin-regular.woff2") format("woff2"), url("../fonts/roboto-condensed-v13-latin-ext_latin-regular.woff") format("woff"), url("../fonts/roboto-condensed-v13-latin-ext_latin-regular.ttf") format("truetype"), url("../fonts/roboto-condensed-v13-latin-ext_latin-regular.svg#RobotoCondensed") format("svg");
-
-  /* Legacy iOS */
-}
+@import "fonts";
 
 // Import bootstrap itself
 @import "node_modules/bootstrap/scss/bootstrap.scss";
@@ -143,7 +132,7 @@
     }
 
     .topic-comment-wrapper {
-      margin-bottom: $grid-gutter-width * 2;
+      margin-bottom: $grid-gutter-width / 2;
 
       &.is-highlighted {
         .card-header,
@@ -159,6 +148,7 @@
         @include transition(background 1s linear);
         .comment-content {
           padding: $card-spacer-x $card-spacer-y;
+          font-family: 'Maitree', $font-family-sans-serif;
           img {
             max-width: 100%;
             height: auto;
@@ -167,12 +157,12 @@
         .topic-comment-onereply {
           padding: 0 $card-spacer-y;
           text-align: right;
-          font-family: "Roboto Condensed";
+          font-family: "Saira Condensed";
         }
       }
 
       .card-header {
-        font-family: 'Roboto Condensed';
+        font-family: 'Saira Condensed';
       }
 
     }
