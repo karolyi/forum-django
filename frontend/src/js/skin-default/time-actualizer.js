@@ -43,7 +43,6 @@ class TimeActualizer {
   updateOneInstance(data) {
     const { jqElement, luxonInstance } = data
     const isoDate = luxonInstance.toISODate()
-    console.debug('XXX', jqElement[0], isoDate, this.isoToday)
     if (isoDate === this.isoToday) {
       const formattedTime = luxonInstance.toLocaleString(DateTime.TIME_SIMPLE)
       jqElement.text(`${this.strings.today}, ${formattedTime}`)

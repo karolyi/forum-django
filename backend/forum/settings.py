@@ -308,6 +308,11 @@ CRXFORUM_CONNECTION = locals().get('CRXFORUM_CONNECTION') or dict(
     db='crxforum', user='crxforum', passwd='test123', charset='utf8',
     host='localhost')
 
+# Where (and how) to reach the iframely embed server
+IFRAMELY_CONNECTION = locals().get('IFRAMELY_CONNECTION') or dict(
+    host='localhost', port=443, scheme='https', path='/',
+    auth=dict(mode=None, username='', password=''))
+
 # Keep this at the very bottom of settings.py
 try:
     from forum.settings_override import *  # NOQA

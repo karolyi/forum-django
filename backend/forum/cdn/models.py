@@ -5,8 +5,10 @@ from django.db.models.base import Model
 from django.db.models.constraints import UniqueConstraint
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import (
-    CharField, FilePathField, PositiveIntegerField, URLField)
+    CharField, DateTimeField, FilePathField, PositiveIntegerField,
+    PositiveSmallIntegerField, TextField, URLField)
 from django.db.models.fields.related import ForeignKey
+from django.db.models.indexes import Index
 from django.db.models.signals import pre_delete
 from django.utils.translation import ugettext_lazy as _
 
@@ -77,3 +79,26 @@ class MissingImage(Model):
     src = URLField(
         verbose_name=_('Original source'), max_length=191, db_index=True,
         unique=True)
+
+
+class IframelyResponse(Model):
+    'A response from iframely for a requested URL.'
+
+    class Meta(object):
+        verbose_name = _('ImageUrl')
+        verbose_name_plural = _('ImageUrls')
+        indexes = (
+            Index(fields=['accessed_at'], name='accessedat'),
+        )
+        constraints = (
+            UniqueConstraint(fields=['src_hash'], name='srchash'),
+        )
+
+    orig_src = URLField(
+        verbose_name=_('Original source'), max_length=512)
+    src_hash = Sha512Field(
+        verbose_name=_('SHA512 hash of orig_src'), max_length=64)
+    accessed_at = DateTimeField(verbose_name=_('Accessed at'))
+    response_code = PositiveSmallIntegerField(
+        verbose_name=_('HTTP response code'))
+    response_json = TextField(verbose_name=_('JSON response'))
