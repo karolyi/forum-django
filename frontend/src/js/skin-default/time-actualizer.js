@@ -33,20 +33,21 @@ class TimeActualizer {
 
   updateTime() {
     this.now = DateTime.local().setLocale(this.options.languageInfo.code)
-    this.IsoToday = DateTime.fromISO(this.now.toISODate())
-    this.IsoYesterday =
-      this.IsoToday.minus({ days: 1 }).toISODate()
+    this.isoToday = this.now.toISODate()
+    this.isoYesterday =
+      this.now.minus({ days: 1 }).toISODate()
     this.isoDayBeforeYesterday =
-      this.IsoToday.minus({ days: 2 }).toISODate()
+      this.now.minus({ days: 2 }).toISODate()
   }
 
   updateOneInstance(data) {
     const { jqElement, luxonInstance } = data
     const isoDate = luxonInstance.toISODate()
-    if (isoDate === this.IsoToday) {
+    console.debug('XXX', jqElement[0], isoDate, this.isoToday)
+    if (isoDate === this.isoToday) {
       const formattedTime = luxonInstance.toLocaleString(DateTime.TIME_SIMPLE)
       jqElement.text(`${this.strings.today}, ${formattedTime}`)
-    } else if (isoDate === this.IsoYesterday) {
+    } else if (isoDate === this.isoYesterday) {
       const formattedTime = luxonInstance.toLocaleString(DateTime.TIME_SIMPLE)
       jqElement.text(`${this.strings.yDay}, ${formattedTime}`)
     } else if (isoDate === this.isoDayBeforeYesterday) {
