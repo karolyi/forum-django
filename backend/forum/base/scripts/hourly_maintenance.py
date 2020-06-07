@@ -65,7 +65,17 @@ def _clear_old_converted_sized_cdnfiles():
     'Delete old CDN files that were a result of a conversion.'
     for size in settings.CDN['MAXWIDTH']:
         size_path = settings.CDN['PATH_SIZES'][size]  # type: Path
-        for path in size_path.rglob(pattern='*'):  # type: Path
+        iterator = size_path.rglob(pattern='*')
+        while True:
+            try:
+                path = next(iterator)  # type: Path
+            except FileNotFoundError as exc:
+                if exc.args[0] != 2:
+                    raise
+                # Directory has been removed in a former iteration
+                continue
+            except StopIteration:
+                break
             if path.is_symlink():
                 if path.lstat().st_mtime <= one_week_ago:
                     _unlink_path_and_parents(path=path)
