@@ -16,7 +16,7 @@ from ..utils.paths import (
 
 IMG_404_URL = f'{settings.ALLOWED_HOSTS[0]}{settings.IMG_404_PATH}'
 RESIZED_PREFIXES = \
-    set(x for x in settings.CDN['PATH_SIZES'] if x != 'downloaded')
+    set(settings.CDN['PATH_SIZES']) - set(['downloaded', 'original'])
 _404_PATH_PARAM = settings.IMG_404_PATH.split('/')[1:]
 LOCK_PREFIX = 'watermarked-'
 
@@ -41,7 +41,7 @@ class ResizeImageView(RedirectView):
         except ValueError:
             # Outside of size root
             raise FileNotFoundError
-        if target_path.exists():
+        if target_path.is_symlink() or target_path.exists():
             raise FileExistsError
 
     @cached_property

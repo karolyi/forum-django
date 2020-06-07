@@ -21,14 +21,13 @@ class LinkParser(object):
 
     @cached_property
     def biggest_thumbnail_url(self) -> Optional[str]:
-        result = []
-        for item in self._response.loaded_json.get('links', []):
-            pass
-        return result
+        links = self._response.loaded_json.get('links', [])
+        links = filter(lambda x: 'thumbnail' in x.get('rel', []), links)
+        return links
 
     def process(self) -> str:
         'Return the preview HTML content.'
-        self._response = IframelyResponse.objects.get_url(url=self._url)
+        self._response = IframelyResponse.objects.get_for_url(url=self._url)
         if self._response.response_code != 200:
             raise UnparseableResponseError(response=self._response)
         self._evaluate_response()

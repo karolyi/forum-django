@@ -135,7 +135,7 @@ class IframelyResponseManager(Manager):
             accessed_at=localtime(), response_code=response.status_code,
             response_json=response.text)
 
-    def get_url(self, url: str) -> IframelyResponse:
+    def get_for_url(self, url: str) -> IframelyResponse:
         'Return content for a URL.'
         hasher = sha512()
         hasher.update(url.encode('utf-8'))
