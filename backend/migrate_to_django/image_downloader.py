@@ -10,7 +10,7 @@ import variables
 from forum.base.models import Comment, User
 from forum.cdn.models import Image, MissingImage
 from forum.cdn.utils.downloader import (
-    CdnImageDownloader, ImageAlreadyDownloadedException, ImageMissingException)
+    CdnImageDownloader, ImageAlreadyDownloadedError, ImageMissingError)
 
 mime = magic.Magic(mime=True)
 logger = logging.getLogger(__name__)
@@ -74,11 +74,11 @@ def do_download(img_tag: Tag, model_item: Model):
     try:
         cdn_image = processor.process()
         variables.SUCCESSFULLY_DOWNLOADED += 1
-    except ImageMissingException as exc:
+    except ImageMissingError as exc:
         return add_missing_comment_image(
             img_tag=img_tag, missing_image=exc.args[0],
             is_newly_missing=exc.args[1])
-    except ImageAlreadyDownloadedException as exc:
+    except ImageAlreadyDownloadedError as exc:
         variables.ALREADY_DOWNLOADED_IMAGE_COUNT += 1
         cdn_image = exc.args[0]
     future_assign_model_to_image(cdn_image=cdn_image, model_item=model_item)
