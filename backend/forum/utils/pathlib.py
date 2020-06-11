@@ -53,7 +53,7 @@ class Path(PathBase):
         `gid`, make sure you can set the appropriate umask for `mode`
         and you can set the ownership for the passed `uid`/`gid`.
 
-        Return the new  for chaining when done.
+        Return the ensured `self`+`relative_path` for when done.
         """
         if type(relative_path) is str:
             relative_path = Path(relative_path)
