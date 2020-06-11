@@ -1,8 +1,9 @@
 from fcntl import LOCK_EX, LOCK_UN, flock
 from os import statvfs
-from pathlib import Path
 
 from django.conf import settings
+
+from .pathlib import Path
 
 settings.FORUM_LOCKROOT_PATH.mkdir(exist_ok=True)
 PATH_TEMPLOCK_CONTEXT = Path(settings.FORUM_LOCKROOT_PATH, 'temp-context-lock')

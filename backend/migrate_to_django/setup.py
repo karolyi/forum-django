@@ -1,9 +1,10 @@
 import logging
 import sys
 from os import environ
-from pathlib import Path
 
 import django
+
+from forum.utils.pathlib import Path
 
 environ.setdefault('DJANGO_SETTINGS_MODULE', 'forum.settings')
 forum_path = Path(__file__).absolute().parent.parent

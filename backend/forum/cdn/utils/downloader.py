@@ -3,7 +3,6 @@ from datetime import datetime
 from hashlib import sha512
 from io import BytesIO
 from logging import Logger, getLogger
-from pathlib import Path
 from re import compile as re_compile
 from typing import Optional, Tuple
 from urllib.parse import unquote
@@ -18,6 +17,7 @@ from unidecode import unidecode
 
 from forum.utils import get_random_safestring
 from forum.utils.locking import MAX_FILENAME_SIZE
+from forum.utils.pathlib import Path
 
 from ..models import Image, ImageUrl, MissingImage
 from .image import convert_image

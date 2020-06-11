@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from hashlib import sha512
 from json import loads
-from pathlib import Path
 
 from django.conf import settings
 from django.db.models.base import Model
@@ -23,6 +22,7 @@ from requests.api import get
 
 from forum.utils.dbfields import Sha512Field
 from forum.utils.locking import TempLock
+from forum.utils.pathlib import Path
 
 
 def cdn_delete_file(sender, instance, *args, **kwargs):

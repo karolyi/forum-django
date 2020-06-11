@@ -1,10 +1,10 @@
 from datetime import datetime
-from pathlib import Path
 from time import time
 
 from django.conf import settings
 
 from forum.utils.locking import PATH_TEMPLOCK_DIR
+from forum.utils.pathlib import Path
 
 one_week_ago = time() - 60 * 60 * 24 * 7
 PATH_SIZES_SET = set(settings.CDN['PATH_SIZES'].values())
