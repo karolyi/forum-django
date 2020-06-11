@@ -95,7 +95,6 @@ export function escapeHtml(text) {
   }).html()
 }
 
-
 const calcNavbarHeight = () => {
   // Calculate navbar height
   const cssNavbarHeight = $(options.selectors.navbar).css('height')

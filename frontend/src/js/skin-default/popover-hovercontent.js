@@ -21,7 +21,6 @@ const initializeTipContent = (jqElement, jqTip) => {
   })
 }
 
-
 const onMouseLeaveTip = (jqElement, jqTip) => {
   jqTip.data('isTipMouseEntered', false)
   setTimeout(() => {

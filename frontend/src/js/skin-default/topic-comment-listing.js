@@ -8,7 +8,6 @@ import { add as usernameAdd } from './username'
 import { add as timeActualizerAdd } from './time-actualizer'
 import { init as paginatorInit } from './paginator'
 
-
 export class CommentListing {
   onClickLinkPreviousComment(event) {
     this.sendBrowserToComment(event)
