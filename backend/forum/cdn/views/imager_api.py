@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from django.conf import settings
 from django.utils.functional import cached_property
 from django.views.generic.base import RedirectView
@@ -7,8 +5,9 @@ from hyperlink._url import URL
 from PIL.Image import Image
 from PIL.Image import open as image_open
 
-from forum.utils import get_relative_path, slugify
+from forum.utils import slugify
 from forum.utils.locking import TempLock
+from forum.utils.pathlib import Path
 
 from ..utils.image import convert_image
 from ..utils.paths import (
@@ -116,9 +115,8 @@ class ResizeImageView(RedirectView):
             return self._watermarked_original_path
         max_width = settings.CDN['MAXWIDTH'][requested_size]
         if self._image.size[0] <= max_width:
-            relative_path = get_relative_path(
-                path_from=self._new_absolute_path,
-                path_to=self._watermarked_original_path)
+            relative_path = self._new_absolute_path.get_relative(
+                to=self._watermarked_original_path)
             self._new_absolute_path.symlink_to(target=relative_path)
             set_cdn_fileattrs(path=self._new_absolute_path)
             return self._new_absolute_path

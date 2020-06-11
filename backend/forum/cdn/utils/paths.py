@@ -1,9 +1,10 @@
 from os import chown, umask
-from pathlib import Path
 from typing import Iterable
 
 from django.conf import settings
 from PIL.Image import Image
+
+from forum.utils.pathlib import Path
 
 FILE_EXTENSIONS = {
     'image/jpeg': 'jpg',
@@ -25,7 +26,7 @@ def get_path_with_ensured_dirs(path_elements: Iterable) -> Path:
     """
     requested_size, *_iter_metapath = path_elements
     new_absolute_path = Path(
-        settings.CDN['PATH_SIZES'][requested_size]).absolute()
+        settings.CDN['PATH_SIZES'][requested_size]).resolve()
     mode_dir = settings.CDN['POSIXFLAGS']['mode_dir']
     gid = settings.CDN['POSIXFLAGS']['gid']
     old_umask = umask(0o777 - mode_dir)

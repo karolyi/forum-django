@@ -1,5 +1,4 @@
 from functools import lru_cache, wraps
-from pathlib import Path
 from weakref import ref
 
 from colour_runner.django_runner import ColourRunnerMixin
@@ -42,22 +41,6 @@ def memoized_method(*lru_args, **lru_kwargs):
             return cached_method(*args, **kwargs)
         return wrapped_func
     return decorator
-
-
-def get_relative_path(path_from: Path, path_to: Path) -> Path:
-    """
-    Calculate and return a relative path between the `path_from` and
-    `path_to` paths. Both paths must be absolute paths!
-    """
-    if not (path_from.is_absolute() and path_to.is_absolute()):
-        raise ValueError('One or both of the passed paths are not absolute.')
-    items_from = path_from.parts
-    items_to = path_to.parts
-    # Remove identical path prefix parts
-    while items_from[0] == items_to[0]:
-        items_from = items_from[1:]
-        items_to = items_to[1:]
-    return Path(*('..' for x in range(1, len(items_from))), *items_to)
 
 
 class DjangoTestRunner(ColourRunnerMixin, DiscoverRunner):

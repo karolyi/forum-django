@@ -11,10 +11,11 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import mimetypes
 from grp import getgrnam
 from os import chown, environ
-from pathlib import Path
 
 from django.utils.translation import ugettext_lazy as _
 from django_jinja.builtins import DEFAULT_EXTENSIONS
+
+from forum.utils.pathlib import Path
 
 # Keep this at the beginning, after module imports
 try:
