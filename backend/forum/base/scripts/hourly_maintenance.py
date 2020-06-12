@@ -63,6 +63,7 @@ def _clean_old_sizes():
             except FileNotFoundError as exc:
                 if exc.args[0] != 2:
                     raise
+                continue
             except StopIteration:
                 break
             mtime = path.lstat().st_mtime if path.is_symlink() \
