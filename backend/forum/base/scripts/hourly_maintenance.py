@@ -1,4 +1,6 @@
 from datetime import datetime
+from logging import DEBUG, basicConfig
+from sys import stderr
 from time import time
 
 from django.conf import settings
@@ -75,6 +77,7 @@ def _clean_old_sizes():
 
 def run():
     'Run maintenance.'
+    basicConfig(stream=stderr, level=DEBUG)
     _clear_templocks()
     _clean_watermarked_originals()
     _clean_old_sizes()
