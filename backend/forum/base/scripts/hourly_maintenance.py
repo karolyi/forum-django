@@ -48,8 +48,8 @@ def _clean_watermarked_originals():
             abs_path = root_original.joinpath(relative)
             path_date = \
                 datetime.fromtimestamp(abs_path.stat().st_mtime).strftime('%c')
+            print(f'Removing {size_path!r}: {path_date}')
             abs_path.remove_up_to(parent=root_original)
-            print(f'Removed {size_path!r}: {path_date}')
 
 
 def _clean_old_sizes():
@@ -72,8 +72,8 @@ def _clean_old_sizes():
                 # is newer AND resolves as a symlink
                 continue
             path_date = datetime.fromtimestamp(mtime).strftime('%c')
+            print(f'Removing {path!r}: {path_date}')
             path.remove_up_to(parent=root_size)
-            print(f'Removed {path!r}: {path_date}')
 
 
 def run():
