@@ -36,9 +36,11 @@ class Path(PathBase):
         new_path = self
         for part in relative_path.parent.parts:
             new_path = new_path.joinpath(part)
-            if new_path.exists():
+            try:
+                # A race condition can occur here
+                new_path.mkdir()
+            except FileExistsError:
                 continue
-            new_path.mkdir()
             if uid is None and gid is None:
                 continue
             chown(
