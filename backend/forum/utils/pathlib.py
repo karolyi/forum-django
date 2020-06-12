@@ -56,8 +56,10 @@ class Path(PathBase):
 
         Return the ensured `self`+`relative_path` for when done.
         """
-        if isinstance(relative_path, Iterable):  # str is Iterable
+        if type(relative_path) is str:
             relative_path = Path(relative_path)
+        elif isinstance(relative_path, Iterable):  # str is Iterable
+            relative_path = Path(*relative_path)
         if relative_path.is_absolute():
             raise ValueError(f'{relative_path!r} must not be absolute.')
         if not self.is_dir():
