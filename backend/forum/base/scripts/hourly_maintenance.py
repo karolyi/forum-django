@@ -57,16 +57,10 @@ def _clean_old_sizes():
     'Go through the sized images and delete them if they are old.'
     for size in settings.CDN['MAXWIDTH']:
         root_size = settings.CDN['PATH_SIZES'][size]  # type: Path
-        iterator = root_size.rglob(pattern='*')
-        while True:
-            try:
-                path = next(iterator)  # type: Path
-            except FileNotFoundError as exc:
-                if exc.args[0] != 2:
-                    raise
-                continue
-            except StopIteration:
-                break
+        path_list = list(
+            path for path in root_size.rglob(pattern='*')
+            if path.is_symlink() or path.is_file())
+        for path in path_list:  # type: Path
             mtime = path.lstat().st_mtime if path.is_symlink() \
                 else path.stat().st_mtime
             if mtime > ONE_WEEK_AGO and path.exists():

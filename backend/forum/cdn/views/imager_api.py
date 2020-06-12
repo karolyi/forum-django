@@ -89,7 +89,7 @@ class ResizeImageView(RedirectView):
         """
         requested_size, *cdn_metapath = self._path_elements
         size_root = Path(settings.CDN['PATH_SIZES']['original'])
-        original_path = size_root.joinpath(cdn_metapath)
+        original_path = size_root.joinpath(*cdn_metapath)
         if original_path.exists():
             return original_path
         size_root.ensure_parentdirs(
