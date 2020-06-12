@@ -1,5 +1,5 @@
 from datetime import datetime
-from logging import DEBUG, basicConfig
+from logging import DEBUG, basicConfig, getLogger
 from sys import stderr
 from time import time
 
@@ -10,6 +10,7 @@ from forum.utils.pathlib import Path
 
 ONE_WEEK_AGO = time() - 60 * 60 * 24 * 7
 PATH_SIZES_SET = set(settings.CDN['PATH_SIZES'].values())
+_LOGGER = getLogger(name=__name__)
 
 
 def _clear_templocks():
@@ -42,13 +43,13 @@ def _clean_watermarked_originals():
                 to_delete = False
                 continue
             path_date = datetime.fromtimestamp(mtime).strftime('%c')
+            _LOGGER.info(msg=f'Removing {size_path!r}: {path_date}')
             size_path.remove_up_to(parent=root_size)
-            print(f'Removed {size_path!r}: {path_date}')
         if to_delete:
             abs_path = root_original.joinpath(relative)
             path_date = \
                 datetime.fromtimestamp(abs_path.stat().st_mtime).strftime('%c')
-            print(f'Removing {size_path!r}: {path_date}')
+            _LOGGER.info(msg=f'Removing {size_path!r}: {path_date}')
             abs_path.remove_up_to(parent=root_original)
 
 
@@ -72,7 +73,7 @@ def _clean_old_sizes():
                 # is newer AND resolves as a symlink
                 continue
             path_date = datetime.fromtimestamp(mtime).strftime('%c')
-            print(f'Removing {path!r}: {path_date}')
+            _LOGGER.info(msg=f'Removing {path!r}: {path_date}')
             path.remove_up_to(parent=root_size)
 
 
@@ -80,5 +81,7 @@ def run():
     'Run maintenance.'
     basicConfig(stream=stderr, level=DEBUG)
     _clear_templocks()
+    _LOGGER.info(msg='====== Clear watermarked originals:')
     _clean_watermarked_originals()
+    _LOGGER.info(msg='====== Clear old sizes:')
     _clean_old_sizes()
