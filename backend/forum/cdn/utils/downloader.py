@@ -7,6 +7,7 @@ from re import compile as re_compile
 from typing import Optional, Tuple
 from urllib.parse import unquote
 
+from django.conf import settings
 from django.utils.functional import cached_property
 from hyperlink import URL
 from PIL import UnidentifiedImageError
@@ -21,7 +22,7 @@ from forum.utils.pathlib import Path
 
 from ..models import Image, ImageUrl, MissingImage
 from .image import convert_image
-from .paths import get_path_with_ensured_dirs, set_cdn_fileattrs
+from .paths import set_cdn_fileattrs
 
 MISSING_ORIGSRC_LEN = MissingImage._meta.get_field('src').max_length
 MAXLEN_IMAGEURL = ImageUrl._meta.get_field('orig_src').max_length
@@ -147,24 +148,36 @@ class CdnImageDownloader(object):
         prefix = prefix[:self._MAXLEN_FILENAME - len(enforced_extension) - 1]
         return '.'.join([prefix, enforced_extension]), mime_type
 
-    def _get_stored_filename(self, abs_dir: Path, filename: str) -> str:
+    def _get_stored_filename(self, abs_path: Path) -> str:
         'Return the final filename part of the fully stored CDN path.'
+        filename = abs_path.name
         while True:
-            abspath = abs_dir.joinpath(filename)
-            if not abspath.exists():
+            if not abs_path.exists():
                 break
             if len(filename) >= MAX_FILENAME_SIZE - 9:
                 filename = filename[9:]
             filename = '-'.join((get_random_safestring(length=8), filename))
         while True:
-            temp_path = abs_dir.joinpath(get_random_safestring())
+            temp_path = abs_path.parent.joinpath(get_random_safestring())
             if not temp_path.exists():
                 break
         temp_path.write_bytes(data=self._downloaded_content.getvalue())
         set_cdn_fileattrs(path=temp_path)
-        temp_path.rename(target=abspath)
-        _LOGGER.debug(msg=f'Stored {self._url_source!r} into {abspath!r}.')
-        return abspath.name
+        temp_path.rename(target=abs_path)
+        _LOGGER.debug(msg=f'Stored {self._url_source!r} into {abs_path!r}.')
+        return abs_path.name
+
+    def _get_saved_cdn_metapath(self, filename: str) -> Path:
+        'Return the saved CDN metapath.'
+        cdn_metaparts = (
+            *self._timestamp.date().isoformat().split('-'), filename)
+        size_root = Path(settings.CDN['PATH_SIZES']['downloaded'])
+        abs_path = size_root.ensure_parentdirs(
+            relative_path=cdn_metaparts,
+            mode=settings.CDN['POSIXFLAGS']['mode_dir'],
+            gid=settings.CDN['POSIXFLAGS']['gid'])
+        filename = self._get_stored_filename(abs_path=abs_path)
+        return Path(cdn_metaparts)
 
     def _get_cdn_image(self) -> Image:
         'Return a previously or newly created `Image`.'
@@ -177,12 +190,7 @@ class CdnImageDownloader(object):
                 msg=f'{self._url_source!r} already downloaded to '
                 f'{cdn_image.cdn_path!r}.')
             return cdn_image
-        path_parts = (
-            'downloaded', *self._timestamp.date().isoformat().split('-'), '')
-        abs_dir = get_path_with_ensured_dirs(path_elements=path_parts)
-        filename = \
-            self._get_stored_filename(abs_dir=abs_dir, filename=filename)
-        cdn_metapath = Path(*path_parts[1:-1], filename)
+        cdn_metapath = self._get_saved_cdn_metapath(filename=filename)
         return Image.objects.create(
             mime_type=mime_type, cdn_path=cdn_metapath,
             file_hash=self._hash_downloaded, width=self._loaded_image.width,

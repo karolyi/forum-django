@@ -10,8 +10,7 @@ from forum.utils.locking import TempLock
 from forum.utils.pathlib import Path
 
 from ..utils.image import convert_image
-from ..utils.paths import (
-    get_path_with_ensured_dirs, save_new_image, set_cdn_fileattrs)
+from ..utils.paths import save_new_image, set_cdn_fileattrs
 
 IMG_404_URL = f'{settings.ALLOWED_HOSTS[0]}{settings.IMG_404_PATH}'
 RESIZED_PREFIXES = \
@@ -76,17 +75,27 @@ class ResizeImageView(RedirectView):
     @cached_property
     def _new_absolute_path(self) -> Path:
         'Return a created recursive CDN path while setting mode/gid.'
-        return get_path_with_ensured_dirs(path_elements=self._path_elements)
+        requested_size, *cdn_metapath = self._path_elements
+        size_root = Path(settings.CDN['PATH_SIZES'][requested_size])
+        return size_root.ensure_parentdirs(
+            relative_path=cdn_metapath,
+            mode=settings.CDN['POSIXFLAGS']['mode_dir'],
+            gid=settings.CDN['POSIXFLAGS']['gid'])
 
     def _get_watermarked_original_path(self) -> Path:
         """
         Return the created watermarked original `Path`while optionally
         locked.
         """
-        original_path = get_path_with_ensured_dirs(
-            path_elements=['original', *self._path_elements[1:]])
+        requested_size, *cdn_metapath = self._path_elements
+        size_root = Path(settings.CDN['PATH_SIZES']['original'])
+        original_path = size_root.joinpath(cdn_metapath)
         if original_path.exists():
             return original_path
+        size_root.ensure_parentdirs(
+            relative_path=cdn_metapath,
+            mode=settings.CDN['POSIXFLAGS']['mode_dir'],
+            gid=settings.CDN['POSIXFLAGS']['gid'])
         image, save_kwargs, *_ = convert_image(
             image=self._image, size=self._image.size, do_watermark=True)
         save_new_image(
@@ -99,12 +108,12 @@ class ResizeImageView(RedirectView):
         Return (and create) the path of the watermarked original image.
         Optionally lock if necessary.
         """
-        requested_size = self._path_elements[0]
+        requested_size, *cdn_metapath = self._path_elements
         if requested_size == 'original':
             return self._get_watermarked_original_path()
         # Another size was requested originally, locking is necessary
         lock_name = LOCK_PREFIX + slugify(
-            input_data='-'.join(('original', *self._path_elements[1:])))
+            input_data='-'.join(('original', *cdn_metapath)))
         with TempLock(name=lock_name):
             return self._get_watermarked_original_path()
 

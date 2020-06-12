@@ -7,9 +7,9 @@ from pathlib import Path as PathBase
 from pathlib import PosixPath as PosixPathBase
 from pathlib import WindowsPath as WindowsPathBase
 from threading import RLock
-from typing import Optional, Union
+from typing import Iterable, Optional, Union
 
-_LOCK = RLock()
+_UMASK_LOCK = RLock()
 
 
 class Path(PathBase):
@@ -25,12 +25,12 @@ class Path(PathBase):
         self._init()
         return self
 
-    def _ensure_dirs_inner(
+    def _ensure_parentdirs_inner(
             self, relative_path: Path, mode: Optional[int] = None,
             uid: Optional[int] = None, gid: Optional[int] = None) -> Path:
-        'Do the work for `ensure_dirs` while threadlocked or not.'
+        'Do the work for `ensure_parentdirs` while threadlocked or not.'
         new_path = self
-        for part in relative_path.parts[:-1]:
+        for part in relative_path.parent.parts:
             new_path = new_path.joinpath(part)
             if new_path.exists():
                 continue
@@ -40,13 +40,14 @@ class Path(PathBase):
             chown(
                 path=new_path, uid=-1 if uid is None else uid,
                 gid=-1 if gid is None else gid)
-        return new_path.joinpath(relative_path.parts[-1])
+        return new_path.joinpath(relative_path.name)
 
-    def ensure_dirs(
-            self, relative_path: Union[Path, str], mode: Optional[int] = None,
-            uid: Optional[int] = None, gid: Optional[int] = None) -> Path:
+    def ensure_parentdirs(
+            self, relative_path: Union[Path, str, Iterable],
+            mode: Optional[int] = None, uid: Optional[int] = None,
+            gid: Optional[int] = None) -> Path:
         """
-        Ensure the directories up until the last part (the file) in
+        Ensure the directories up until the last part (the filename) in
         self, starting from `self`. If `mode`, `uid` and `gid` is
         passed, the ownership and modes will be set on the
         *newly created* directories. If you pass `mode`, `uid` and
@@ -55,21 +56,23 @@ class Path(PathBase):
 
         Return the ensured `self`+`relative_path` for when done.
         """
-        if type(relative_path) is str:
+        if isinstance(relative_path, Iterable):  # str is Iterable
             relative_path = Path(relative_path)
+        if relative_path.is_absolute():
+            raise ValueError(f'{relative_path!r} must not be absolute.')
         if not self.is_dir():
             raise ValueError(f'{self!r} must be a directory.')
         if mode is None:
-            return self._ensure_dirs_inner(
+            return self._ensure_parentdirs_inner(
                 relative_path=relative_path, mode=mode, uid=uid, gid=gid)
         try:
-            _LOCK.acquire()
+            _UMASK_LOCK.acquire()
             old_umask = umask(0o777 - mode)
-            return self._ensure_dirs_inner(
+            return self._ensure_parentdirs_inner(
                 relative_path=relative_path, mode=mode, uid=uid, gid=gid)
         finally:
             umask(old_umask)
-            _LOCK.release()
+            _UMASK_LOCK.release()
 
     def get_relative(self, to: Path) -> Path:
         """
