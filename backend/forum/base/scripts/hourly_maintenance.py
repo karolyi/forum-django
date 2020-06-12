@@ -1,6 +1,9 @@
+from contextlib import contextmanager
 from datetime import datetime
-from logging import DEBUG, basicConfig, getLogger
-from sys import stderr
+from io import TextIOWrapper
+from logging import (
+    DEBUG, Formatter, Logger, RootLogger, StreamHandler, getLogger)
+from tempfile import TemporaryFile
 from time import time
 
 from django.conf import settings
@@ -11,6 +14,7 @@ from forum.utils.pathlib import Path
 ONE_WEEK_AGO = time() - 60 * 60 * 24 * 7
 PATH_SIZES_SET = set(settings.CDN['PATH_SIZES'].values())
 _LOGGER = getLogger(name=__name__)
+_ROOTLOGGER = Logger.root  # type: RootLogger
 
 
 def _clear_templocks():
@@ -71,11 +75,29 @@ def _clean_old_sizes():
             path.remove_up_to(parent=root_size)
 
 
+@contextmanager
+def _setup_logging() -> TextIOWrapper:
+    with TemporaryFile(mode='r+') as fd:
+        stream_handler = StreamHandler(stream=fd)
+        stream_handler.setFormatter(fmt=Formatter(
+            fmt='%(levelname)s:%(asctime)s:%(name)s:%(message)s'))
+        _ROOTLOGGER.addHandler(hdlr=stream_handler)
+        _ROOTLOGGER.setLevel(level=DEBUG)
+        try:
+            yield fd
+        finally:
+            _ROOTLOGGER.removeHandler(hdlr=stream_handler)
+            fd.seek(0)
+            lines = fd.readlines()
+            if len(lines) > 2:
+                print(''.join(lines))
+
+
 def run():
     'Run maintenance.'
-    basicConfig(stream=stderr, level=DEBUG)
-    _clear_templocks()
-    _LOGGER.info(msg='====== Clear watermarked originals:')
-    _clean_watermarked_originals()
-    _LOGGER.info(msg='====== Clear old sizes:')
-    _clean_old_sizes()
+    with _setup_logging():
+        _clear_templocks()
+        _LOGGER.info(msg='====== Clear watermarked originals:')
+        _clean_watermarked_originals()
+        _LOGGER.info(msg='====== Clear old sizes:')
+        _clean_old_sizes()
