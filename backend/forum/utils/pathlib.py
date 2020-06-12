@@ -114,6 +114,7 @@ class Path(PathBase):
                     return
             else:
                 iter_self.unlink()
+                _LOGGER.debug(msg=f'Removed {iter_self!r}')
             iter_self = iter_self.parent
 
 

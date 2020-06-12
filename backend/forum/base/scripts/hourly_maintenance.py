@@ -49,7 +49,7 @@ def _clean_watermarked_originals():
             abs_path = root_original.joinpath(relative)
             path_date = \
                 datetime.fromtimestamp(abs_path.stat().st_mtime).strftime('%c')
-            _LOGGER.info(msg=f'Removing {size_path!r}: {path_date}')
+            _LOGGER.info(msg=f'Removing {abs_path!r}: {path_date}')
             abs_path.remove_up_to(parent=root_original)
 
 
