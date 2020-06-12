@@ -1,15 +1,19 @@
 from __future__ import annotations
 
+from logging import Logger, getLogger
 from os import chown
 from os import name as os_name
 from os import umask
 from pathlib import Path as PathBase
 from pathlib import PosixPath as PosixPathBase
 from pathlib import WindowsPath as WindowsPathBase
+from platform import system
 from threading import RLock
 from typing import Iterable, Optional, Union
 
 _UMASK_LOCK = RLock()
+_CODE_OSERROR_DIRECTORY_NOT_EMPTY = 66 if system() == 'FreeBSD' else 39
+_LOGGER = getLogger(name=__name__)  # type: Logger
 
 
 class Path(PathBase):
@@ -90,6 +94,25 @@ class Path(PathBase):
             items_from = items_from[1:]
             items_to = items_to[1:]
         return Path(*('..' for x in range(1, len(items_from))), *items_to)
+
+    def remove_up_to(self, parent: Path):
+        'Remove the paths in `self` until the passed `parent`.'
+        if not self.is_absolute() or not parent.is_absolute():
+            raise ValueError(f'{self!r} and {parent!r} must be absolute.')
+        self.relative_to(parent)
+        iter_self = self
+        while iter_self != parent:
+            if iter_self.is_dir():
+                try:
+                    iter_self.rmdir()
+                    _LOGGER.debug(msg=f'Removed {iter_self!r}')
+                except OSError as exc:
+                    if exc.args[0] != _CODE_OSERROR_DIRECTORY_NOT_EMPTY:
+                        raise
+                    return
+            else:
+                iter_self.unlink()
+            iter_self = iter_self.parent
 
 
 class WindowsPath(Path, WindowsPathBase):

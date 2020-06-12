@@ -6,7 +6,7 @@ from django.conf import settings
 from forum.utils.locking import PATH_TEMPLOCK_DIR
 from forum.utils.pathlib import Path
 
-one_week_ago = time() - 60 * 60 * 24 * 7
+ONE_WEEK_AGO = time() - 60 * 60 * 24 * 7
 PATH_SIZES_SET = set(settings.CDN['PATH_SIZES'].values())
 
 
@@ -18,89 +18,63 @@ def _clear_templocks():
             path.unlink()
 
 
-def _destroy_path(path: Path):
-    'Delete a directory or file. It must exist.'
-    filetype = 'symlink' if path.is_symlink() else \
-        'file' if path.is_file() else \
-        'directory' if path.is_dir() else 'unknown type'
-    stat = path.lstat() if filetype == 'symlink' else path.stat()
-    path_date = datetime.fromtimestamp(stat.st_mtime).strftime('%c')
-    if filetype != 'directory':
-        path.unlink()
-    else:
-        try:
-            path.rmdir()
-        except OSError as exc:
-            if exc.args[0] != 66:
-                raise
-            return
-    print(f'Removed {filetype} {path!r} ({path_date})')
+def _clean_watermarked_originals():
+    """
+    Clean up `original` watermarked files if they are old AND none of
+    the symlinks within the CDN pointing to them are old.
+    """
+    root_original = settings.CDN['PATH_SIZES']['original']  # type: Path
+    relative_list = list(
+        path.relative_to(root_original)
+        for path in root_original.rglob(pattern='*')
+        if path.is_file() and path.stat().st_mtime <= ONE_WEEK_AGO)
+    for relative in relative_list:
+        to_delete = True
+        for size in settings.CDN['MAXWIDTH']:
+            root_size = settings.CDN['PATH_SIZES'][size]  # type: Path
+            size_path = root_size.joinpath(relative)
+            if not size_path.is_symlink():
+                continue
+            mtime = size_path.lstat().st_mtime
+            if mtime > ONE_WEEK_AGO:
+                to_delete = False
+                continue
+            path_date = datetime.fromtimestamp(mtime).strftime('%c')
+            size_path.remove_up_to(parent=root_size)
+            print(f'Removed {size_path!r}: {path_date}')
+        if to_delete:
+            abs_path = root_original.joinpath(relative)
+            path_date = \
+                datetime.fromtimestamp(abs_path.stat().st_mtime).strftime('%c')
+            abs_path.remove_up_to(parent=root_original)
+            print(f'Removed {size_path!r}: {path_date}')
 
 
-def _unlink_parents(path: Path):
-    'Unlink parents of the path.'
-    while True:
-        path = path.parent.resolve()
-        if path in PATH_SIZES_SET:
-            return
-        if not path.exists():
-            continue
-        _destroy_path(path=path)
-
-
-def _unlink_path_and_parents(path: Path):
-    'Unlink a file and its containing directories without errors.'
-    path = path.resolve()
-    if not path.exists():
-        return
-    try:
-        path.relative_to(settings.CDN['PATH_ROOT'])
-    except ValueError:
-        return
-    _destroy_path(path=path)
-    _unlink_parents(path=path)
-
-
-def _clear_old_converted_sized_cdnfiles():
-    'Delete old CDN files that were a result of a conversion.'
+def _clean_old_sizes():
+    'Go through the sized images and delete them if they are old.'
     for size in settings.CDN['MAXWIDTH']:
-        size_path = settings.CDN['PATH_SIZES'][size]  # type: Path
-        iterator = size_path.rglob(pattern='*')
+        root_size = settings.CDN['PATH_SIZES'][size]  # type: Path
+        iterator = root_size.rglob(pattern='*')
         while True:
             try:
                 path = next(iterator)  # type: Path
             except FileNotFoundError as exc:
                 if exc.args[0] != 2:
                     raise
-                # Directory has been removed in a former iteration
-                continue
             except StopIteration:
                 break
-            if path.is_symlink():
-                if path.lstat().st_mtime <= one_week_ago:
-                    _unlink_path_and_parents(path=path)
-            elif path.is_file() or path.is_dir():
-                if path.stat().st_mtime <= one_week_ago:
-                    _unlink_path_and_parents(path=path)
-
-
-def _clean_watermarked_originals():
-    'Clean up `original` watermarked files.'
-    original_path = settings.CDN['PATH_SIZES']['original']  # type: Path
-    relative_list = list(
-        path.relative_to(original_path)
-        for path in original_path.rglob(pattern='*')
-        if path.exists() and path.stat().st_mtime <= one_week_ago)
-    for relative in relative_list:
-        for size in settings.CDN['MAXWIDTH']:
-            size_path = settings.CDN['PATH_SIZES'][size]  # type: Path
-            size_path = size_path.joinpath(relative)
-            _unlink_path_and_parents(path=size_path)
-        _unlink_path_and_parents(path=original_path.joinpath(relative))
+            mtime = path.lstat().st_mtime if path.is_symlink() \
+                else path.stat().st_mtime
+            if mtime > ONE_WEEK_AGO and path.exists():
+                # is newer AND resolves as a symlink
+                continue
+            path_date = datetime.fromtimestamp(mtime).strftime('%c')
+            path.remove_up_to(parent=root_size)
+            print(f'Removed {path!r}: {path_date}')
 
 
 def run():
     'Run maintenance.'
     _clear_templocks()
     _clean_watermarked_originals()
-    _clear_old_converted_sized_cdnfiles()
+    _clean_old_sizes()
