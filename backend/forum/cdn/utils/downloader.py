@@ -171,13 +171,13 @@ class CdnImageDownloader(object):
         'Return the saved CDN metapath.'
         cdn_metaparts = (
             *self._timestamp.date().isoformat().split('-'), filename)
-        size_root = Path(settings.CDN['PATH_SIZES']['downloaded'])
+        size_root = settings.CDN['PATH_SIZES']['downloaded']  # type: Path
         abs_path = size_root.ensure_parentdirs(
             relative_path=cdn_metaparts,
             mode=settings.CDN['POSIXFLAGS']['mode_dir'],
             gid=settings.CDN['POSIXFLAGS']['gid'])
         filename = self._get_stored_filename(abs_path=abs_path)
-        return Path(cdn_metaparts)
+        return Path(*cdn_metaparts)
 
     def _get_cdn_image(self) -> Image:
         'Return a previously or newly created `Image`.'
