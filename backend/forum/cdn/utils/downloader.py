@@ -79,7 +79,7 @@ class CdnImageDownloader(object):
         try:
             r = get(url=self._url_source, verify=False, timeout=10)
         except Exception as e:
-            _LOGGER.error(msg=f'_downloaded_content - caught error: f{e}')
+            _LOGGER.error(msg=f'_downloaded_content - caught error: {e}')
             return None
         if r.status_code != 200:
             _LOGGER.error(
