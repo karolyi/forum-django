@@ -157,6 +157,7 @@ class CdnImageDownloader(object):
             if len(filename) >= MAX_FILENAME_SIZE - 9:
                 filename = filename[9:]
             filename = '-'.join((get_random_safestring(length=8), filename))
+            abs_path = abs_path.parent.joinpath(filename)
         while True:
             temp_path = abs_path.parent.joinpath(get_random_safestring())
             if not temp_path.exists():
