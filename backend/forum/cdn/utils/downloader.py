@@ -178,7 +178,7 @@ class CdnImageDownloader(object):
             mode=settings.CDN['POSIXFLAGS']['mode_dir'],
             gid=settings.CDN['POSIXFLAGS']['gid'])
         filename = self._get_stored_filename(abs_path=abs_path)
-        return Path(*cdn_metaparts)
+        return Path(*cdn_metaparts).parent.joinpath(filename)
 
     def _get_cdn_image(self) -> Image:
         'Return a previously or newly created `Image`.'
