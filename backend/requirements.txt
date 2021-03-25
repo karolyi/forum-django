@@ -19,7 +19,7 @@ MarkupSafe==1.1.1
 mysqlclient==1.4.6
 Pillow==7.1.2
 pytz==2020.1
-PyYAML==5.3.1
+PyYAML==5.4
 redis==3.5.3
 requests==2.23.0
 rjsmin==1.1.0
